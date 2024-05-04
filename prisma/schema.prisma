@@ -7,11 +7,19 @@ datasource db {
     url      = env("DATABASE_URI")
 }
 
-model Leaderboard {
-    id       String @id @map("_id") @db.ObjectId
-    x_id     String @unique
-    username String @unique
-    posts    Int    @default(0)
-    views    Int    @default(0)
-    likes    Int    @default(0)
+model User {
+    id          String @id @default(auto()) @map("_id") @db.ObjectId
+    profileId   String @unique
+    username    String @unique
+    displayName String
+    stat        Stat?
+}
+
+model Stat {
+    id     String @id @default(auto()) @map("_id") @db.ObjectId
+    posts  Int    @default(0)
+    views  Int    @default(0)
+    likes  Int    @default(0)
+    user   User   @relation(references: [id], fields: [userId])
+    userId String @unique @db.ObjectId
 }
