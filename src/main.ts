@@ -11,6 +11,7 @@ async function bootstrap() {
     origin: [
       'http://localhost:3000',
       `http://localhost:${PORT}`,
+      'https://memegoat.onrender.com'
     ],
     credentials: true,
     optionsSuccessStatus: 200,
@@ -21,6 +22,7 @@ async function bootstrap() {
   const swaggerOptions = new DocumentBuilder()
     .setTitle('Memegoat API')
     .setVersion('1.2.7')
+    .addServer(`https://memegoat.onrender.com/`, 'Staging')
     .addServer(`http://localhost:${PORT}/`, 'Local')
     .addBearerAuth()
     .build()
