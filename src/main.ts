@@ -1,25 +1,22 @@
 import * as express from 'express'
 import { AppModule } from './app.module'
 import { NestFactory } from '@nestjs/core'
-import { ValidationPipe } from '@nestjs/common'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 
 async function bootstrap() {
-  const PORT: number = parseInt(process.env.PORT, 10) || 2005
+  const PORT: number = parseInt(process.env.PORT, 10) || 2007
   const app = await NestFactory.create(AppModule)
-  const expressApp = app.getHttpAdapter().getInstance()
 
   app.enableCors({
     origin: [
       'http://localhost:3000',
+      `http://localhost:${PORT}`,
     ],
     credentials: true,
     optionsSuccessStatus: 200,
     methods: 'GET',
   })
-  expressApp.set('trust proxy', true)
   app.use(express.json({ limit: 100 << 20 }))
-  app.useGlobalPipes(new ValidationPipe())
 
   const swaggerOptions = new DocumentBuilder()
     .setTitle('Memegoat API')

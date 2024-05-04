@@ -1,0 +1,17 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "mongodb"
+    url      = env("DATABASE_URI")
+}
+
+model Leaderboard {
+    id       String @id @map("_id") @db.ObjectId
+    x_id     String @unique
+    username String @unique
+    posts    Int    @default(0)
+    views    Int    @default(0)
+    likes    Int    @default(0)
+}
