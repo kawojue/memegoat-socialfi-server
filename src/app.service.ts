@@ -16,20 +16,18 @@ export class AppService {
     try {
       const profileId = profile.id?.toString()
 
-      let user = await this.prisma.user.findFirst({
+      let user = await this.prisma.user.findUnique({
         where: { profileId }
       })
 
-      if (user) {
-        if (user.username !== profile.username || user.displayName !== user.displayName) {
-          await this.prisma.user.update({
-            where: { profileId },
-            data: {
-              username: profile.username,
-              displayName: profile.displayName,
-            }
-          })
-        }
+      if (user && (user.username !== profile.username || user.displayName !== user.displayName)) {
+        await this.prisma.user.update({
+          where: { profileId },
+          data: {
+            username: profile.username,
+            displayName: profile.displayName,
+          }
+        })
       }
 
       if (!user) {
