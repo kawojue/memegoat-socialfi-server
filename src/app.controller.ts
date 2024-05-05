@@ -18,6 +18,11 @@ export class AppController {
 
   @Get('x/callback')
   async xCallback(@Req() req: Request, @Res() res: Response) {
-    res.redirect('https://memegoat.io/challenges')
+    res.redirect('http://localhost:3000/challenges')
+  }
+
+  @Get('/check')
+  async check(@Res() res: Response) {
+    return await this.appService.check(res)
   }
 }

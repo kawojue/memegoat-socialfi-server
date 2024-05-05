@@ -13,6 +13,14 @@ model User {
     username    String @unique
     displayName String
     stat        Stat?
+    posts       Post[]
+}
+
+model Post {
+    id     String @id @default(auto()) @map("_id") @db.ObjectId
+    postId String @unique
+    user   User   @relation(references: [id], fields: [userId])
+    userId String @unique @db.ObjectId
 }
 
 model Stat {
