@@ -140,24 +140,41 @@ export class AppService {
   }
 
   async leaderboard(res: Response) {
-    const users = await this.prisma.user.findMany({
-      select: {
-        username: true,
-        displayName: true,
-        tweets: {
-          select: { impression: true }
+    try {
+      const users = await this.prisma.user.findMany({
+        select: {
+          tweets: true,
+          username: true,
+          displayName: true,
+        },
+      })
+
+      const leaderboardData = []
+      for (const user of users) {
+        let impressions = 0
+
+        for (const tweet of user.tweets) {
+          if (tweet.referenced) {
+            impressions += tweet.like + tweet.retweet + tweet.reply + tweet.impression + tweet.quote
+          }
         }
-      },
-    })
 
-    const usersWithImpressionSum = users.map(user => ({
-      ...user,
-      tweets: user.tweets.length,
-      impressions: user.tweets.reduce((sum, tweet) => sum + tweet.impression, 0),
-    }))
+        if (impressions > 0) {
+          leaderboardData.push({
+            impressions,
+            username: user.username,
+            tweets: user.tweets.length,
+            displayName: user.displayName,
+          })
+        }
+      }
 
-    usersWithImpressionSum.sort((a, b) => b.impressions - a.impressions)
+      leaderboardData.sort((a, b) => b.impressions - a.impressions)
 
-    this.response.sendSuccess(res, StatusCodes.OK, { data: usersWithImpressionSum })
+      this.response.sendSuccess(res, StatusCodes.OK, { data: leaderboardData })
+    } catch (err) {
+      console.error(err)
+      this.response.sendError(res, StatusCodes.InternalServerError, 'Something went wrong')
+    }
   }
 }
