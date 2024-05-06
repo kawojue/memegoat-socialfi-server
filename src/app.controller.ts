@@ -32,4 +32,9 @@ export class AppController {
   async leaderboard(@Res() res: Response) {
     await this.appService.leaderboard(res)
   }
+
+  @Get('/metrics')
+  async metrics(@Res() res: Response) {
+    await this.appService.metrics(res)
+  }
 }
