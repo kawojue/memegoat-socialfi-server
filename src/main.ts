@@ -6,20 +6,20 @@ import { NestFactory } from '@nestjs/core'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 
 async function bootstrap() {
-  const PORT: number = parseInt(process.env.PORT, 10) || 2007
+  const PORT: number = parseInt(process.env.PORT, 10) || 2005
   const app = await NestFactory.create(AppModule)
 
   app.enableCors({
-    origin: 'http://localhost:3000',
-    // origin: [
-    //   'http://localhost:3000',
-    //   // `http://localhost:${PORT}`,
-    //   // 'https://memegoat.onrender.com',
-    // ],
-    credentials: true,
-    optionsSuccessStatus: 200,
-    methods: "GET, DELETE, POST, PATCH"
+    origin: [
+      'http://localhost:3000',
+      `http://localhost:${PORT}`,
+      'https://memegoat.onrender.com',
+      'https://memegoat.io',
+    ],
+    methods: 'GET,OPTIONS',
+    credentials: true
   })
+
   app.use(express.json({ limit: 1 << 20 }))
   app.use(session({
     resave: false,

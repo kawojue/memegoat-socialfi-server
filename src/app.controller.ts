@@ -12,17 +12,24 @@ export class AppController {
     return this.appService.getHello()
   }
 
-  @Get('x')
+  @Get('/auth/x')
   @UseGuards(AuthGuard('twitter'))
   async xLogin() { }
 
-  @Get('x/callback')
+  @Get('/auth/x/callback')
+  @UseGuards(AuthGuard('twitter'))
   async xCallback(@Req() req: Request, @Res() res: Response) {
-    res.redirect('http://localhost:3000/challenges')
+    const user = await this.appService.auth(res, req)
+
+    if (!user) {
+      res.redirect('http://localhost:3000/login')
+    } else {
+      res.redirect('http://localhost:3000/challenges')
+    }
   }
 
   @Get('/check')
   async check(@Res() res: Response) {
-    return await this.appService.check(res)
+    await this.appService.check(res)
   }
 }

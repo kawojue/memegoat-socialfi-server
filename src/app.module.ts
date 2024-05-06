@@ -5,6 +5,7 @@ import { AppController } from './app.controller'
 import { PassportModule } from '@nestjs/passport'
 import { PrismaService } from 'prisma/prisma.service'
 import { ResponseService } from 'lib/response.service'
+import { SessionSerializer } from './jwt/session.serialize'
 import { LeaderboardModule } from './leaderboard/leaderboard.module'
 
 @Module({
@@ -13,6 +14,13 @@ import { LeaderboardModule } from './leaderboard/leaderboard.module'
     PassportModule.register({ defaultStrategy: 'twitter' })
   ],
   controllers: [AppController],
-  providers: [AppService, XStrategy, PrismaService, ResponseService],
+  providers: [
+    AppService,
+    XStrategy,
+    PrismaService,
+    ResponseService,
+    SessionSerializer,
+  ],
 })
+
 export class AppModule { }

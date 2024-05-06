@@ -5,19 +5,22 @@ import { AppService } from 'src/app.service'
 import { PassportStrategy } from '@nestjs/passport'
 
 @Injectable()
-export class XStrategy extends PassportStrategy(Strategy, 'twitter') {
+export class XStrategy extends PassportStrategy(Strategy) {
     constructor(private appService: AppService) {
         super({
             consumerKey: process.env.X_API_KEY,
             consumerSecret: process.env.X_API_SECRET,
-            callbackURL: '/x/callback',
+            callbackURL: '/auth/x/callback',
             passReqToCallback: true,
-            failureRedirect: '/login'
         })
     }
 
-    async validate(req: Request, token: string, tokenSecret: string, profile: any, done: any) {
-        const user = await this.appService.auth(profile)
+    async validate(req: any, accessToken: string, refreshToken: string, profile: any, done: Function) {
+        const user = {
+            accessToken,
+            refreshToken,
+            profile,
+        }
         done(null, user)
     }
 }

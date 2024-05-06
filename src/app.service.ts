@@ -1,9 +1,8 @@
-const Twit = require('twit')
 const Twitter = require('twitter-v2')
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'prisma/prisma.service'
 import { ResponseService } from 'lib/response.service'
-import { Response } from 'express'
+import { Request, Response } from 'express'
 import { StatusCodes } from 'enums/statusCodes'
 import { TwitterApi, TwitterApiReadOnly } from 'twitter-api-v2'
 
@@ -12,7 +11,6 @@ export class AppService {
   private readonly twit: TwitterApi
   private readonly x: TwitterApiReadOnly
   private readonly tw: any
-  private readonly t: any
 
   constructor(
     private readonly prisma: PrismaService,
@@ -20,13 +18,6 @@ export class AppService {
   ) {
     this.twit = new TwitterApi(process.env.X_BEARER_TOKEN)
     this.x = this.twit.readOnly
-
-    this.t = new Twit({
-      access_token: process.env.X_ACCESS_TOKEN,
-      access_token_secret: process.env.X_ACCESS_TOKEN_SECRET,
-      consumer_key: process.env.X_API_KEY,
-      consumer_secret: process.env.X_API_SECRET,
-    })
     this.tw = new Twitter({
       // bearer_token: process.env.X_BEARER_TOKEN,
       access_token_key: process.env.X_ACCESS_TOKEN,
@@ -40,8 +31,11 @@ export class AppService {
     return 'Memegoat!'
   }
 
-  async auth(profile: any) {
+  async auth(res: Response, req: Request) {
     try {
+      // @ts-ignore
+      const profile = req.user?.profile
+
       const profileId = profile.id?.toString()
 
       let user = await this.prisma.user.findUnique({
@@ -79,15 +73,6 @@ export class AppService {
 
   async check(res: Response) {
     try {
-
-      // this.t.get('/2/users/1163109596610928641/followers', {}, (err, data, response) => {
-      //   if (err) {
-      //     console.error(err)
-      //     return
-      //   }
-      //   console.log(data)
-      // })
-
       const data = await this.tw.get('users/me')
 
       console.log(data)
@@ -96,6 +81,7 @@ export class AppService {
     } catch (err) {
       console.error(err)
       this.response.sendError(res, StatusCodes.InternalServerError, 'Somthing went wrong')
+      return
     }
   }
 }
