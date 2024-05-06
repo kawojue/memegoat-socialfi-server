@@ -1,9 +1,10 @@
 const Twitter = require('twitter-v2')
 import { Injectable } from '@nestjs/common'
-import { PrismaService } from 'prisma/prisma.service'
-import { ResponseService } from 'lib/response.service'
 import { Request, Response } from 'express'
 import { StatusCodes } from 'enums/statusCodes'
+import { PrismaService } from 'prisma/prisma.service'
+import { ResponseService } from 'lib/response.service'
+import { Cron, CronExpression } from '@nestjs/schedule'
 import { TwitterApi, TwitterApiReadOnly } from 'twitter-api-v2'
 
 @Injectable()
@@ -16,14 +17,14 @@ export class AppService {
     private readonly prisma: PrismaService,
     private readonly response: ResponseService,
   ) {
-    this.twit = new TwitterApi(process.env.X_BEARER_TOKEN)
+    this.twit = new TwitterApi(`${process.env.X_BEARER_TOKEN}`)
     this.x = this.twit.readOnly
+
     this.tw = new Twitter({
-      // bearer_token: process.env.X_BEARER_TOKEN,
-      access_token_key: process.env.X_ACCESS_TOKEN,
-      access_token_secret: process.env.X_ACCESS_TOKEN_SECRET,
       consumer_key: process.env.X_API_KEY,
       consumer_secret: process.env.X_API_SECRET,
+      access_token_key: process.env.X_ACCESS_TOKEN,
+      access_token_secret: process.env.X_ACCESS_TOKEN_SECRET,
     })
   }
 
@@ -60,8 +61,6 @@ export class AppService {
             displayName: profile.displayName,
           }
         })
-
-        await this.prisma.stat.create({ data: { user: { connect: { id: user.id } } } })
       }
 
       return user
@@ -70,18 +69,65 @@ export class AppService {
     }
   }
 
-
-  async check(res: Response) {
+  @Cron(CronExpression.EVERY_MINUTE)
+  async metrics() {
     try {
-      const data = await this.tw.get('users/me')
+      const users = await this.prisma.user.findMany()
 
-      console.log(data)
+      for (const user of users) {
+        const { data: { data: tweets } } = await this.x.v2.userTimeline(user.profileId, {
+          max_results: 100,
+          'tweet.fields': 'public_metrics'
+        })
 
-      this.response.sendSuccess(res, StatusCodes.OK, {})
+        for (const { id, public_metrics, text } of tweets) {
+          if (text.includes('@GoatCoinSTX')) {
+            const existingTweet = await this.prisma.tweet.findUnique({
+              where: { postId: id },
+            })
+            if (existingTweet) {
+              if (public_metrics.impression_count > existingTweet.impression) {
+                await this.prisma.tweet.update({
+                  where: { postId: id },
+                  data: { impression: public_metrics.impression_count },
+                })
+              }
+            } else {
+              await this.prisma.tweet.create({
+                data: {
+                  postId: id,
+                  impression: public_metrics.impression_count,
+                  user: { connect: { id: user.id } }
+                },
+              })
+            }
+          }
+        }
+      }
     } catch (err) {
       console.error(err)
-      this.response.sendError(res, StatusCodes.InternalServerError, 'Somthing went wrong')
-      return
     }
+  }
+
+  async leaderboard(res: Response) {
+    const users = await this.prisma.user.findMany({
+      select: {
+        username: true,
+        displayName: true,
+        tweets: {
+          select: { impression: true }
+        }
+      },
+    })
+
+    const usersWithImpressionSum = users.map(user => ({
+      ...user,
+      tweets: user.tweets.length,
+      impressions: user.tweets.reduce((sum, tweet) => sum + tweet.impression, 0),
+    }))
+
+    usersWithImpressionSum.sort((a, b) => b.impressions - a.impressions)
+
+    this.response.sendSuccess(res, StatusCodes.OK, { data: usersWithImpressionSum })
   }
 }

@@ -24,12 +24,12 @@ export class AppController {
     if (!user) {
       res.redirect('http://localhost:3000/login')
     } else {
-      res.redirect('http://localhost:3000/challenges')
+      res.redirect('http://localhost:3000/leaderboard')
     }
   }
 
-  @Get('/check')
-  async check(@Res() res: Response) {
-    await this.appService.check(res)
+  @Get('/leaderboard')
+  async leaderboard(@Res() res: Response) {
+    await this.appService.leaderboard(res)
   }
 }
