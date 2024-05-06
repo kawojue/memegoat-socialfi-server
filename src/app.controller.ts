@@ -4,7 +4,7 @@ import {
 import { AppService } from './app.service'
 import { Request, Response } from 'express'
 import { AuthGuard } from '@nestjs/passport'
-import { JwtAuthGuard } from './jwt/jwt-auth.guard'
+// import { JwtAuthGuard } from './jwt/jwt-auth.guard'
 
 @Controller()
 export class AppController {
@@ -44,13 +44,8 @@ export class AppController {
     await this.appService.leaderboard(res)
   }
 
-  @Get('/metrics')
-  async metrics(@Res() res: Response) {
-    await this.appService.metrics(res)
-  }
-
   @Get('/dashboard')
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   async dashboard(@Req() req: Request, @Res() res: Response) {
     await this.appService.dashboard(res, req)
   }

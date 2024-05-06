@@ -28,8 +28,8 @@ async function bootstrap() {
     saveUninitialized: false,
     secret: process.env.SESSION_SECRET!,
   }))
-  app.use(passport.initialize())
   app.use(passport.session())
+  app.use(passport.initialize())
 
   const swaggerOptions = new DocumentBuilder()
     .setTitle('Memegoat API')

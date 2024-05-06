@@ -12,6 +12,7 @@ model User {
     profileId   String   @unique
     username    String   @unique
     displayName String
+    avatar      String?
     tweets      Tweet[]
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt

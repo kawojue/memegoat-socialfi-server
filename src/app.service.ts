@@ -1,34 +1,18 @@
-
-const Twitter = require('twitter-v2')
 import { JwtService } from '@nestjs/jwt'
 import { Request, Response } from 'express'
+import { Injectable } from '@nestjs/common'
 import { StatusCodes } from 'enums/statusCodes'
 import { PrismaService } from 'prisma/prisma.service'
 import { ResponseService } from 'lib/response.service'
-import { HttpException, Injectable } from '@nestjs/common'
-import { TwitterApi, TwitterApiReadOnly } from 'twitter-api-v2'
 
 @Injectable()
 export class AppService {
-  private readonly twit: TwitterApi
-  private readonly x: TwitterApiReadOnly
-  private readonly tw: any
 
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
     private readonly response: ResponseService,
-  ) {
-    this.twit = new TwitterApi(`${process.env.X_BEARER_TOKEN}`)
-    this.x = this.twit.readOnly
-
-    this.tw = new Twitter({
-      consumer_key: process.env.X_API_KEY,
-      consumer_secret: process.env.X_API_SECRET,
-      access_token_key: process.env.X_ACCESS_TOKEN,
-      access_token_secret: process.env.X_ACCESS_TOKEN_SECRET,
-    })
-  }
+  ) { }
 
   getHello(): string {
     return 'Memegoat!'
@@ -41,16 +25,26 @@ export class AppService {
 
       const profileId = profile.id?.toString()
 
-      console.log(profile)
+      const photos = profile.photos
+      let image: string = null
+
+      if (photos.length > 0) {
+        image = photos[0]?.value
+      }
 
       let user = await this.prisma.user.findUnique({
         where: { profileId }
       })
 
-      if (user && (user.username !== profile.username || user.displayName !== user.displayName)) {
+      if (user && (
+        user.avatar !== image ||
+        user.username !== profile.username ||
+        user.displayName !== profile.displayName
+      )) {
         await this.prisma.user.update({
           where: { profileId },
           data: {
+            avatar: image,
             username: profile.username,
             displayName: profile.displayName,
           }
@@ -60,6 +54,7 @@ export class AppService {
       if (!user) {
         user = await this.prisma.user.create({
           data: {
+            avatar: image,
             profileId: profileId,
             username: profile.username,
             displayName: profile.displayName,
@@ -68,81 +63,11 @@ export class AppService {
       }
 
       const payload = { username: user.username, sub: user.id, profileId }
-      const token = this.jwtService.sign(payload)
+      const token = await this.jwtService.signAsync(payload)
 
       return { user, token }
     } catch (err) {
       console.error(err)
-    }
-  }
-
-  async metrics(res: Response) {
-    try {
-      const users = await this.prisma.user.findMany()
-
-      for (const user of users) {
-        const { data: { data: tweets } } = await this.x.v2.userTimeline(user.profileId, {
-          max_results: 100,
-          expansions: 'referenced_tweets.id',
-          'tweet.fields': 'public_metrics',
-        })
-
-        for (const { id, public_metrics, text, referenced_tweets } of tweets) {
-          if (text.includes('@GoatCoinSTX') || text.toLowerCase().includes('$goat')) {
-            let referenced = false
-
-            if (referenced_tweets) {
-              for (const { id } of referenced_tweets) {
-                const { data } = await this.x.v2.singleTweet(id, {
-                  'tweet.fields': 'author_id'
-                })
-
-                if (data.author_id === process.env.X_PROFILE_ID) {
-                  referenced = true
-                }
-              }
-            }
-
-            const existingTweet = await this.prisma.tweet.findUnique({
-              where: { postId: id },
-            })
-
-            if (existingTweet) {
-              if (public_metrics.impression_count > existingTweet.impression) {
-                await this.prisma.tweet.update({
-                  where: { postId: id },
-                  data: {
-                    referenced,
-                    like: public_metrics.like_count,
-                    reply: public_metrics.reply_count,
-                    quote: public_metrics.quote_count,
-                    retweet: public_metrics.retweet_count,
-                    impression: public_metrics.impression_count,
-                  },
-                })
-              }
-            } else {
-              await this.prisma.tweet.create({
-                data: {
-                  postId: id,
-                  referenced,
-                  like: public_metrics.like_count,
-                  reply: public_metrics.reply_count,
-                  quote: public_metrics.quote_count,
-                  retweet: public_metrics.retweet_count,
-                  impression: public_metrics.impression_count,
-                  user: { connect: { id: user.id } }
-                },
-              })
-            }
-          }
-        }
-      }
-
-      this.response.sendSuccess(res, StatusCodes.OK, {})
-    } catch (err) {
-      console.error(err)
-      throw new HttpException('Task is down', StatusCodes.InternalServerError)
     }
   }
 
@@ -192,7 +117,6 @@ export class AppService {
   }
 
   async dashboard(res: Response, req: Request) {
-    console.log(req.user)
     const user = await this.prisma.user.findUnique({
       where: {
         // @ts-ignore
