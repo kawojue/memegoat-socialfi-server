@@ -22,6 +22,8 @@ export class TaskService {
         try {
             const users = await this.prisma.user.findMany()
 
+            if (users.length === 0) return
+
             for (const user of users) {
                 const { data: { data: tweets } } = await this.x.v2.userTimeline(user.profileId, {
                     max_results: 100,

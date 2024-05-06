@@ -1,9 +1,11 @@
+import {
+  DocumentBuilder, SwaggerModule
+} from '@nestjs/swagger'
 import * as express from 'express'
 import * as passport from 'passport'
 import { AppModule } from './app.module'
 import * as session from 'express-session'
 import { NestFactory } from '@nestjs/core'
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 
 async function bootstrap() {
   const PORT: number = parseInt(process.env.PORT, 10) || 2005

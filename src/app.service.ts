@@ -1,5 +1,6 @@
 
 const Twitter = require('twitter-v2')
+import { JwtService } from '@nestjs/jwt'
 import { Request, Response } from 'express'
 import { StatusCodes } from 'enums/statusCodes'
 import { PrismaService } from 'prisma/prisma.service'
@@ -15,6 +16,7 @@ export class AppService {
 
   constructor(
     private readonly prisma: PrismaService,
+    private readonly jwtService: JwtService,
     private readonly response: ResponseService,
   ) {
     this.twit = new TwitterApi(`${process.env.X_BEARER_TOKEN}`)
@@ -32,12 +34,14 @@ export class AppService {
     return 'Memegoat!'
   }
 
-  async auth(res: Response, req: Request) {
+  async auth(req: Request) {
     try {
       // @ts-ignore
       const profile = req.user?.profile
 
       const profileId = profile.id?.toString()
+
+      console.log(profile)
 
       let user = await this.prisma.user.findUnique({
         where: { profileId }
@@ -63,7 +67,10 @@ export class AppService {
         })
       }
 
-      return user
+      const payload = { username: user.username, sub: user.id, profileId }
+      const token = this.jwtService.sign(payload)
+
+      return { user, token }
     } catch (err) {
       console.error(err)
     }
@@ -149,7 +156,13 @@ export class AppService {
         },
       })
 
-      const leaderboardData = []
+      const leaderboardData = [] as {
+        tweets: number
+        username: string
+        impressions: number
+        displayName: string
+      }[]
+
       for (const user of users) {
         let impressions = 0
 
@@ -176,5 +189,69 @@ export class AppService {
       console.error(err)
       this.response.sendError(res, StatusCodes.InternalServerError, 'Something went wrong')
     }
+  }
+
+  async dashboard(res: Response, req: Request) {
+    console.log(req.user)
+    const user = await this.prisma.user.findUnique({
+      where: {
+        // @ts-ignore
+        profileId: req.user?.profileId
+      },
+      include: { tweets: true }
+    })
+
+    if (!user) {
+      return this.response.sendError(res, StatusCodes.NotFound, 'Account not found')
+    }
+
+    const users = await this.prisma.user.findMany({
+      select: {
+        id: true,
+        tweets: true,
+        username: true,
+        displayName: true,
+      },
+    })
+
+    const leaderboardData = [] as {
+      id: string
+      tweets: number
+      username: string
+      impressions: number
+      displayName: string
+    }[]
+
+    for (const u of users) {
+      let impressions = 0
+
+      for (const tweet of u.tweets) {
+        if (tweet.referenced) {
+          impressions += tweet.like + tweet.retweet + tweet.reply + tweet.impression + tweet.quote
+        }
+      }
+
+      if (impressions > 0) {
+        leaderboardData.push({
+          id: u.id,
+          impressions,
+          username: u.username,
+          tweets: u.tweets.length,
+          displayName: u.displayName,
+        })
+      }
+    }
+
+    leaderboardData.sort((a, b) => b.impressions - a.impressions)
+
+    const userIndex = leaderboardData.findIndex(u => u.id === user.id)
+    const userRank = userIndex !== -1 ? userIndex + 1 : null
+
+    const responseData = {
+      data: user,
+      userRank: userRank,
+    }
+
+    this.response.sendSuccess(res, StatusCodes.OK, responseData)
   }
 }
