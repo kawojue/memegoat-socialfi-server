@@ -1,4 +1,3 @@
-import { JwtService } from '@nestjs/jwt'
 import { Request, Response } from 'express'
 import { Injectable } from '@nestjs/common'
 import { StatusCodes } from 'enums/statusCodes'
@@ -10,7 +9,6 @@ export class AppService {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly jwtService: JwtService,
     private readonly response: ResponseService,
   ) { }
 
@@ -80,17 +78,13 @@ export class AppService {
       select: {
         id: true,
         tweets: true,
-        username: true,
-        displayName: true,
       },
     })
 
     const leaderboardData = [] as {
       id: string
-      tweets: number
-      username: string
       impressions: number
-      displayName: string
+      tweets: number
     }[]
 
     for (const u of users) {
@@ -106,18 +100,38 @@ export class AppService {
         leaderboardData.push({
           id: u.id,
           impressions,
-          username: u.username,
           tweets: u.tweets.length,
-          displayName: u.displayName,
         })
       }
     }
 
     leaderboardData.sort((a, b) => b.impressions - a.impressions)
 
+    const metadata = {
+      views: 0,
+      likes: 0,
+      quotes: 0,
+      replies: 0,
+      retweets: 0,
+    } as {
+      views: number
+      likes: number
+      quotes: number
+      replies: number
+      retweets: number
+    }
+
+    for (const tweet of user.tweets) {
+      metadata.quotes += tweet.quote
+      metadata.likes += tweet.like
+      metadata.replies += tweet.reply
+      metadata.views += tweet.impression
+      metadata.retweets += tweet.retweet
+    }
+
     const userIndex = leaderboardData.findIndex(u => u.id === user.id)
     const userRank = userIndex !== -1 ? userIndex + 1 : null
 
-    this.response.sendSuccess(res, StatusCodes.OK, { data: { user, userRank } })
+    this.response.sendSuccess(res, StatusCodes.OK, { data: { user, metadata, userRank } })
   }
 }
