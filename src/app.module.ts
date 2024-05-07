@@ -12,7 +12,7 @@ import { SessionSerializer } from './jwt/session.serialize'
 @Module({
   imports: [
     AuthModule,
-    // ScheduleModule.forRoot(),
+    ScheduleModule.forRoot(),
     JwtModule,
   ],
   controllers: [AppController],

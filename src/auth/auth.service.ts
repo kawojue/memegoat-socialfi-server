@@ -1,6 +1,6 @@
+import { Request } from 'express'
 import { JwtService } from '@nestjs/jwt'
 import { Injectable } from '@nestjs/common'
-import { Request } from 'express'
 import { PrismaService } from 'prisma/prisma.service'
 
 @Injectable()
