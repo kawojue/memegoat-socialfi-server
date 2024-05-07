@@ -17,7 +17,7 @@ export class TaskService {
         this.x = this.twit.readOnly
     }
 
-    @Cron(CronExpression.EVERY_30_MINUTES)
+    @Cron(CronExpression.EVERY_MINUTE)
     async metrics() {
         try {
             const users = await this.prisma.user.findMany()
@@ -41,7 +41,7 @@ export class TaskService {
                                     'tweet.fields': 'author_id'
                                 })
 
-                                if (data.author_id === process.env.X_PROFILE_ID) {
+                                if (data.author_id === "1163109596610928641") {
                                     referenced = true
                                 }
                             }
