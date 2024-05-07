@@ -26,7 +26,7 @@ export class TaskService {
 
             for (const user of users) {
                 const { data: { data: tweets } } = await this.x.v2.userTimeline(user.profileId, {
-                    max_results: 100,
+                    max_results: 50,
                     expansions: 'referenced_tweets.id',
                     'tweet.fields': 'public_metrics',
                 })
