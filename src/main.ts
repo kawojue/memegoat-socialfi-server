@@ -6,6 +6,7 @@ import * as passport from 'passport'
 import { AppModule } from './app.module'
 import * as session from 'express-session'
 import { NestFactory } from '@nestjs/core'
+import * as cookieParser from 'cookie-parser'
 
 async function bootstrap() {
   const PORT: number = parseInt(process.env.PORT, 10) || 2005
@@ -22,7 +23,8 @@ async function bootstrap() {
     credentials: true
   })
 
-  app.use(express.json({ limit: 1 << 20 }))
+  app.use(express.json({ limit: 2 << 20 }))
+  app.use(cookieParser())
   app.use(session({
     resave: false,
     saveUninitialized: false,

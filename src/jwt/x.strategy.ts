@@ -7,11 +7,10 @@ import { PassportStrategy } from '@nestjs/passport'
 export class XStrategy extends PassportStrategy(Strategy) {
     constructor() {
         super({
-            session: true,
-            passReqToCallback: true,
-            callbackURL: '/auth/x/callback',
             consumerKey: process.env.X_API_KEY,
             consumerSecret: process.env.X_API_SECRET,
+            passReqToCallback: true,
+            callbackURL: '/auth/x/callback',
         })
     }
 
