@@ -25,7 +25,7 @@ export class AuthController {
     const isProd = process.env.NODE_ENV === 'production'
 
     if (!user) {
-      res.redirect(isProd ? `${process.env.CLIENT_URL}/login` : 'http://localhost:3000/login')
+      res.redirect(isProd ? `${process.env.CLIENT_URL}` : 'http://localhost:3000')
     } else {
       res.cookie('token', token, {
         domain: isProd ? process.env.CLIENT_URL : undefined,
