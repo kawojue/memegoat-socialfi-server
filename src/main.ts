@@ -17,7 +17,7 @@ async function bootstrap() {
       'http://localhost:3000',
       `http://localhost:${PORT}`,
       'https://memegoat.onrender.com',
-      'https://memegoat.io',
+      'https://memegoat-client.vercel.app'
     ],
     methods: 'GET,OPTIONS',
     credentials: true
