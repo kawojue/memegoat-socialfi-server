@@ -24,16 +24,16 @@ export class AuthController {
 
     const isProd = process.env.NODE_ENV === 'production'
 
-    if (!user) {
-      res.redirect(isProd ? `${process.env.CLIENT_URL}` : 'http://localhost:3000')
-    } else {
-      res.cookie('token', token, {
+   try {
+     res.cookie('token', token, {
         domain: isProd ? process.env.CLIENT_URL : undefined,
         secure: isProd,
         sameSite: isProd ? 'none' : 'strict',
         maxAge: 7 * 24 * 60 * 60 * 1000,
       })
       res.redirect(isProd ? `${process.env.CLIENT_URL}/dashboard` : 'http://localhost:3000/dashboard')
-    }
+   } catch {
+     res.redirect(isProd ? `${process.env.CLIENT_URL}` : 'http://localhost:3000')
+   }
   }
 }
