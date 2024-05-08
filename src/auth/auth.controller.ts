@@ -20,11 +20,13 @@ export class AuthController {
   @Get('/x/callback')
   @UseGuards(AuthGuard('twitter'))
   async xCallback(@Req() req: Request, @Res() res: Response) {
-    const { user, token } = await this.authService.auth(req)
-
     const isProd = process.env.NODE_ENV === 'production'
 
     try {
+      const token = await this.authService.auth(req)
+
+      console.log(token)
+
       res.cookie('token', token, {
         domain: isProd ? "memegoat-client.vercel.app" : undefined,
         secure: isProd,

@@ -54,10 +54,11 @@ export class AuthService {
                 })
             }
 
-            const payload = { username: user.username, sub: user.id, profileId }
-            const token = await this.jwtService.signAsync(payload)
+            const token = await this.jwtService.signAsync({
+                username: user.username, sub: user.id, profileId
+            })
 
-            return { user, token }
+            return token
         } catch (err) {
             console.error(err)
         }
