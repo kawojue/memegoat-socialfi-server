@@ -10,7 +10,7 @@ export class XStrategy extends PassportStrategy(Strategy) {
             consumerKey: process.env.X_API_KEY,
             consumerSecret: process.env.X_API_SECRET,
             passReqToCallback: true,
-            callbackURL: '/auth/x/callback',
+            callbackURL: 'https://memegoat.onrender.com/auth/x/callback',
         })
     }
 
