@@ -26,7 +26,7 @@ export class AuthController {
 
    try {
      res.cookie('token', token, {
-        domain: isProd ? process.env.CLIENT_URL : undefined,
+        domain: isProd ? "memegoat-client.vercel.app" : undefined,
         secure: isProd,
         sameSite: isProd ? 'none' : 'strict',
         maxAge: 7 * 24 * 60 * 60 * 1000,
