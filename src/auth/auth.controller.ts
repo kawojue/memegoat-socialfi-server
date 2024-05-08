@@ -26,9 +26,8 @@ export class AuthController {
       const token = await this.authService.auth(req)
 
       res.cookie('token', token, {
-        // domain: isProd ? "memegoat-client.vercel.app" : undefined,
         secure: isProd,
-        sameSite: isProd ? 'none' : 'strict',
+        sameSite: isProd ? 'none' : 'lax',
         maxAge: 7 * 24 * 60 * 60 * 1000,
       })
       res.redirect(isProd ? `${process.env.CLIENT_URL}/dashboard` : 'http://localhost:3000/dashboard')
