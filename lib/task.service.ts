@@ -19,10 +19,6 @@ export class TaskService {
     @Cron(CronExpression.EVERY_30_MINUTES)
     async metrics() {
         try {
-            const now = new Date()
-            const sevenDays = new Date(now)
-            sevenDays.setDate(now.getDate() + 7)
-
             const users = await this.prisma.user.findMany()
             if (users.length === 0) return
 
@@ -35,13 +31,7 @@ export class TaskService {
 
                 const tweetIds = tweets.map(tweet => tweet.id)
                 const existingTweets = await this.prisma.tweet.findMany({
-                    where: {
-                        postId: { in: tweetIds },
-                        createdAt: {
-                            gte: sevenDays,
-                            lte: now,
-                        }
-                    },
+                    where: { postId: { in: tweetIds } },
                 })
                 const existingTweetMap = new Map(existingTweets.map(tweet => [tweet.postId, tweet]))
 
