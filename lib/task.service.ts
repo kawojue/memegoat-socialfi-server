@@ -19,19 +19,29 @@ export class TaskService {
     @Cron(CronExpression.EVERY_30_MINUTES)
     async metrics() {
         try {
+            const now = new Date()
+            const sevenDays = new Date(now)
+            sevenDays.setDate(now.getDate() + 7)
+
             const users = await this.prisma.user.findMany()
             if (users.length === 0) return
 
             await Promise.all(users.map(async (user) => {
                 const { data: { data: tweets } } = await this.x.v2.userTimeline(user.profileId, {
-                    max_results: 10,
+                    max_results: 25,
                     expansions: 'referenced_tweets.id',
                     'tweet.fields': 'public_metrics',
                 })
 
                 const tweetIds = tweets.map(tweet => tweet.id)
                 const existingTweets = await this.prisma.tweet.findMany({
-                    where: { postId: { in: tweetIds } },
+                    where: {
+                        postId: { in: tweetIds },
+                        createdAt: {
+                            gte: sevenDays,
+                            lte: now,
+                        }
+                    },
                 })
                 const existingTweetMap = new Map(existingTweets.map(tweet => [tweet.postId, tweet]))
 
@@ -44,7 +54,7 @@ export class TaskService {
                                 const { data } = await this.x.v2.singleTweet(id, {
                                     'tweet.fields': 'author_id',
                                 })
-                                if (data.author_id === "1163109596610928641") {
+                                if (data.author_id === process.env.X_PROFILE_ID) {
                                     referenced = true
                                 }
                             }))
