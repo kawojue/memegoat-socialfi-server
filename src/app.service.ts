@@ -153,26 +153,18 @@ export class AppService {
       }
 
       const decryptedKey = decryptKey(key, `${process.env.X_CLIENT_SECRET}-${userExist.profileId}`)
+      const decryptedAuthKey = decryptKey(userExist.smartKey, `${process.env.X_CLIENT_SECRET}-${userExist.profileId}`)
 
-      const keyExist = await this.prisma.user.findUnique({
-        where: { smartKey: decryptedKey }
-      })
-
-      if (!keyExist) {
-        return this.response.sendError(res, StatusCodes.NotFound, "Key does not exist")
-      }
-
-      const isMatch = decryptedKey === userExist.smartKey
-
+      const isMatch = decryptedKey === decryptedAuthKey
       if (!isMatch) {
         return this.response.sendError(res, StatusCodes.Unauthorized, "Invalid Smart Key")
       }
 
-      const { user, metadata, userRank } = await this.info(decryptedKey, 'smartKey')
+      const { user, metadata, userRank } = await this.info(key, 'smartKey')
       this.response.sendSuccess(res, StatusCodes.OK, { data: { user, metadata, userRank } })
     } catch (err) {
       console.error(err)
-      return this.response.sendError(res, StatusCodes.InternalServerError, "Something went wrong")
+      return this.response.sendError(res, StatusCodes.InternalServerError, "Error decrypting key")
     }
   }
 }

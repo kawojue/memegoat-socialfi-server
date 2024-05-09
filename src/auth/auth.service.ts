@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import { JwtService } from '@nestjs/jwt'
 import { Injectable } from '@nestjs/common'
-import { encryptKey } from 'helpers/smartKey'
+import { decryptKey, encryptKey } from 'helpers/smartKey'
 import { PrismaService } from 'prisma/prisma.service'
 
 @Injectable()
@@ -45,7 +45,7 @@ export class AuthService {
             }
 
             if (!user) {
-                const encryptedKey = encryptKey(12, `${process.env.X_CLIENT_SECRET}-${profileId}`)
+                const encryptedKey = encryptKey(16, `${process.env.X_CLIENT_SECRET}-${profileId}`)
 
                 user = await this.prisma.user.create({
                     data: {

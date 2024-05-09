@@ -4,8 +4,9 @@ import {
 import { Request, Response } from 'express'
 import { AuthService } from './auth.service'
 import { AuthGuard } from '@nestjs/passport'
-import { ApiOperation } from '@nestjs/swagger'
+import { ApiOperation, ApiTags } from '@nestjs/swagger'
 
+@ApiTags("Auth")
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) { }
