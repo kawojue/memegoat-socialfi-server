@@ -1,5 +1,7 @@
 import { Request, Response } from 'express'
 import { Injectable } from '@nestjs/common'
+import { SmartKeyDTO } from './dto/key.dto'
+import { decryptKey } from 'helpers/smartKey'
 import { StatusCodes } from 'enums/statusCodes'
 import { PrismaService } from 'prisma/prisma.service'
 import { ResponseService } from 'lib/response.service'
@@ -61,18 +63,17 @@ export class AppService {
     }
   }
 
-  async dashboard(res: Response, req: Request) {
+  private async info(key: string, fieldName: 'smartKey' | 'profileId') {
     const user = await this.prisma.user.findUnique({
-      where: {
-        // @ts-ignore
-        profileId: req.user?.profileId
+      where: fieldName === "profileId" ? {
+        profileId: key
+      } : {
+        smartKey: key
       },
       include: { tweets: true }
     })
 
-    if (!user) {
-      return this.response.sendError(res, StatusCodes.NotFound, 'Account not found')
-    }
+    if (!user) return
 
     const users = await this.prisma.user.findMany({
       select: {
@@ -122,8 +123,8 @@ export class AppService {
     }
 
     for (const tweet of user.tweets) {
-      metadata.quotes += tweet.quote
       metadata.likes += tweet.like
+      metadata.quotes += tweet.quote
       metadata.replies += tweet.reply
       metadata.views += tweet.impression
       metadata.retweets += tweet.retweet
@@ -132,6 +133,46 @@ export class AppService {
     const userIndex = leaderboardData.findIndex(u => u.id === user.id)
     const userRank = userIndex !== -1 ? userIndex + 1 : null
 
+    return { user, metadata, userRank }
+  }
+
+  async dashboard(res: Response, req: Request) {
+    // @ts-ignore
+    const { metadata, user, userRank } = await this.info(req.user?.profileId, 'profileId')
     this.response.sendSuccess(res, StatusCodes.OK, { data: { user, metadata, userRank } })
+  }
+
+  async verifySmartKey(res: Response, { key, username }: SmartKeyDTO) {
+    try {
+      const userExist = await this.prisma.user.findUnique({
+        where: { username }
+      })
+
+      if (!userExist) {
+        return this.response.sendError(res, StatusCodes.NotFound, "Account not found")
+      }
+
+      const decryptedKey = decryptKey(key, `${process.env.X_CLIENT_SECRET}-${userExist.profileId}`)
+
+      const keyExist = await this.prisma.user.findUnique({
+        where: { smartKey: decryptedKey }
+      })
+
+      if (!keyExist) {
+        return this.response.sendError(res, StatusCodes.NotFound, "Key does not exist")
+      }
+
+      const isMatch = decryptedKey === userExist.smartKey
+
+      if (!isMatch) {
+        return this.response.sendError(res, StatusCodes.Unauthorized, "Invalid Smart Key")
+      }
+
+      const { user, metadata, userRank } = await this.info(decryptedKey, 'smartKey')
+      this.response.sendSuccess(res, StatusCodes.OK, { data: { user, metadata, userRank } })
+    } catch (err) {
+      console.error(err)
+      return this.response.sendError(res, StatusCodes.InternalServerError, "Something went wrong")
+    }
   }
 }

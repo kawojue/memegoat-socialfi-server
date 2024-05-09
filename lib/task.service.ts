@@ -24,7 +24,7 @@ export class TaskService {
 
             await Promise.all(users.map(async (user) => {
                 const { data: { data: tweets } } = await this.x.v2.userTimeline(user.profileId, {
-                    max_results: 50,
+                    max_results: 10,
                     expansions: 'referenced_tweets.id',
                     'tweet.fields': 'public_metrics',
                 })

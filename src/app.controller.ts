@@ -1,9 +1,10 @@
-import {
-  Controller, Get, Req, Res, UseGuards,
-} from '@nestjs/common'
 import { AppService } from './app.service'
+import { SmartKeyDTO } from './dto/key.dto'
 import { Request, Response } from 'express'
 import { ApiBearerAuth } from '@nestjs/swagger'
+import {
+  Body, Controller, Get, Post, Req, Res, UseGuards,
+} from '@nestjs/common'
 import { JwtAuthGuard } from './jwt/jwt-auth.guard'
 
 @Controller()
@@ -25,5 +26,10 @@ export class AppController {
   @UseGuards(JwtAuthGuard)
   async dashboard(@Req() req: Request, @Res() res: Response) {
     await this.appService.dashboard(res, req)
+  }
+
+  @Post('/verify/smartKey')
+  async verifySmartKey(@Res() res: Response, @Body() body: SmartKeyDTO) {
+    await this.appService.verifySmartKey(res, body)
   }
 }
