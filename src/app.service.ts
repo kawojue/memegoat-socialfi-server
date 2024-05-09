@@ -21,15 +21,15 @@ export class AppService {
   async leaderboard(res: Response) {
     try {
       const now = new Date()
-      const sevenDays = new Date(now)
-      sevenDays.setDate(now.getDate() - 7)
+      const sevenDaysAgo = new Date(now)
+      sevenDaysAgo.setDate(now.getDate() - 7)
 
       const users = await this.prisma.user.findMany({
         select: {
           tweets: {
             where: {
               createdAt: {
-                gte: sevenDays,
+                gte: sevenDaysAgo,
                 lte: now,
               }
             }
@@ -76,8 +76,8 @@ export class AppService {
 
   private async info(key: string, fieldName: 'smartKey' | 'profileId') {
     const now = new Date()
-    const sevenDays = new Date(now)
-    sevenDays.setDate(now.getDate() - 7)
+    const sevenDaysAgo = new Date(now)
+    sevenDaysAgo.setDate(now.getDate() - 7)
 
     const user = await this.prisma.user.findUnique({
       where: fieldName === "profileId" ? {
@@ -89,7 +89,7 @@ export class AppService {
         tweets: {
           where: {
             createdAt: {
-              gte: sevenDays,
+              gte: sevenDaysAgo,
               lte: now,
             }
           }
@@ -105,7 +105,7 @@ export class AppService {
         tweets: {
           where: {
             createdAt: {
-              gte: sevenDays,
+              gte: sevenDaysAgo,
               lte: now,
             }
           }
