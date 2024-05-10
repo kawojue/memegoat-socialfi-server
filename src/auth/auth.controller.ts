@@ -31,9 +31,9 @@ export class AuthController {
         sameSite: isProd ? 'none' : 'lax',
         maxAge: 7 * 24 * 60 * 60 * 1000,
       })
-      res.redirect(isProd ? `${process.env.CLIENT_URL}/dashboard` : 'http://localhost:3000/dashboard')
+      res.redirect(isProd ? `${process.env.CLIENT_URL}/dashboard` : 'http://localhost:5173/dashboard')
     } catch {
-      res.redirect(isProd ? `${process.env.CLIENT_URL}` : 'http://localhost:3000')
+      res.redirect(isProd ? `${process.env.CLIENT_URL}` : 'http://localhost:5173')
     }
   }
 }

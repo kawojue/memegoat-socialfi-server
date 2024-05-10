@@ -1,12 +1,12 @@
 import { AppService } from './app.service'
 import { SmartKeyDTO } from './dto/key.dto'
 import { Request, Response } from 'express'
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import {
   Body, Controller, Get, Post, Req, Res, UseGuards,
   ValidationPipe,
 } from '@nestjs/common'
 import { JwtAuthGuard } from './jwt/jwt-auth.guard'
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 
 @ApiTags("App")
 @Controller()
