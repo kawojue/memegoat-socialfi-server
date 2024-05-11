@@ -13,6 +13,8 @@ export class JwtAuthGuard implements CanActivate {
 
         const token = request.cookies?.token
 
+        console.log(token)
+
         if (!token) return false
 
         try {
