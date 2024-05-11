@@ -31,7 +31,7 @@ export class AuthController {
         secure: true,
         maxAge: 7 * 24 * 60 * 60 * 1000,
       })
-      res.redirect('http://localhost:3000/dashboard')
+      res.redirect('http://localhost:5173/social')
     } catch {
       res.redirect('http://localhost:3000')
     }
