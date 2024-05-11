@@ -27,8 +27,8 @@ export class AuthController {
       const token = await this.authService.auth(req)
 
       res.cookie('token', token, {
-        sameSite: "none",
-        secure: true,
+        // sameSite: "none",
+        // secure: true,
         maxAge: 7 * 24 * 60 * 60 * 1000,
       })
       res.redirect('http://localhost:5173/social')
