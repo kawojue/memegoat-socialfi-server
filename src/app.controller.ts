@@ -40,10 +40,8 @@ export class AppController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   async verifyRef(
-    @Res() res: Response,
     @Req() req: Request,
+    @Res() res: Response,
     @Body(ValidationPipe) body: RefDTO
-  ) {
-    await this.appService.verifyRef(req, res, body)
-  }
+  ) { await this.appService.verifyRef(req, res, body) }
 }
