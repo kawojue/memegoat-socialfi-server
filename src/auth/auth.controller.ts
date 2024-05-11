@@ -33,7 +33,7 @@ export class AuthController {
       })
       res.redirect('http://localhost:5173/social')
     } catch {
-      res.redirect('http://localhost:3000')
+      res.redirect('http://localhost:5173')
     }
   }
 }
