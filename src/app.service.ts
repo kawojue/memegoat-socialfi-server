@@ -222,21 +222,17 @@ export class AppService {
         where: { id: sub }
       })
 
-      if (!referred) {
-        return this.response.sendError(res, StatusCodes.NotFound, "Referral not found")
-      }
-
-      if (referred.useRef) {
+      if (referred && referred.useRef) {
         return this.response.sendError(res, StatusCodes.BadRequest, "Already used your referral")
       }
 
-      const refPoint = await this.prisma.refPoint.findFirst()
+      const { point } = await this.prisma.refPoint.findFirst()
 
       await this.prisma.$transaction([
         this.prisma.user.update({
           where: { id: referral.id },
           data: {
-            refPoint: { increment: refPoint.point }
+            refPoint: { increment: point }
           }
         }),
         this.prisma.user.update({
