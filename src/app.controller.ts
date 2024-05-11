@@ -1,10 +1,11 @@
+import {
+  Res, UseGuards, ValidationPipe,
+  Body, Controller, Get, Post, Req,
+} from '@nestjs/common'
+import { RefDTO } from './dto/ref.dto'
 import { AppService } from './app.service'
 import { SmartKeyDTO } from './dto/key.dto'
 import { Request, Response } from 'express'
-import {
-  Body, Controller, Get, Post, Req, Res, UseGuards,
-  ValidationPipe,
-} from '@nestjs/common'
 import { JwtAuthGuard } from './jwt/jwt-auth.guard'
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 
@@ -33,5 +34,16 @@ export class AppController {
   @Post('/verify/smartKey')
   async verifySmartKey(@Res() res: Response, @Body(ValidationPipe) body: SmartKeyDTO) {
     await this.appService.verifySmartKey(res, body)
+  }
+
+  @Post('/verify/referral')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  async verifyRef(
+    @Res() res: Response,
+    @Req() req: Request,
+    @Body(ValidationPipe) body: RefDTO
+  ) {
+    await this.appService.verifyRef(req, res, body)
   }
 }

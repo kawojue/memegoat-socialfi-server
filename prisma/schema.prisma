@@ -15,6 +15,8 @@ model User {
     avatar      String?
     smartKey    String   @unique
     tweets      Tweet[]
+    useRef      Boolean  @default(false)
+    refPoint    Float    @default(0)
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
 }
@@ -32,4 +34,9 @@ model Tweet {
     updatedAt  DateTime @updatedAt
     user       User     @relation(references: [id], fields: [userId])
     userId     String   @unique @db.ObjectId
+}
+
+model RefPoint {
+    id    String @id @default(auto()) @map("_id") @db.ObjectId
+    point Float
 }

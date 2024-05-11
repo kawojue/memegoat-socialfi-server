@@ -1,3 +1,4 @@
+import { RefDTO } from './dto/ref.dto'
 import { Request, Response } from 'express'
 import { Injectable } from '@nestjs/common'
 import { SmartKeyDTO } from './dto/key.dto'
@@ -102,6 +103,7 @@ export class AppService {
     const users = await this.prisma.user.findMany({
       select: {
         id: true,
+        refPoint: true,
         tweets: {
           where: {
             createdAt: {
@@ -120,7 +122,7 @@ export class AppService {
     }[]
 
     for (const u of users) {
-      let impressions = 0
+      let impressions = u.refPoint
 
       for (const tweet of u.tweets) {
         if (tweet.referenced) {
@@ -196,6 +198,59 @@ export class AppService {
     } catch (err) {
       console.error(err)
       return this.response.sendError(res, StatusCodes.InternalServerError, "Error decrypting key")
+    }
+  }
+
+  async verifyRef(
+    req: Request,
+    res: Response,
+    { username }: RefDTO
+  ) {
+    try {
+      // @ts-ignore
+      const sub = req.user?.sub
+
+      const referral = await this.prisma.user.findUnique({
+        where: { username: username.toLowerCase() }
+      })
+
+      if (!referral) {
+        return this.response.sendError(res, StatusCodes.NotFound, "Referral does not exist")
+      }
+
+      const referred = await this.prisma.user.findUnique({
+        where: { id: sub }
+      })
+
+      if (!referred) {
+        return this.response.sendError(res, StatusCodes.NotFound, "Referral not found")
+      }
+
+      if (referred.useRef) {
+        return this.response.sendError(res, StatusCodes.BadRequest, "Already used your referral")
+      }
+
+      const refPoint = await this.prisma.refPoint.findFirst()
+
+      await this.prisma.$transaction([
+        this.prisma.user.update({
+          where: { id: referral.id },
+          data: {
+            refPoint: { increment: refPoint.point }
+          }
+        }),
+        this.prisma.user.update({
+          where: { id: referred.id },
+          data: { useRef: true }
+        })
+      ])
+
+      this.response.sendSuccess(res, StatusCodes.OK, {
+        message: "Successful"
+      })
+    } catch (err) {
+      console.error(err)
+      return this.response.sendError(res, StatusCodes.InternalServerError, "Something went wrong")
     }
   }
 }
