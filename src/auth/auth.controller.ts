@@ -28,12 +28,12 @@ export class AuthController {
 
       res.cookie('token', token, {
         secure: false,
-        sameSite: 'strict',
+        sameSite: 'none',
         maxAge: 7 * 24 * 60 * 60 * 1000,
       })
-      res.redirect('http://localhost:5173/social')
+      res.redirect('http://localhost:3000/dashboard')
     } catch {
-      res.redirect('http://localhost:5173/social')
+      res.redirect('http://localhost:3000')
     }
   }
 }
