@@ -29,7 +29,7 @@ export class AuthController {
       res.cookie('token', token, {
         sameSite: "strict",
         httpOnly: true,
-        // secure: true,
+        secure: true,
         maxAge: 7 * 24 * 60 * 60 * 1000,
       })
       res.redirect('http://localhost:5173/social')
