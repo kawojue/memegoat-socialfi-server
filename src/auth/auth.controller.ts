@@ -27,7 +27,7 @@ export class AuthController {
       const token = await this.authService.auth(req)
 
       res.cookie('token', token, {
-        secure: isProd,
+        secure: false,
         sameSite: isProd ? 'none' : 'strict',
         maxAge: 7 * 24 * 60 * 60 * 1000,
       })
