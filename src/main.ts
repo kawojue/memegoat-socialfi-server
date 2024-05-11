@@ -25,7 +25,7 @@ async function bootstrap() {
       'https://memegoat.onrender.com',
       'https://memegoat-client.vercel.app'
     ],
-    methods: 'GET,OPTIONS',
+    methods: 'GET,POST,OPTIONS',
     credentials: true
   })
 
