@@ -85,6 +85,20 @@ export class TaskService {
                 await Promise.all(tweetPromises)
             }))
 
+            const now = new Date()
+            const twentyFourHoursAgo = new Date(now)
+            twentyFourHoursAgo.setDate(now.getDate() - 1)
+
+            await this.prisma.user.updateMany({
+                where: {
+                    useRef: false,
+                    createdAt: {
+                        gte: twentyFourHoursAgo,
+                        lte: now,
+                    },
+                },
+                data: { useRef: true }
+            })
         } catch (err) {
             console.error(err)
             throw new HttpException('Task is down', StatusCodes.InternalServerError)
