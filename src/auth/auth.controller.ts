@@ -20,7 +20,7 @@ export class AuthController {
   })
   @Get('/x/callback')
   @UseGuards(AuthGuard('twitter'))
-  async xCallback(@Req() req: Request, @Res() res: Response) {
+  async xCallback(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const isProd = process.env.NODE_ENV === 'production'
 
     try {
