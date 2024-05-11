@@ -28,8 +28,7 @@ export class AuthController {
 
       res.cookie('token', token, {
         sameSite: "none",
-        httpOnly: true,
-        secure: true,
+        secure: isProd,
         maxAge: 7 * 24 * 60 * 60 * 1000,
       })
       res.redirect('http://testing.memegoat.io/social')
