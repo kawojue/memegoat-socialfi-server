@@ -38,8 +38,7 @@
     "passport-twitter": "^1.0.4",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
-    "twitter-api-v2": "^1.16.3",
-    "twitter-v2": "^1.1.0"
+    "twitter-api-v2": "^1.16.3"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
@@ -52,6 +51,7 @@
     "@types/jest": "^29.5.2",
     "@types/node": "^20.12.8",
     "@types/passport-jwt": "^4.0.1",
+    "@types/passport-twitter": "^1.0.40",
     "@types/supertest": "^6.0.0",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
