@@ -19,6 +19,8 @@ async function bootstrap() {
       'http://localhost:5174',
       `http://localhost:${PORT}`,
       'https://memegoat.io',
+      '192.168.0.1:5173',
+      '192.168.0.1:5174',
       'https://testing.memegoat.io',
       'https://memegoat.onrender.com',
       'https://memegoat-client.vercel.app'
