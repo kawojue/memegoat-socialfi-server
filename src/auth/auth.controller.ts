@@ -27,11 +27,12 @@ export class AuthController {
       const token = await this.authService.auth(req)
 
       res.cookie('token', token, {
-        sameSite: "none",
+        sameSite: "strict",
         secure: isProd,
         maxAge: 7 * 24 * 60 * 60 * 1000,
       })
-      res.redirect('http://testing.memegoat.io/social')
+
+      res.redirect('https://testing.memegoat.io/social')
     } catch {
       res.redirect('http://testing.memegoat.io/auth/social')
     }

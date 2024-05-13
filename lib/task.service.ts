@@ -16,7 +16,7 @@ export class TaskService {
         this.x = this.twit.readOnly
     }
 
-    @Cron(CronExpression.EVERY_30_MINUTES)
+    @Cron(CronExpression.EVERY_10_MINUTES)
     async metrics() {
         try {
             const users = await this.prisma.user.findMany()
