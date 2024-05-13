@@ -4,7 +4,7 @@ import {
 } from '@nestjs/common'
 
 @Injectable()
-export class JwtAuthGuard implements CanActivate {
+export class CookieAuthGuard implements CanActivate {
     constructor(private readonly jwtService: JwtService) { }
 
     async canActivate(context: ExecutionContext) {

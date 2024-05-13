@@ -88,16 +88,7 @@ export class AppService {
       } : {
         smartKey: key
       },
-      include: {
-        tweets: {
-          where: {
-            createdAt: {
-              gte: daysAgo,
-              lte: now,
-            }
-          }
-        },
-      }
+      include: { tweets: true }
     })
 
     if (!user) return

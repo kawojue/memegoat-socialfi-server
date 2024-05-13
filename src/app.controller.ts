@@ -6,8 +6,8 @@ import { RefDTO } from './dto/ref.dto'
 import { AppService } from './app.service'
 import { SmartKeyDTO } from './dto/key.dto'
 import { Request, Response } from 'express'
-import { JwtAuthGuard } from './jwt/jwt-auth.guard'
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
+import { CookieAuthGuard } from './jwt/cookie-auth.guard'
 
 @ApiTags("App")
 @Controller()
@@ -26,7 +26,7 @@ export class AppController {
 
   @Get('/dashboard')
   @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(CookieAuthGuard)
   async dashboard(@Req() req: Request, @Res() res: Response) {
     await this.appService.dashboard(res, req)
   }
@@ -38,7 +38,7 @@ export class AppController {
 
   @Post('/verify/referral')
   @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(CookieAuthGuard)
   async verifyRef(
     @Req() req: Request,
     @Res() res: Response,
