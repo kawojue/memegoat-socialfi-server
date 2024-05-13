@@ -8,12 +8,14 @@ import { JwtModule, JwtService } from '@nestjs/jwt'
 import { PrismaService } from 'prisma/prisma.service'
 import { ResponseService } from 'lib/response.service'
 import { SessionSerializer } from './jwt/session.serialize'
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
     AuthModule,
     ScheduleModule.forRoot(),
     JwtModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [

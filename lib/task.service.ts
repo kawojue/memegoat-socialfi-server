@@ -39,7 +39,8 @@ export class TaskService {
                 const existingTweetMap = new Map(existingTweets.map(tweet => [tweet.postId, tweet]))
 
                 const tweetPromises = tweets.map(async ({ id, public_metrics, text, referenced_tweets }) => {
-                    if (settings.tags.includes(text)) {
+                    const tags = settings.tags.map((tag) => tag.toLowerCase().trim())
+                    if (tags.includes(text.toLowerCase().trim())) {
                         let referenced = false
 
                         if (referenced_tweets) {

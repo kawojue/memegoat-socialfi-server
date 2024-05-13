@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import { JwtService } from '@nestjs/jwt'
 import { Injectable } from '@nestjs/common'
-import { decryptKey, encryptKey } from 'helpers/smartKey'
+import { encryptKey } from 'helpers/smartKey'
 import { PrismaService } from 'prisma/prisma.service'
 
 @Injectable()
