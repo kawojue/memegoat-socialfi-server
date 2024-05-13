@@ -36,7 +36,16 @@ model Tweet {
     userId     String   @unique @db.ObjectId
 }
 
-model RefPoint {
-    id    String @id @default(auto()) @map("_id") @db.ObjectId
-    point Float
+model Settings {
+    id                   String   @id @default(auto()) @map("_id") @db.ObjectId
+    hasTurnedOffCampaign Boolean  @default(false)
+    days                 Int      @default(7)
+    tags                 String[]
+    point                Float
+}
+
+model Admin {
+    id       String @id @default(auto()) @map("_id") @db.ObjectId
+    password String
+    username String
 }

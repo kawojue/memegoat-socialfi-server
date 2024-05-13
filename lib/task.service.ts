@@ -19,6 +19,9 @@ export class TaskService {
     @Cron(CronExpression.EVERY_10_MINUTES)
     async metrics() {
         try {
+            const settings = await this.prisma.settings.findFirst()
+            if (settings.hasTurnedOffCampaign) return
+
             const users = await this.prisma.user.findMany()
             if (users.length === 0) return
 
@@ -36,7 +39,7 @@ export class TaskService {
                 const existingTweetMap = new Map(existingTweets.map(tweet => [tweet.postId, tweet]))
 
                 const tweetPromises = tweets.map(async ({ id, public_metrics, text, referenced_tweets }) => {
-                    if (text.includes('@GoatCoinSTX') || text.toLowerCase().includes('$goat')) {
+                    if (settings.tags.includes(text)) {
                         let referenced = false
 
                         if (referenced_tweets) {

@@ -22,15 +22,16 @@ export class AppService {
   async leaderboard(res: Response) {
     try {
       const now = new Date()
-      const sevenDaysAgo = new Date(now)
-      sevenDaysAgo.setDate(now.getDate() - 7)
+      const daysAgo = new Date(now)
+      const { days } = await this.prisma.settings.findFirst()
+      daysAgo.setDate(now.getDate() - days)
 
       const users = await this.prisma.user.findMany({
         select: {
           tweets: {
             where: {
               createdAt: {
-                gte: sevenDaysAgo,
+                gte: daysAgo,
                 lte: now,
               }
             }
@@ -77,8 +78,9 @@ export class AppService {
 
   private async info(key: string, fieldName: 'smartKey' | 'profileId') {
     const now = new Date()
-    const sevenDaysAgo = new Date(now)
-    sevenDaysAgo.setDate(now.getDate() - 7)
+    const daysAgo = new Date(now)
+    const { days } = await this.prisma.settings.findFirst()
+    daysAgo.setDate(now.getDate() - days)
 
     const user = await this.prisma.user.findUnique({
       where: fieldName === "profileId" ? {
@@ -90,7 +92,7 @@ export class AppService {
         tweets: {
           where: {
             createdAt: {
-              gte: sevenDaysAgo,
+              gte: daysAgo,
               lte: now,
             }
           }
@@ -107,7 +109,7 @@ export class AppService {
         tweets: {
           where: {
             createdAt: {
-              gte: sevenDaysAgo,
+              gte: daysAgo,
               lte: now,
             }
           }
@@ -226,7 +228,7 @@ export class AppService {
         return this.response.sendError(res, StatusCodes.BadRequest, "Already used your referral")
       }
 
-      const { point } = await this.prisma.refPoint.findFirst()
+      const { point } = await this.prisma.settings.findFirst()
 
       await this.prisma.$transaction([
         this.prisma.user.update({
