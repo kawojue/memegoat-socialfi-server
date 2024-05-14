@@ -4,14 +4,14 @@ import {
 } from '@nestjs/common'
 
 @Injectable()
-export class CookieAuthGuard implements CanActivate {
+export class JwtAuthGuard implements CanActivate {
     constructor(private readonly jwtService: JwtService) { }
 
     async canActivate(context: ExecutionContext) {
         const ctx = context.switchToHttp()
         const request = ctx.getRequest()
 
-        const token = request.cookies?.token
+        const token = request.headers.authorization?.split('Bearer ')[1]
         if (!token) return false
 
         try {
