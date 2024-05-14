@@ -59,7 +59,7 @@ export class AdminService {
                 return this.response.sendError(res, StatusCodes.Unauthorized, "Incorrect password")
             }
 
-            const access_token = await this.jwt.signAsync({ sub: admin.id, email })
+            const access_token = await this.jwt.signAsync({ sub: admin.id })
 
             this.response.sendSuccess(res, StatusCodes.OK, { data: { email }, access_token })
         } catch (err) {
