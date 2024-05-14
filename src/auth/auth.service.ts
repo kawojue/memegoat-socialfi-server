@@ -17,6 +17,7 @@ export class AuthService {
             const profile = req.user?.profile
 
             const profileId = profile.id?.toString()
+            const username = profile.username.toLowerCase()
 
             const photos = profile.photos
             let image: string = null
@@ -31,14 +32,13 @@ export class AuthService {
 
             if (user && (
                 user.avatar !== image ||
-                user.username !== profile.username ||
+                user.username !== username ||
                 user.displayName !== profile.displayName
             )) {
                 await this.prisma.user.update({
                     where: { profileId },
                     data: {
-                        avatar: image,
-                        username: profile.username,
+                        avatar: image, username,
                         displayName: profile.displayName,
                     }
                 })
@@ -49,17 +49,18 @@ export class AuthService {
 
                 user = await this.prisma.user.create({
                     data: {
-                        avatar: image,
                         profileId: profileId,
                         smartKey: encryptedKey,
-                        username: profile.username,
+                        avatar: image, username,
                         displayName: profile.displayName,
                     }
                 })
             }
 
             const token = await this.jwtService.signAsync({
-                username: user.username, sub: user.id, profileId
+                username,
+                profileId,
+                sub: user.id,
             })
 
             return token

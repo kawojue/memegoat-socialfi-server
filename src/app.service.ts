@@ -97,46 +97,11 @@ export class AppService {
 
     if (!user) return
 
-    const users = await this.prisma.user.findMany({
-      select: {
-        id: true,
-        refPoint: true,
-        tweets: {
-          where: {
-            createdAt: {
-              gte: daysAgo,
-              lte: now,
-            }
-          }
-        },
-      },
-    })
-
     let leaderboardData = [] as {
       id: string
-      impressions: number
       tweets: number
+      impressions: number
     }[]
-
-    for (const u of users) {
-      let impressions = u.refPoint
-
-      for (const tweet of u.tweets) {
-        if (tweet.referenced) {
-          impressions += tweet.like + tweet.retweet + tweet.reply + tweet.impression + tweet.quote
-        }
-      }
-
-      if (impressions > 0) {
-        leaderboardData.push({
-          id: u.id,
-          impressions,
-          tweets: u.tweets.length,
-        })
-      }
-    }
-
-    leaderboardData.sort((a, b) => b.impressions - a.impressions)
 
     const metadata = {
       views: 0,
@@ -160,12 +125,45 @@ export class AppService {
       metadata.retweets += tweet.retweet
     }
 
+    if (hasTurnedOffCampaign === false) {
+      const users = await this.prisma.user.findMany({
+        select: {
+          id: true,
+          refPoint: true,
+          tweets: {
+            where: {
+              createdAt: {
+                gte: daysAgo,
+                lte: now,
+              }
+            }
+          },
+        },
+      })
+
+      for (const u of users) {
+        let impressions = u.refPoint
+
+        for (const tweet of u.tweets) {
+          if (tweet.referenced) {
+            impressions += tweet.like + tweet.retweet + tweet.reply + tweet.impression + tweet.quote
+          }
+        }
+
+        if (impressions > 0) {
+          leaderboardData.push({
+            id: u.id,
+            impressions,
+            tweets: u.tweets.length,
+          })
+        }
+      }
+
+      leaderboardData.sort((a, b) => b.impressions - a.impressions)
+    }
+
     const userIndex = leaderboardData.findIndex(u => u.id === user.id)
     const userRank = hasTurnedOffCampaign ? null : userIndex !== -1 ? userIndex + 1 : null
-
-    if (hasTurnedOffCampaign) {
-      leaderboardData = []
-    }
 
     return { user, metadata, userRank }
   }
