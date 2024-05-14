@@ -23,7 +23,7 @@ export class AppService {
     try {
       const now = new Date()
       const daysAgo = new Date(now)
-      const { days } = await this.prisma.settings.findFirst()
+      const { days, hasTurnedOffCampaign } = await this.prisma.settings.findFirst()
       daysAgo.setDate(now.getDate() - days)
 
       const users = await this.prisma.user.findMany({
@@ -41,7 +41,7 @@ export class AppService {
         },
       })
 
-      const leaderboardData = [] as {
+      let leaderboardData = [] as {
         tweets: number
         username: string
         impressions: number
@@ -69,6 +69,10 @@ export class AppService {
 
       leaderboardData.sort((a, b) => b.impressions - a.impressions)
 
+      if (hasTurnedOffCampaign) {
+        leaderboardData = []
+      }
+
       this.response.sendSuccess(res, StatusCodes.OK, { data: leaderboardData })
     } catch (err) {
       console.error(err)
@@ -79,7 +83,7 @@ export class AppService {
   private async info(key: string, fieldName: 'smartKey' | 'profileId') {
     const now = new Date()
     const daysAgo = new Date(now)
-    const { days } = await this.prisma.settings.findFirst()
+    const { days, hasTurnedOffCampaign } = await this.prisma.settings.findFirst()
     daysAgo.setDate(now.getDate() - days)
 
     const user = await this.prisma.user.findUnique({
@@ -108,7 +112,7 @@ export class AppService {
       },
     })
 
-    const leaderboardData = [] as {
+    let leaderboardData = [] as {
       id: string
       impressions: number
       tweets: number
@@ -157,7 +161,11 @@ export class AppService {
     }
 
     const userIndex = leaderboardData.findIndex(u => u.id === user.id)
-    const userRank = userIndex !== -1 ? userIndex + 1 : null
+    const userRank = hasTurnedOffCampaign ? null : userIndex !== -1 ? userIndex + 1 : null
+
+    if (hasTurnedOffCampaign) {
+      leaderboardData = []
+    }
 
     return { user, metadata, userRank }
   }

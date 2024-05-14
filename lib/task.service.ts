@@ -48,7 +48,7 @@ export class TaskService {
                                 const { data } = await this.x.v2.singleTweet(id, {
                                     'tweet.fields': 'author_id',
                                 })
-                                if (data.author_id === process.env.X_PROFILE_ID) {
+                                if (data.author_id === settings.profileId) {
                                     referenced = true
                                 }
                             }))

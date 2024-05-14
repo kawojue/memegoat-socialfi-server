@@ -38,6 +38,7 @@ model Tweet {
 
 model Settings {
     id                   String   @id @default(auto()) @map("_id") @db.ObjectId
+    profileId            String   @default("1765374788577398784")
     hasTurnedOffCampaign Boolean  @default(false)
     days                 Int      @default(7)
     tags                 String[]
