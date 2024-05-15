@@ -34,7 +34,7 @@ export class AuthController {
 
       res.redirect('https://testing.memegoat.io/social')
     } catch {
-      res.redirect('https://testing.memegoat.io/auth/social')
+      res.redirect('https://testing.memegoat.io/social')
     }
   }
 }

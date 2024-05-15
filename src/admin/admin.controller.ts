@@ -1,12 +1,12 @@
 import { Response } from 'express'
 import { AuthDTO } from './dto/auth.dto'
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import {
   Body, Controller, Get, Post, Res, UseGuards
 } from '@nestjs/common'
 import { AdminService } from './admin.service'
 import { SettingsDTO } from './dto/settings.dto'
 import { JwtAuthGuard } from 'src/jwt/jwt-auth.guard'
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 
 @ApiTags("Admin")
 @Controller('admin')
