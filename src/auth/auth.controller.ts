@@ -34,9 +34,9 @@ export class AuthController {
       });
 
       // res.send({ token: token });
-      res.redirect('https://socialfi.memegoat.io/dashboard');
+      res.redirect('https://app.memegoat.io/social');
     } catch {
-      res.redirect('https://socialfi.memegoat.io');
+      res.redirect('https://app.memegoat.io/social');
     }
   }
 }
