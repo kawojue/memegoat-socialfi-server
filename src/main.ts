@@ -17,6 +17,7 @@ async function bootstrap() {
       'https://memegoat.io',
       'https://socialfi.memegoat.io',
       'https://memegoat-socialfi-backend.onrender.com',
+      'https://testing.memegoat.io',
       'https://api-socialfi.memegoat.io/dashboard',
       'https://memegoat.onrender.com',
       'https://memegoat-client.vercel.app',
