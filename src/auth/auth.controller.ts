@@ -34,9 +34,9 @@ export class AuthController {
       });
 
       // res.send({ token: token });
-      res.redirect('https://app.memegoat.io/social');
+      res.redirect('https://testing.memegoat.io/social');
     } catch {
-      res.redirect('https://app.memegoat.io/social');
+      res.redirect('https://testing.memegoat.io/social');
     }
   }
 }
