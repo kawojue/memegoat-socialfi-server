@@ -17,6 +17,7 @@ async function bootstrap() {
       'https://memegoat.io',
       'https://socialfi.memegoat.io',
       'https://memegoat-socialfi-backend.onrender.com',
+      'https://api-socialfi.memegoat.io/dashboard',
       'https://memegoat.onrender.com',
       'https://memegoat-client.vercel.app',
     ],
@@ -39,7 +40,7 @@ async function bootstrap() {
   const swaggerOptions = new DocumentBuilder()
     .setTitle('Memegoat API')
     .setVersion('1.2.7')
-    .addServer(`https://memegoat-socialfi-backend.onrender.com`, 'Staging')
+    .addServer(`https://api-socialfi.memegoat.io`, 'Staging')
     .addServer(`http://localhost:${PORT}`, 'Local')
     .addBearerAuth()
     .build();
