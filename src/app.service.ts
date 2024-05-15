@@ -36,6 +36,7 @@ export class AppService {
               }
             }
           },
+          avatar: true,
           username: true,
           displayName: true,
         },
@@ -46,6 +47,7 @@ export class AppService {
         username: string
         impressions: number
         displayName: string
+        avatar: string | null
       }[]
 
       for (const user of users) {
@@ -60,6 +62,7 @@ export class AppService {
         if (impressions > 0) {
           leaderboardData.push({
             impressions,
+            avatar: user.avatar,
             username: user.username,
             tweets: user.tweets.length,
             displayName: user.displayName,

@@ -41,7 +41,9 @@ export class TaskService {
                 const tweetPromises = tweets.map(async ({ id, public_metrics, text, referenced_tweets, author_id }) => {
                     if (author_id !== settings.profileId) {
                         const tags = settings.tags.map((tag) => tag.toLowerCase().trim())
-                        if (tags.includes(text.toLowerCase().trim())) {
+                        const containsTag = tags.some(tag => text.toLowerCase().trim().includes(tag))
+
+                        if (containsTag) {
                             let referenced = false
 
                             if (referenced_tweets) {
@@ -56,6 +58,7 @@ export class TaskService {
                             }
 
                             const existingTweet = existingTweetMap.get(id)
+
                             if (existingTweet && public_metrics.impression_count > existingTweet.impression) return
 
                             if (existingTweet) {
