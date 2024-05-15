@@ -1,7 +1,7 @@
-import { Request } from 'express';
-import { Injectable } from '@nestjs/common';
-import { Strategy } from 'passport-twitter';
-import { PassportStrategy } from '@nestjs/passport';
+import { Request } from 'express'
+import { Injectable } from '@nestjs/common'
+import { Strategy } from 'passport-twitter'
+import { PassportStrategy } from '@nestjs/passport'
 
 @Injectable()
 export class XStrategy extends PassportStrategy(Strategy) {
@@ -11,7 +11,7 @@ export class XStrategy extends PassportStrategy(Strategy) {
       consumerSecret: process.env.X_API_SECRET,
       passReqToCallback: true,
       callbackURL: 'https://api-socialfi.memegoat.io/auth/x/callback',
-    });
+    })
   }
 
   async validate(
@@ -25,7 +25,7 @@ export class XStrategy extends PassportStrategy(Strategy) {
       accessToken,
       refreshToken,
       profile,
-    };
-    done(null, user);
+    }
+    done(null, user)
   }
 }
