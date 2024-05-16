@@ -113,7 +113,7 @@ export class AppService {
 
     if (!user) return;
 
-    let leaderboardData = [] as {
+    const leaderboardData = [] as {
       id: string;
       tweets: number;
       impressions: number;
@@ -195,8 +195,9 @@ export class AppService {
 
   async dashboard(res: Response, req: Request) {
     // @ts-ignore
+    const profileId = req.user?.profileId;
     const { metadata, user, userRank } = await this.info(
-      req.user?.profileId,
+      profileId,
       'profileId',
     );
     this.response.sendSuccess(res, StatusCodes.OK, {
