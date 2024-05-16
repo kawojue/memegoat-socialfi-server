@@ -10,7 +10,7 @@ export class XStrategy extends PassportStrategy(Strategy) {
       consumerKey: process.env.X_API_KEY,
       consumerSecret: process.env.X_API_SECRET,
       passReqToCallback: true,
-      callbackURL: 'https://api-socialfi.memegoat.dev/auth/x/callback',
+      callbackURL: 'https://api-socialfi.memegoat.io/auth/x/callback',
     })
   }
 
