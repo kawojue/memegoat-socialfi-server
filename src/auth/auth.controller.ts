@@ -41,6 +41,12 @@ export class AuthController {
 
   @Post('/logout')
   logout(@Res() res: Response) {
-    this.authService.logout(res)
+    const isProd = process.env.NODE_ENV === 'production'
+
+    res.clearCookie('token', {
+      sameSite: isProd ? 'none' : 'lax',
+      secure: isProd,
+    })
+    res.sendStatus(204)
   }
 }

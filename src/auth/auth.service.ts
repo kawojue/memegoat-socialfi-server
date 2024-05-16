@@ -74,9 +74,4 @@ export class AuthService {
       console.error(err)
     }
   }
-
-  logout(res: Response) {
-    res.clearCookie('token')
-    res.sendStatus(204)
-  }
 }
