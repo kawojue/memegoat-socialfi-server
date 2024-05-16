@@ -39,13 +39,14 @@ export class TaskService {
                 const existingTweetMap = new Map(existingTweets.map(tweet => [tweet.postId, tweet]))
 
                 const tweetPromises = tweets.map(async ({ id, public_metrics, text, referenced_tweets, author_id }) => {
-                    if (author_id !== settings.profileId) {
-                        const tags = settings.tags.map((tag) => tag.toLowerCase().trim())
-                        const containsTag = tags.some(tag => text.toLowerCase().trim().includes(tag))
 
-                        if (containsTag) {
-                            let referenced = false
+                    const tags = settings.tags.map((tag) => tag.toLowerCase().trim())
+                    const containsTag = tags.some(tag => text.toLowerCase().trim().includes(tag))
 
+                    if (containsTag) {
+                        let referenced = false
+
+                        if (author_id !== settings.profileId) {
                             if (referenced_tweets) {
                                 await Promise.all(referenced_tweets.map(async ({ id }) => {
                                     const { data } = await this.x.v2.singleTweet(id, {
@@ -56,37 +57,37 @@ export class TaskService {
                                     }
                                 }))
                             }
+                        }
 
-                            const existingTweet = existingTweetMap.get(id)
+                        const existingTweet = existingTweetMap.get(id)
 
-                            if (existingTweet && public_metrics.impression_count > existingTweet.impression) return
+                        if (existingTweet && public_metrics.impression_count > existingTweet.impression) return
 
-                            if (existingTweet) {
-                                await this.prisma.tweet.update({
-                                    where: { postId: id },
-                                    data: {
-                                        referenced,
-                                        like: public_metrics.like_count,
-                                        reply: public_metrics.reply_count,
-                                        quote: public_metrics.quote_count,
-                                        retweet: public_metrics.retweet_count,
-                                        impression: public_metrics.impression_count,
-                                    },
-                                })
-                            } else {
-                                await this.prisma.tweet.create({
-                                    data: {
-                                        postId: id,
-                                        referenced,
-                                        like: public_metrics.like_count,
-                                        reply: public_metrics.reply_count,
-                                        quote: public_metrics.quote_count,
-                                        retweet: public_metrics.retweet_count,
-                                        impression: public_metrics.impression_count,
-                                        user: { connect: { id: user.id } },
-                                    },
-                                })
-                            }
+                        if (existingTweet) {
+                            await this.prisma.tweet.update({
+                                where: { postId: id },
+                                data: {
+                                    referenced,
+                                    like: public_metrics.like_count,
+                                    reply: public_metrics.reply_count,
+                                    quote: public_metrics.quote_count,
+                                    retweet: public_metrics.retweet_count,
+                                    impression: public_metrics.impression_count,
+                                },
+                            })
+                        } else {
+                            await this.prisma.tweet.create({
+                                data: {
+                                    postId: id,
+                                    referenced,
+                                    like: public_metrics.like_count,
+                                    reply: public_metrics.reply_count,
+                                    quote: public_metrics.quote_count,
+                                    retweet: public_metrics.retweet_count,
+                                    impression: public_metrics.impression_count,
+                                    user: { connect: { id: user.id } },
+                                },
+                            })
                         }
                     }
                 })
