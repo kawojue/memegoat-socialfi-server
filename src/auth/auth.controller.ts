@@ -1,17 +1,17 @@
-import { Request, Response } from 'express'
-import { AuthService } from './auth.service'
-import { AuthGuard } from '@nestjs/passport'
-import { ApiOperation, ApiTags } from '@nestjs/swagger'
-import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common'
+import { Request, Response } from 'express';
+import { AuthService } from './auth.service';
+import { AuthGuard } from '@nestjs/passport';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) { }
+  constructor(private readonly authService: AuthService) {}
 
   @Get('/x')
   @UseGuards(AuthGuard('twitter'))
-  async xLogin() { }
+  async xLogin() {}
 
   @ApiOperation({
     summary: 'Ignore this',
@@ -22,20 +22,20 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const isProd = process.env.NODE_ENV === 'production'
+    const isProd = process.env.NODE_ENV === 'production';
 
     try {
-      const token = await this.authService.auth(req)
+      const token = await this.authService.auth(req);
 
       res.cookie('token', token, {
-        sameSite: isProd ? "none" : 'lax',
+        sameSite: isProd ? 'none' : 'lax',
         secure: isProd,
         maxAge: 7 * 24 * 60 * 60 * 1000,
-      })
+      });
 
-      res.redirect('https://testing.memegoat.io/social')
+      res.redirect('https://socialfi.memegoat.dev/dashboard');
     } catch {
-      res.redirect('https://testing.memegoat.io/social')
+      res.redirect('https://socialfi.memegoat.dev');
     }
   }
 }
