@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import { AuthService } from './auth.service'
 import { AuthGuard } from '@nestjs/passport'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
-import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common'
+import { Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common'
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -37,5 +37,10 @@ export class AuthController {
     } catch {
       res.redirect('https://socialfi.memegoat.io')
     }
+  }
+
+  @Post('/logout')
+  logout(@Res() res: Response) {
+    this.authService.logout(res)
   }
 }
