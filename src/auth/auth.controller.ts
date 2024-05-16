@@ -33,9 +33,9 @@ export class AuthController {
         maxAge: 7 * 24 * 60 * 60 * 1000,
       })
 
-      res.redirect('https://socialfi.memegoat.dev/dashboard')
+      res.redirect('https://socialfi.memegoat.io/dashboard')
     } catch {
-      res.redirect('https://socialfi.memegoat.dev')
+      res.redirect('https://socialfi.memegoat.io')
     }
   }
 }
