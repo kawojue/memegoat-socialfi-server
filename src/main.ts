@@ -1,14 +1,15 @@
-import * as express from 'express';
-import * as passport from 'passport';
-import { AppModule } from './app.module';
-import * as session from 'express-session';
-import { NestFactory } from '@nestjs/core';
-import * as cookieParser from 'cookie-parser';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as express from 'express'
+import * as passport from 'passport'
+import { AppModule } from './app.module'
+import * as session from 'express-session'
+import { NestFactory } from '@nestjs/core'
+import * as cookieParser from 'cookie-parser'
+import { ValidationPipe } from '@nestjs/common'
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 
 async function bootstrap() {
-  const PORT: number = parseInt(process.env.PORT, 10) || 2005;
-  const app = await NestFactory.create(AppModule);
+  const PORT: number = parseInt(process.env.PORT, 10) || 2005
+  const app = await NestFactory.create(AppModule)
 
   app.enableCors({
     origin: [
@@ -26,19 +27,20 @@ async function bootstrap() {
     credentials: true,
     optionsSuccessStatus: 200,
     methods: 'GET,POST,OPTIONS',
-  });
+  })
 
-  app.use(express.json({ limit: 2 << 20 }));
-  app.use(cookieParser());
+  app.use(express.json({ limit: 2 << 20 }))
+  app.use(cookieParser())
   app.use(
     session({
       resave: false,
       saveUninitialized: false,
       secret: process.env.SESSION_SECRET!,
     }),
-  );
-  app.use(passport.session());
-  app.use(passport.initialize());
+  )
+  app.use(passport.session())
+  app.use(passport.initialize())
+  app.useGlobalPipes(new ValidationPipe())
 
   const swaggerOptions = new DocumentBuilder()
     .setTitle('Memegoat API')
@@ -46,16 +48,16 @@ async function bootstrap() {
     .addServer(`https://api-socialfi.memegoat.dev`, 'Staging')
     .addServer(`http://localhost:${PORT}`, 'Local')
     .addBearerAuth()
-    .build();
+    .build()
 
-  const swaggerDocument = SwaggerModule.createDocument(app, swaggerOptions);
-  SwaggerModule.setup('docs', app, swaggerDocument);
+  const swaggerDocument = SwaggerModule.createDocument(app, swaggerOptions)
+  SwaggerModule.setup('docs', app, swaggerDocument)
 
   try {
-    await app.listen(PORT);
-    console.log(`http://localhost:${PORT}`);
+    await app.listen(PORT)
+    console.log(`http://localhost:${PORT}`)
   } catch (err) {
-    console.error(err.message);
+    console.error(err.message)
   }
 }
-bootstrap();
+bootstrap()
