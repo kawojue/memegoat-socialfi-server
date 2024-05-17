@@ -16,7 +16,7 @@ export class TaskService {
         this.x = this.twit.readOnly
     }
 
-    @Cron(CronExpression.EVERY_10_MINUTES)
+    @Cron(CronExpression.EVERY_MINUTE)
     async metrics() {
         try {
             const settings = await this.prisma.settings.findFirst()
@@ -63,8 +63,6 @@ export class TaskService {
                         }
 
                         const existingTweet = existingTweetMap.get(id)
-                        if (existingTweet && public_metrics.impression_count == existingTweet.impression) return
-
                         if (existingTweet) {
                             await this.prisma.tweet.update({
                                 where: { postId: id },
