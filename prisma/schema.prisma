@@ -22,18 +22,19 @@ model User {
 }
 
 model Tweet {
-    id         String   @id @default(auto()) @map("_id") @db.ObjectId
-    postId     String   @unique
-    like       Int      @default(0)
-    reply      Int      @default(0)
-    quote      Int      @default(0)
-    retweet    Int      @default(0)
-    impression Int      @default(0)
-    referenced Boolean  @default(false)
-    createdAt  DateTime @default(now())
-    updatedAt  DateTime @updatedAt
-    user       User     @relation(references: [id], fields: [userId])
-    userId     String   @unique @db.ObjectId
+    id         String    @id @default(auto()) @map("_id") @db.ObjectId
+    postId     String    @unique
+    postedAt   DateTime?
+    like       Int       @default(0)
+    reply      Int       @default(0)
+    quote      Int       @default(0)
+    retweet    Int       @default(0)
+    impression Int       @default(0)
+    referenced Boolean   @default(false)
+    createdAt  DateTime  @default(now())
+    updatedAt  DateTime  @updatedAt
+    user       User      @relation(references: [id], fields: [userId])
+    userId     String    @unique @db.ObjectId
 }
 
 model Settings {
