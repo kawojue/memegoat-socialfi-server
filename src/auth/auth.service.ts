@@ -39,8 +39,7 @@ export class AuthService {
         await this.prisma.user.update({
           where: { profileId },
           data: {
-            avatar: image,
-            username,
+            avatar: image, username,
             displayName: profile.displayName,
           },
         })
@@ -55,9 +54,9 @@ export class AuthService {
         user = await this.prisma.user.create({
           data: {
             profileId: profileId,
+            createdAt: new Date(),
             smartKey: encryptedKey,
-            avatar: image,
-            username,
+            username, avatar: image,
             displayName: profile.displayName,
           },
         })

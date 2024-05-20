@@ -96,15 +96,13 @@ export class TaskService {
             }))
 
             const now = new Date()
-            const twentyFourHours = new Date(now)
-            twentyFourHours.setDate(now.getDate() + 1)
+            const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000)
 
             await this.prisma.user.updateMany({
                 where: {
                     useRef: false,
                     createdAt: {
-                        gte: now,
-                        lte: twentyFourHours,
+                        lte: twentyFourHoursAgo,
                     },
                 },
                 data: { useRef: true }
