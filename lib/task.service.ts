@@ -103,8 +103,8 @@ export class TaskService {
                 where: {
                     useRef: false,
                     createdAt: {
-                        gte: twentyFourHours,
-                        lte: now,
+                        gte: now,
+                        lte: twentyFourHours,
                     },
                 },
                 data: { useRef: true }
