@@ -1,7 +1,7 @@
 import { Response } from 'express'
 import { AuthDTO } from './dto/auth.dto'
 import {
-  Body, Controller, Get, Post, Res, UseGuards
+  Body, Controller, Get, Param, Post, Res, UseGuards
 } from '@nestjs/common'
 import { AdminService } from './admin.service'
 import { SettingsDTO } from './dto/settings.dto'
@@ -42,5 +42,12 @@ export class AdminController {
   @UseGuards(JwtAuthGuard)
   async tweakSettings(@Res() res: Response, @Body() body: SettingsDTO) {
     await this.adminService.tweakSettings(res, body)
+  }
+
+  @Post('/tasks/:taskId')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  async removeTask(@Res() res: Response, @Param('taskId') taskId: string) {
+    await this.adminService.removeTask(res, taskId)
   }
 }
