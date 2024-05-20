@@ -190,7 +190,7 @@ export class AppService {
         ? userIndex + 1
         : null
 
-    return { user, metadata, userRank }
+    return { user, metadata, userRank, hasTurnedOffCampaign }
   }
 
   async dashboard(res: Response, req: Request) {
