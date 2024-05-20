@@ -307,4 +307,12 @@ export class AppService {
       )
     }
   }
+
+  async fetchTasks(res: Response) {
+    this.response.sendSuccess(res, StatusCodes.OK, {
+      data: await this.prisma.task.findMany({
+        orderBy: { createdAt: 'desc' }
+      })
+    })
+  }
 }

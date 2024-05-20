@@ -131,4 +131,20 @@ export class AdminService {
             this.response.sendError(res, StatusCodes.InternalServerError, "Something went wrong")
         }
     }
+
+    async removeTask(res: Response, taskId: string) {
+        const task = await this.prisma.task.findUnique({
+            where: { id: taskId }
+        })
+
+        if (!task) {
+            return this.response.sendError(res, StatusCodes.NotFound, "Task not found")
+        }
+
+        await this.prisma.task.delete({
+            where: { id: taskId }
+        })
+
+        this.response.sendSuccess(res, StatusCodes.OK, {})
+    }
 }

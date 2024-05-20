@@ -51,3 +51,10 @@ model Admin {
     email    String @unique
     password String
 }
+
+model Task {
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    content   String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}

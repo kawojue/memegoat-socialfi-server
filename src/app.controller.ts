@@ -49,4 +49,9 @@ export class AppController {
   ) {
     await this.appService.verifyRef(req, res, body)
   }
+
+  @Get('/tasks')
+  async fetchTasks(@Res() res: Response) {
+    await this.appService.fetchTasks(res)
+  }
 }
