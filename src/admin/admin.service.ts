@@ -7,6 +7,7 @@ import { SettingsDTO } from './dto/settings.dto'
 import { Encryption } from 'lib/encryption.service'
 import { PrismaService } from 'prisma/prisma.service'
 import { ResponseService } from 'lib/response.service'
+import { AddTaskDTO } from './dto/task.dto'
 
 @Injectable()
 export class AdminService {
@@ -146,5 +147,13 @@ export class AdminService {
         })
 
         this.response.sendSuccess(res, StatusCodes.OK, {})
+    }
+
+    async addTask(res: Response, { content }: AddTaskDTO) {
+        const task = await this.prisma.task.create({
+            data: { content }
+        })
+
+        this.response.sendSuccess(res, StatusCodes.OK, { data: task })
     }
 }

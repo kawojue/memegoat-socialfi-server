@@ -1,12 +1,13 @@
 import { Response } from 'express'
 import { AuthDTO } from './dto/auth.dto'
-import {
-  Body, Controller, Get, Param, Post, Res, UseGuards
-} from '@nestjs/common'
+import { AddTaskDTO } from './dto/task.dto'
 import { AdminService } from './admin.service'
 import { SettingsDTO } from './dto/settings.dto'
 import { JwtAuthGuard } from 'src/jwt/jwt-auth.guard'
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
+import {
+  Body, Controller, Delete, Get, Param, Post, Res, UseGuards
+} from '@nestjs/common'
 
 @ApiTags("Admin")
 @Controller('admin')
@@ -44,7 +45,14 @@ export class AdminController {
     await this.adminService.tweakSettings(res, body)
   }
 
-  @Post('/tasks/:taskId')
+  @ApiBearerAuth()
+  @Post('tasks/new')
+  @UseGuards(JwtAuthGuard)
+  async addTask(@Res() res: Response, @Body() body: AddTaskDTO) {
+    await this.adminService.addTask(res, body)
+  }
+
+  @Delete('/tasks/:taskId')
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   async removeTask(@Res() res: Response, @Param('taskId') taskId: string) {
