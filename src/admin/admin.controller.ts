@@ -31,13 +31,6 @@ export class AdminController {
     await this.adminService.fetchSettings(res)
   }
 
-  @Post('settings/toggle-campaign')
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
-  async toggleCampaign(@Res() res: Response) {
-    await this.adminService.toggleCampaign(res)
-  }
-
   @Post('/settings')
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)

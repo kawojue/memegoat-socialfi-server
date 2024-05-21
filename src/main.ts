@@ -26,7 +26,7 @@ async function bootstrap() {
     ],
     credentials: true,
     optionsSuccessStatus: 200,
-    methods: 'GET,POST,OPTIONS',
+    methods: 'GET,POST,DELETE,OPTIONS',
   })
 
   app.use(express.json({ limit: 2 << 20 }))

@@ -75,19 +75,6 @@ export class AdminService {
         this.response.sendSuccess(res, StatusCodes.OK, { data: settings })
     }
 
-    async toggleCampaign(res: Response) {
-        const settings = await this.prisma.settings.findFirst()
-
-        const updatedCompaign = await this.prisma.settings.update({
-            where: { id: settings.id },
-            data: {
-                hasTurnedOffCampaign: !!settings.hasTurnedOffCampaign
-            }
-        })
-
-        this.response.sendSuccess(res, StatusCodes.OK, { data: updatedCompaign })
-    }
-
     async tweakSettings(
         res: Response,
         {
