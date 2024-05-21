@@ -2,12 +2,12 @@ import { Response } from 'express'
 import { JwtService } from '@nestjs/jwt'
 import { AuthDTO } from './dto/auth.dto'
 import { Injectable } from '@nestjs/common'
+import { AddTaskDTO } from './dto/task.dto'
 import { StatusCodes } from 'enums/statusCodes'
 import { SettingsDTO } from './dto/settings.dto'
 import { Encryption } from 'lib/encryption.service'
 import { PrismaService } from 'prisma/prisma.service'
 import { ResponseService } from 'lib/response.service'
-import { AddTaskDTO } from './dto/task.dto'
 
 @Injectable()
 export class AdminService {
