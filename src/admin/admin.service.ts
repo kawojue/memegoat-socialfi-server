@@ -78,45 +78,50 @@ export class AdminService {
     async tweakSettings(
         res: Response,
         {
-            point, days, tags,
-            campaign, profileId,
+            point,
+            days,
+            tags,
+            campaign,
+            profileId,
         }: SettingsDTO
     ) {
         try {
             const settings = await this.prisma.settings.findFirst()
 
-            if (point === undefined || point === null) {
-                point = settings.point
+            if (!settings) {
+                return this.response.sendError(res, StatusCodes.NotFound, "Settings not found")
             }
 
-            if (!days) {
-                days = settings.days
-            }
+            point = point ?? settings.point
+            days = days ?? settings.days
+            profileId = profileId ?? settings.profileId
 
-            if (campaign === undefined || campaign === null) {
-                campaign = settings.hasTurnedOffCampaign
-            }
-
-            if (!profileId) {
-                profileId = settings.profileId
-            }
-
-            if (!tags?.length && tags.length !== 0) {
+            if (!Array.isArray(tags)) {
                 tags = settings.tags
+            }
+
+            let campaignedAt = settings.campaignedAt
+
+            if (campaign !== undefined && campaign !== settings.hasTurnedOffCampaign) {
+                campaignedAt = campaign ? null : new Date()
             }
 
             const updatedSettings = await this.prisma.settings.update({
                 where: { id: settings.id },
                 data: {
-                    point, days, tags, profileId,
-                    hasTurnedOffCampaign: campaign
-                }
+                    point,
+                    days,
+                    tags,
+                    profileId,
+                    campaignedAt,
+                    hasTurnedOffCampaign: campaign,
+                },
             })
 
-            this.response.sendSuccess(res, StatusCodes.OK, { data: updatedSettings })
+            return this.response.sendSuccess(res, StatusCodes.OK, { data: updatedSettings })
         } catch (err) {
-            console.error(err)
-            this.response.sendError(res, StatusCodes.InternalServerError, "Something went wrong")
+            console.error('Error updating settings:', err)
+            return this.response.sendError(res, StatusCodes.InternalServerError, "Something went wrong while updating settings")
         }
     }
 

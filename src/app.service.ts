@@ -21,9 +21,21 @@ export class AppService {
   async leaderboard(res: Response) {
     try {
       const now = new Date()
+      const settings = await this.prisma.settings.findFirst()
+      const { days, hasTurnedOffCampaign, campaignedAt } = settings
+
+      if (!campaignedAt || hasTurnedOffCampaign) {
+        return this.response.sendSuccess(res, StatusCodes.OK, { data: [] })
+      }
+
+      const campaignEndDate = new Date(campaignedAt)
+      campaignEndDate.setDate(campaignEndDate.getDate() + days)
+
+      if (now > campaignEndDate) {
+        return this.response.sendSuccess(res, StatusCodes.OK, { data: [] })
+      }
+
       const daysAgo = new Date(now)
-      const { days, hasTurnedOffCampaign } =
-        await this.prisma.settings.findFirst()
       daysAgo.setDate(now.getDate() - days)
 
       const users = await this.prisma.user.findMany({
@@ -42,13 +54,13 @@ export class AppService {
         },
       })
 
-      let leaderboardData = [] as {
+      let leaderboardData: {
         tweets: number
         username: string
         impressions: number
         displayName: string
         avatar: string | null
-      }[]
+      }[] = []
 
       for (const user of users) {
         let impressions = 0
@@ -77,47 +89,23 @@ export class AppService {
 
       leaderboardData.sort((a, b) => b.impressions - a.impressions)
 
-      if (hasTurnedOffCampaign) {
-        leaderboardData = []
-      }
-
       this.response.sendSuccess(res, StatusCodes.OK, { data: leaderboardData })
     } catch (err) {
-      console.error(err)
-      this.response.sendError(
-        res,
-        StatusCodes.InternalServerError,
-        'Something went wrong',
-      )
+      console.error('Error generating leaderboard:', err)
+      this.response.sendError(res, StatusCodes.InternalServerError, 'Something went wrong while generating leaderboard')
     }
   }
 
   private async info(key: string, fieldName: 'smartKey' | 'profileId') {
     const now = new Date()
-    const daysAgo = new Date(now)
-    const { days, hasTurnedOffCampaign } =
-      await this.prisma.settings.findFirst()
-    daysAgo.setDate(now.getDate() - days)
+    const settings = await this.prisma.settings.findFirst()
+    const { days, hasTurnedOffCampaign, campaignedAt } = settings
 
     const user = await this.prisma.user.findUnique({
-      where:
-        fieldName === 'profileId'
-          ? {
-            profileId: key,
-          }
-          : {
-            smartKey: key,
-          },
-      include: { tweets: true },
+      where: fieldName === 'profileId' ? { profileId: key } : { smartKey: key },
     })
 
     if (!user) return
-
-    const leaderboardData = [] as {
-      id: string
-      tweets: number
-      impressions: number
-    }[]
 
     const metadata = {
       views: 0,
@@ -125,15 +113,13 @@ export class AppService {
       quotes: 0,
       replies: 0,
       retweets: 0,
-    } as {
-      views: number
-      likes: number
-      quotes: number
-      replies: number
-      retweets: number
     }
 
-    for (const tweet of user.tweets) {
+    const tweets = await this.prisma.tweet.findMany({
+      where: { userId: user.id },
+    })
+
+    for (const tweet of tweets) {
       metadata.likes += tweet.like
       metadata.quotes += tweet.quote
       metadata.replies += tweet.reply
@@ -141,54 +127,58 @@ export class AppService {
       metadata.retweets += tweet.retweet
     }
 
-    if (hasTurnedOffCampaign === false) {
-      const users = await this.prisma.user.findMany({
-        select: {
-          id: true,
-          refPoint: true,
-          tweets: {
-            where: {
-              createdAt: {
-                gte: daysAgo,
-                lte: now,
+    let userRank = null
+
+    if (!hasTurnedOffCampaign && campaignedAt) {
+      const campaignEndDate = new Date(campaignedAt)
+      campaignEndDate.setDate(campaignedAt.getDate() + days)
+
+      if (now <= campaignEndDate) {
+        const daysAgo = new Date(now)
+        daysAgo.setDate(now.getDate() - days)
+
+        const users = await this.prisma.user.findMany({
+          select: {
+            id: true,
+            refPoint: true,
+            tweets: {
+              where: {
+                createdAt: {
+                  gte: daysAgo,
+                  lte: now,
+                },
               },
             },
           },
-        },
-      })
+        })
 
-      for (const u of users) {
-        let impressions = u.refPoint
+        const leaderboardData = users.map(u => {
+          let impressions = u.refPoint
 
-        for (const tweet of u.tweets) {
-          if (tweet.referenced) {
-            impressions +=
-              tweet.like +
-              tweet.retweet +
-              tweet.reply +
-              tweet.impression +
-              tweet.quote
+          for (const tweet of u.tweets) {
+            if (tweet.referenced) {
+              impressions +=
+                tweet.like +
+                tweet.retweet +
+                tweet.reply +
+                tweet.impression +
+                tweet.quote
+            }
           }
-        }
 
-        if (impressions > 0) {
-          leaderboardData.push({
+          return {
             id: u.id,
             impressions,
             tweets: u.tweets.length,
-          })
-        }
+          }
+        }).filter(u => u.impressions > 0)
+
+        leaderboardData.sort((a, b) => b.impressions - a.impressions)
+
+        const userIndex = leaderboardData.findIndex(u => u.id === user.id)
+        userRank = userIndex !== -1 ? userIndex + 1 : null
       }
-
-      leaderboardData.sort((a, b) => b.impressions - a.impressions)
     }
-
-    const userIndex = leaderboardData.findIndex((u) => u.id === user.id)
-    const userRank = hasTurnedOffCampaign
-      ? null
-      : userIndex !== -1
-        ? userIndex + 1
-        : null
 
     return { user, metadata, userRank, hasTurnedOffCampaign }
   }
