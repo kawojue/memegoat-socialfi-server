@@ -103,6 +103,7 @@ export class AppService {
 
     const user = await this.prisma.user.findUnique({
       where: fieldName === 'profileId' ? { profileId: key } : { smartKey: key },
+      include: { tweets: true }
     })
 
     if (!user) return
@@ -115,11 +116,7 @@ export class AppService {
       retweets: 0,
     }
 
-    const tweets = await this.prisma.tweet.findMany({
-      where: { userId: user.id },
-    })
-
-    for (const tweet of tweets) {
+    for (const tweet of user.tweets) {
       metadata.likes += tweet.like
       metadata.quotes += tweet.quote
       metadata.replies += tweet.reply
