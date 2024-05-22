@@ -190,10 +190,7 @@ export class AppService {
   async dashboard(res: Response, req: Request) {
     // @ts-ignore
     const profileId = req.user?.profileId
-    const info = await this.info(
-      profileId,
-      'profileId',
-    )
+    const info = await this.info(profileId, 'profileId')
     this.response.sendSuccess(res, StatusCodes.OK, {
       data: {
         user: info.user,
@@ -236,9 +233,14 @@ export class AppService {
         )
       }
 
-      const { user, metadata, userRank } = await this.info(key, 'smartKey')
+      const info = await this.info(key, 'smartKey',)
       this.response.sendSuccess(res, StatusCodes.OK, {
-        data: { user, metadata, userRank },
+        data: {
+          user: info.user,
+          metadata: info.metadata,
+          userRank: info.userRank,
+          hasTurnedOffCampaign: info.hasTurnedOffCampaign,
+        },
       })
     } catch (err) {
       console.error(err)
