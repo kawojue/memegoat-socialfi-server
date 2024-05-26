@@ -1,5 +1,5 @@
 import { Response } from 'express'
-import escapeHtml from 'escape-html'
+import { escape } from 'html-escaper'
 import { JwtService } from '@nestjs/jwt'
 import { AuthDTO } from './dto/auth.dto'
 import { Injectable } from '@nestjs/common'
@@ -143,22 +143,27 @@ export class AdminService {
     }
 
     async addTask(res: Response, { content }: AddTaskDTO) {
-        const linkify = (text: string) => {
-            const urlRegex = /((https?:\/\/[^\s]+))/g
-            return text.replace(urlRegex, (url) => {
-                const escapedUrl = escapeHtml(url)
-                return `<a href="${escapedUrl}" style="text-decoration: underline">${escapedUrl}</a>`
+        try {
+            const linkify = (text: string) => {
+                const urlRegex = /((https?:\/\/[^\s]+))/g
+                return text.replace(urlRegex, (url) => {
+                    const escapedUrl = escape(url)
+                    return `<a href="${escapedUrl}" style="text-decoration: underline">${escapedUrl}</a>`
+                })
+            }
+
+            const escapedContent = escape(content)
+            const contentWithLinks = linkify(escapedContent)
+            const finalContent = `<p>${contentWithLinks}</p>`
+
+            const task = await this.prisma.task.create({
+                data: { content: finalContent }
             })
+
+            this.response.sendSuccess(res, StatusCodes.OK, { data: task })
+        } catch (err) {
+            console.error(err)
+            this.response.sendError(res, StatusCodes.InternalServerError, "Something went wrong")
         }
-
-        const escapedContent = escapeHtml(content)
-        const contentWithLinks = linkify(escapedContent)
-        const finalContent = `<p>${contentWithLinks}</p>`
-
-        const task = await this.prisma.task.create({
-            data: { content: finalContent }
-        })
-
-        this.response.sendSuccess(res, StatusCodes.OK, { data: task })
     }
 }
