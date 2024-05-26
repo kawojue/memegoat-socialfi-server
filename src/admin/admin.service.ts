@@ -1,4 +1,5 @@
 import { Response } from 'express'
+import escapeHtml from 'escape-html'
 import { JwtService } from '@nestjs/jwt'
 import { AuthDTO } from './dto/auth.dto'
 import { Injectable } from '@nestjs/common'
@@ -142,8 +143,20 @@ export class AdminService {
     }
 
     async addTask(res: Response, { content }: AddTaskDTO) {
+        const linkify = (text: string) => {
+            const urlRegex = /((https?:\/\/[^\s]+))/g
+            return text.replace(urlRegex, (url) => {
+                const escapedUrl = escapeHtml(url)
+                return `<a href="${escapedUrl}" style="text-decoration: underline">${escapedUrl}</a>`
+            })
+        }
+
+        const escapedContent = escapeHtml(content)
+        const contentWithLinks = linkify(escapedContent)
+        const finalContent = `<p>${contentWithLinks}</p>`
+
         const task = await this.prisma.task.create({
-            data: { content }
+            data: { content: finalContent }
         })
 
         this.response.sendSuccess(res, StatusCodes.OK, { data: task })
