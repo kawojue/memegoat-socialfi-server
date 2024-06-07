@@ -43,6 +43,7 @@ export class AppService {
 
       const users = await this.prisma.user.findMany({
         select: {
+          refPoint: true,
           tweets: {
             where: {
               createdAt: {
@@ -57,16 +58,10 @@ export class AppService {
         },
       })
 
-      let leaderboardData: {
-        tweets: number
-        username: string
-        impressions: number
-        displayName: string
-        avatar: string | null
-      }[] = []
+      let leaderboardData = []
 
       for (const user of users) {
-        let impressions = 0
+        let impressions = user.refPoint
 
         for (const tweet of user.tweets) {
           if (tweet.referenced) {
@@ -117,41 +112,31 @@ export class AppService {
       retweets: 0,
     }
 
+    const tweets = await this.prisma.tweet.findMany({
+      where: { userId: user.id },
+    })
+
+    const tweetCounts = await this.prisma.tweet.count({
+      where: { userId: user.id },
+    })
+
+    for (const tweet of tweets) {
+      metadata.likes += tweet.like
+      metadata.quotes += tweet.quote
+      metadata.replies += tweet.reply
+      metadata.views += tweet.impression
+      metadata.retweets += tweet.retweet
+    }
+
     let userRank = null
 
     if (!hasTurnedOffCampaign && campaignedAt) {
       const campaignEndDate = new Date(campaignedAt)
-      campaignEndDate.setDate(campaignEndDate.getDate() + days)
+      campaignEndDate.setDate(campaignedAt.getDate() + days)
 
       if (now <= campaignEndDate) {
         const daysAgo = new Date(now)
         daysAgo.setDate(now.getDate() - days)
-
-        const tweets = await this.prisma.tweet.findMany({
-          where: {
-            userId: user.id,
-            createdAt: {
-              gte: daysAgo,
-              lte: now,
-            },
-          },
-        })
-
-        const tweetCounts = tweets.length
-
-        for (const tweet of tweets) {
-          metadata.likes += tweet.like
-          metadata.quotes += tweet.quote
-          metadata.replies += tweet.reply
-          metadata.views += tweet.impression
-          metadata.retweets += tweet.retweet
-        }
-
-        let impressions = metadata.likes + metadata.quotes + metadata.replies + metadata.views + metadata.retweets
-
-        if (user.refPoint) {
-          impressions += user.refPoint
-        }
 
         const users = await this.prisma.user.findMany({
           select: {
@@ -168,49 +153,35 @@ export class AppService {
           },
         })
 
-        const leaderboardData = users.map(u => {
-          let userImpressions = u.refPoint || 0
+        const leaderboardData = users.map((u) => {
+          let impressions = u.refPoint
 
           for (const tweet of u.tweets) {
-            userImpressions +=
-              tweet.like +
-              tweet.retweet +
-              tweet.reply +
-              tweet.impression +
-              tweet.quote
+            if (tweet.referenced) {
+              impressions +=
+                tweet.like +
+                tweet.retweet +
+                tweet.reply +
+                tweet.impression +
+                tweet.quote
+            }
           }
 
           return {
             id: u.id,
-            impressions: userImpressions,
+            impressions,
             tweets: u.tweets.length,
           }
-        }).filter(u => u.impressions > 0)
+        }).filter((u) => u.impressions > 0)
 
         leaderboardData.sort((a, b) => b.impressions - a.impressions)
 
-        const userIndex = leaderboardData.findIndex(u => u.id === user.id)
+        const userIndex = leaderboardData.findIndex((u) => u.id === user.id)
         userRank = userIndex !== -1 ? userIndex + 1 : null
-
-        return {
-          user: { ...user, tweetCounts },
-          metadata,
-          userRank,
-          hasTurnedOffCampaign
-        }
       }
     }
 
-    const tweetCounts = await this.prisma.tweet.count({
-      where: { userId: user.id }
-    })
-
-    return {
-      user: { ...user, tweetCounts },
-      metadata,
-      userRank: null,
-      hasTurnedOffCampaign
-    }
+    return { user: { ...user, tweetCounts }, metadata, userRank, hasTurnedOffCampaign }
   }
 
   async dashboard(res: Response, req: Request) {
