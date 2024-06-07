@@ -60,7 +60,7 @@ export class AdminService {
 
             const access_token = await this.jwt.signAsync({ sub: admin.id }, {
                 expiresIn: '1hr',
-                secret: process.env.SESSION_SECRET
+                secret: process.env.JWT_SECRET!
             })
 
             this.response.sendSuccess(res, StatusCodes.OK, { data: { email }, access_token })
