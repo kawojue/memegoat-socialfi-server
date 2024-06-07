@@ -45,10 +45,24 @@ export class AdminController {
     await this.adminService.addTask(res, body)
   }
 
-  @Delete('/tasks/:taskId')
   @ApiBearerAuth()
+  @Delete('/tasks/:taskId')
   @UseGuards(JwtAuthGuard)
   async removeTask(@Res() res: Response, @Param('taskId') taskId: string) {
     await this.adminService.removeTask(res, taskId)
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Get('/campaign-requests')
+  async fetchCampaignRequests(@Res() res: Response) {
+    await this.adminService.fetchCampaignRequests(res)
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Get('/campaign-requests/:id')
+  async fetchCampaignRequest(@Res() res: Response, @Param('id') id: string) {
+    await this.adminService.fetchCampaignRequest(res, id)
   }
 }

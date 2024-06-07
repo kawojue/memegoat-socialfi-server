@@ -2,10 +2,14 @@ import { JwtService } from '@nestjs/jwt'
 import {
     Injectable, CanActivate, ExecutionContext
 } from '@nestjs/common'
+import { PrismaService } from 'prisma/prisma.service'
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
-    constructor(private readonly jwtService: JwtService) { }
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly jwtService: JwtService,
+    ) { }
 
     async canActivate(context: ExecutionContext) {
         const ctx = context.switchToHttp()
@@ -17,6 +21,16 @@ export class JwtAuthGuard implements CanActivate {
         try {
             const decoded = await this.jwtService.verifyAsync(token, {
                 secret: process.env.JWT_SECRET!
+            })
+
+            this.prisma.admin.findUnique({
+                where: { id: decoded.sub }
+            }).then((res) => {
+                if (!res) {
+                    return false
+                }
+            }).catch(() => {
+                return false
             })
             request.user = decoded
             return true

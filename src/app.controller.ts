@@ -8,6 +8,7 @@ import { SmartKeyDTO } from './dto/key.dto'
 import { Request, Response } from 'express'
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import { CookieAuthGuard } from './jwt/cookie-auth.guard'
+import { CampaignRequestDTO } from './dto/compaign-req.dto'
 
 @ApiTags('App')
 @Controller()
@@ -53,5 +54,10 @@ export class AppController {
   @Get('/tasks')
   async fetchTasks(@Res() res: Response) {
     await this.appService.fetchTasks(res)
+  }
+
+  @Post('/campaign-request')
+  async addCampaignRequest(@Res() res: Response, @Body() body: CampaignRequestDTO) {
+    await this.appService.addCampaignRequest(res, body)
   }
 }

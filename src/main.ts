@@ -36,7 +36,7 @@ async function bootstrap() {
   )
   app.use(passport.session())
   app.use(passport.initialize())
-  app.useGlobalPipes(new ValidationPipe())
+  app.useGlobalPipes(new ValidationPipe({ transform: true }))
 
   const swaggerOptions = new DocumentBuilder()
     .setTitle('Memegoat API')

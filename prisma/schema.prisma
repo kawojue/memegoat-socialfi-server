@@ -59,3 +59,35 @@ model Task {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
+
+model CampaignRequest {
+    id                   String   @id @default(auto()) @map("_id") @db.ObjectId
+    step                 String?
+    tx_id                String?
+    tx_status            String?
+    action               String?
+    user_addr            String?
+    token_image          String?
+    token_name           String?
+    token_desc           String?
+    token_supply         String?
+    token_ticker         String?
+    token_address        String   @unique
+    token_website        String?
+    twitter              String?
+    discord              String?
+    campaign_allocation  String?
+    campaign_description String?
+    campaign_twitter     String?
+    campaign_hashtags    String?
+    listing_allocation   String?
+    sale_allocation      String?
+    sale_description     String?
+    hard_cap             String?
+    soft_cap             String?
+    maximum_buy          String?
+    minimum_buy          String?
+    start_date           DateTime
+    end_date             DateTime
+    createdAt            DateTime @default(now())
+}

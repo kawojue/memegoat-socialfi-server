@@ -3,13 +3,16 @@ import { Request, Response } from 'express'
 import { Injectable } from '@nestjs/common'
 import { SmartKeyDTO } from './dto/key.dto'
 import { decryptKey } from 'helpers/smartKey'
+import { MiscService } from 'lib/misc.service'
 import { StatusCodes } from 'enums/statusCodes'
 import { PrismaService } from 'prisma/prisma.service'
 import { ResponseService } from 'lib/response.service'
+import { CampaignRequestDTO } from './dto/compaign-req.dto'
 
 @Injectable()
 export class AppService {
   constructor(
+    private readonly misc: MiscService,
     private readonly prisma: PrismaService,
     private readonly response: ResponseService,
   ) { }
@@ -91,8 +94,7 @@ export class AppService {
 
       this.response.sendSuccess(res, StatusCodes.OK, { data: leaderboardData })
     } catch (err) {
-      console.error('Error generating leaderboard:', err)
-      this.response.sendError(res, StatusCodes.InternalServerError, 'Something went wrong while generating leaderboard')
+      this.misc.handleServerError(res, err, 'Something went wrong while generating leaderboard')
     }
   }
 
@@ -243,12 +245,7 @@ export class AppService {
         },
       })
     } catch (err) {
-      console.error(err)
-      return this.response.sendError(
-        res,
-        StatusCodes.InternalServerError,
-        'Error decrypting key',
-      )
+      this.misc.handleServerError(res, err, 'Error decrypting key')
     }
   }
 
@@ -296,16 +293,9 @@ export class AppService {
         }),
       ])
 
-      this.response.sendSuccess(res, StatusCodes.OK, {
-        message: 'Successful',
-      })
+      this.response.sendSuccess(res, StatusCodes.OK, { message: 'Successful' })
     } catch (err) {
-      console.error(err)
-      return this.response.sendError(
-        res,
-        StatusCodes.InternalServerError,
-        'Something went wrong',
-      )
+      this.misc.handleServerError(res, err)
     }
   }
 
@@ -313,5 +303,19 @@ export class AppService {
     this.response.sendSuccess(res, StatusCodes.OK, {
       data: await this.prisma.task.findMany()
     })
+  }
+
+  async addCampaignRequest(res: Response, dto: CampaignRequestDTO) {
+    try {
+      await this.prisma.campaignRequest.upsert({
+        where: { token_address: dto.token_address },
+        create: { ...dto, end_date: new Date(dto.end_date), start_date: new Date(dto.start_date) },
+        update: { ...dto, end_date: new Date(dto.end_date), start_date: new Date(dto.start_date) }
+      })
+
+      this.response.sendSuccess(res, StatusCodes.OK, { message: "Saved" })
+    } catch (err) {
+      this.misc.handleServerError(res, err)
+    }
   }
 }

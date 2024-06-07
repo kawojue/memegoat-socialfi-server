@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt'
 import { AuthDTO } from './dto/auth.dto'
 import { Injectable } from '@nestjs/common'
 import { AddTaskDTO } from './dto/task.dto'
+import { MiscService } from 'lib/misc.service'
 import { StatusCodes } from 'enums/statusCodes'
 import { SettingsDTO } from './dto/settings.dto'
 import { Encryption } from 'lib/encryption.service'
@@ -14,6 +15,7 @@ import { ResponseService } from 'lib/response.service'
 export class AdminService {
     constructor(
         private readonly jwt: JwtService,
+        private readonly misc: MiscService,
         private readonly prisma: PrismaService,
         private readonly encryption: Encryption,
         private readonly response: ResponseService,
@@ -21,8 +23,6 @@ export class AdminService {
 
     async signup(res: Response, { email, password }: AuthDTO) {
         try {
-            email = email.toLowerCase().trim()
-
             const admin = await this.prisma.admin.findUnique({
                 where: { email }
             })
@@ -39,15 +39,12 @@ export class AdminService {
 
             this.response.sendSuccess(res, StatusCodes.Created, { message: "Successful" })
         } catch (err) {
-            console.error(err)
-            this.response.sendError(res, StatusCodes.InternalServerError, "Something went wrong")
+            this.misc.handleServerError(res, err)
         }
     }
 
     async login(res: Response, { email, password }: AuthDTO) {
         try {
-            email = email.toLowerCase().trim()
-
             const admin = await this.prisma.admin.findUnique({
                 where: { email }
             })
@@ -61,12 +58,14 @@ export class AdminService {
                 return this.response.sendError(res, StatusCodes.Unauthorized, "Incorrect password")
             }
 
-            const access_token = await this.jwt.signAsync({ sub: admin.id })
+            const access_token = await this.jwt.signAsync({ sub: admin.id }, {
+                expiresIn: '1hr',
+                secret: process.env.SESSION_SECRET
+            })
 
             this.response.sendSuccess(res, StatusCodes.OK, { data: { email }, access_token })
         } catch (err) {
-            console.error(err)
-            this.response.sendError(res, StatusCodes.InternalServerError, "Something went wrong")
+            this.misc.handleServerError(res, err)
         }
     }
 
@@ -121,8 +120,7 @@ export class AdminService {
 
             return this.response.sendSuccess(res, StatusCodes.OK, { data: updatedSettings })
         } catch (err) {
-            console.error('Error updating settings:', err)
-            return this.response.sendError(res, StatusCodes.InternalServerError, "Something went wrong while updating settings")
+            this.misc.handleServerError(res, err, "Something went wrong while updating settings")
         }
     }
 
@@ -162,8 +160,27 @@ export class AdminService {
 
             this.response.sendSuccess(res, StatusCodes.OK, { data: task })
         } catch (err) {
-            console.error(err)
-            this.response.sendError(res, StatusCodes.InternalServerError, "Something went wrong")
+            this.misc.handleServerError(res, err)
         }
+    }
+
+    async fetchCampaignRequests(res: Response) {
+        const requests = await this.prisma.campaignRequest.findMany({
+            orderBy: { createdAt: 'desc' }
+        })
+
+        this.response.sendSuccess(res, StatusCodes.OK, { data: requests })
+    }
+
+    async fetchCampaignRequest(res: Response, id: string) {
+        const request = await this.prisma.campaignRequest.findUnique({
+            where: { id }
+        })
+
+        if (!request) {
+            this.response.sendError(res, StatusCodes.NotFound, "Campaign Request not found")
+        }
+
+        this.response.sendSuccess(res, StatusCodes.OK, { data: request })
     }
 }
