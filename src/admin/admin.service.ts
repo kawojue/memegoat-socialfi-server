@@ -59,7 +59,7 @@ export class AdminService {
             }
 
             const access_token = await this.jwt.signAsync({ sub: admin.id }, {
-                expiresIn: '1hr',
+                expiresIn: '7d',
                 secret: process.env.JWT_SECRET!
             })
 
