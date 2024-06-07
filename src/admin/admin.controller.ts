@@ -14,7 +14,7 @@ import {
 export class AdminController {
   constructor(private readonly adminService: AdminService) { }
 
-  // @Post('/signup')
+  @Post('/signup')
   async signup(@Res() res: Response, @Body() body: AuthDTO) {
     await this.adminService.signup(res, body)
   }
