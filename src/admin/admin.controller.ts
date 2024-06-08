@@ -52,8 +52,6 @@ export class AdminController {
     await this.adminService.removeTask(res, taskId)
   }
 
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
   @Get('/campaign-requests')
   async fetchCampaignRequests(@Res() res: Response) {
     await this.adminService.fetchCampaignRequests(res)
