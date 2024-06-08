@@ -57,8 +57,8 @@ export class AdminController {
     await this.adminService.fetchCampaignRequests(res)
   }
 
-  @Get('/campaign-requests/:id')
-  async fetchCampaignRequest(@Res() res: Response, @Param('id') id: string) {
-    await this.adminService.fetchCampaignRequest(res, id)
+  @Get('/campaign-requests/:token_addr')
+  async fetchCampaignRequest(@Res() res: Response, @Param('token_addr') token_addr: string) {
+    await this.adminService.fetchCampaignRequest(res, token_addr)
   }
 }
