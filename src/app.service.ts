@@ -46,7 +46,7 @@ export class AppService {
           refPoint: true,
           tweets: {
             where: {
-              updatedAt: {
+              createdAt: {
                 gte: daysAgo,
                 lte: now,
               },
@@ -144,7 +144,7 @@ export class AppService {
             refPoint: true,
             tweets: {
               where: {
-                updatedAt: {
+                createdAt: {
                   gte: daysAgo,
                   lte: now,
                 },
