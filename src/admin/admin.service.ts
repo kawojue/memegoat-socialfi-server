@@ -102,7 +102,7 @@ export class AdminService {
 
             let campaignedAt = settings.campaignedAt
 
-            if (!campaign && campaign !== settings.hasTurnedOffCampaign) {
+            if (campaign !== undefined && campaign !== settings.hasTurnedOffCampaign) {
                 campaignedAt = campaign ? null : new Date()
             }
 
