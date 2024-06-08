@@ -1,6 +1,6 @@
-import { Cron } from '@nestjs/schedule'
 import { StatusCodes } from 'enums/statusCodes'
 import { PrismaService } from 'prisma/prisma.service'
+import { Cron, CronExpression } from '@nestjs/schedule'
 import { HttpException, Injectable } from '@nestjs/common'
 import { TwitterApi, TwitterApiReadOnly } from 'twitter-api-v2'
 
@@ -16,7 +16,7 @@ export class TaskService {
         this.x = this.twit.readOnly
     }
 
-    @Cron("0 */17 * * * *")
+    @Cron(CronExpression.EVERY_30_MINUTES)
     async metrics() {
         try {
             const settings = await this.prisma.settings.findFirst()
