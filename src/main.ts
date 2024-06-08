@@ -15,6 +15,7 @@ async function bootstrap() {
     origin: [
       'https://memegoat.io',
       'http://localhost:3000',
+      'http://localhost:5173',
       `http://localhost:${PORT}`,
       'https://socialfi.memegoat.io',
       'https://api-socialfi.memegoat.io',
