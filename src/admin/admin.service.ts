@@ -172,9 +172,9 @@ export class AdminService {
         this.response.sendSuccess(res, StatusCodes.OK, { data: requests })
     }
 
-    async fetchCampaignRequest(res: Response, id: string) {
+    async fetchCampaignRequest(res: Response, token_address: string) {
         const request = await this.prisma.campaignRequest.findUnique({
-            where: { id }
+            where: { token_address }
         })
 
         if (!request) {
