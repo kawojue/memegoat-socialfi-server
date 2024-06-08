@@ -59,8 +59,6 @@ export class AdminController {
     await this.adminService.fetchCampaignRequests(res)
   }
 
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
   @Get('/campaign-requests/:id')
   async fetchCampaignRequest(@Res() res: Response, @Param('id') id: string) {
     await this.adminService.fetchCampaignRequest(res, id)
