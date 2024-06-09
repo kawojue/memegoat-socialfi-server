@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt'
 import { AuthDTO } from './dto/auth.dto'
 import { Injectable } from '@nestjs/common'
 import { AddTaskDTO } from './dto/task.dto'
+import axios, { AxiosInstance } from 'axios'
 import { MiscService } from 'lib/misc.service'
 import { StatusCodes } from 'enums/statusCodes'
 import { SettingsDTO } from './dto/settings.dto'
@@ -13,13 +14,22 @@ import { ResponseService } from 'lib/response.service'
 
 @Injectable()
 export class AdminService {
+    private instance: AxiosInstance
+
     constructor(
         private readonly jwt: JwtService,
         private readonly misc: MiscService,
         private readonly prisma: PrismaService,
         private readonly encryption: Encryption,
         private readonly response: ResponseService,
-    ) { }
+    ) {
+        this.instance = axios.create({
+            baseURL: 'https://api.twitter.com',
+            headers: {
+                'Authorization': `Bearer ${process.env.X_BEARER_TOKEN}`
+            }
+        })
+    }
 
     async signup(res: Response, { email, password }: AuthDTO) {
         try {
@@ -92,12 +102,21 @@ export class AdminService {
                 return this.response.sendError(res, StatusCodes.NotFound, "Settings not found")
             }
 
-            point = point ?? settings.point
             days = days ?? settings.days
-            profileId = profileId ?? settings.profileId
+            point = point ?? settings.point
 
             if (!Array.isArray(tags)) {
                 tags = settings.tags
+            }
+
+            if (profileId && profileId !== settings.profileId) {
+                const { data: { data } } = await this.instance.get(`/2/users/by/username/${profileId}`)
+
+                profileId = data.id
+
+                console.log(profileId)
+            } else {
+                profileId = settings.profileId
             }
 
             let campaignedAt = settings.campaignedAt
