@@ -51,14 +51,4 @@ export class AdminController {
   async removeTask(@Res() res: Response, @Param('taskId') taskId: string) {
     await this.adminService.removeTask(res, taskId)
   }
-
-  @Get('/campaign-requests')
-  async fetchCampaignRequests(@Res() res: Response) {
-    await this.adminService.fetchCampaignRequests(res)
-  }
-
-  @Get('/campaign-requests/:token_addr')
-  async fetchCampaignRequest(@Res() res: Response, @Param('token_addr') token_addr: string) {
-    await this.adminService.fetchCampaignRequest(res, token_addr)
-  }
 }

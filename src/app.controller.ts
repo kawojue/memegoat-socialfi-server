@@ -1,6 +1,6 @@
 import {
-  Body, Res, Controller,
-  Get, Post, Req, UseGuards,
+  Body, Res, Controller, Req,
+  Get, Post, Param, UseGuards,
 } from '@nestjs/common'
 import { RefDTO } from './dto/ref.dto'
 import { AppService } from './app.service'
@@ -59,5 +59,16 @@ export class AppController {
   @Post('/campaign-request')
   async addCampaignRequest(@Res() res: Response, @Body() body: CampaignRequestDTO) {
     await this.appService.addCampaignRequest(res, body)
+  }
+
+
+  @Get('/campaign-requests')
+  async fetchCampaignRequests(@Res() res: Response) {
+    await this.appService.fetchCampaignRequests(res)
+  }
+
+  @Get('/campaign-requests/:token_addr')
+  async fetchCampaignRequest(@Res() res: Response, @Param('token_addr') token_addr: string) {
+    await this.appService.fetchCampaignRequest(res, token_addr)
   }
 }

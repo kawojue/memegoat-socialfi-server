@@ -182,24 +182,4 @@ export class AdminService {
             this.misc.handleServerError(res, err)
         }
     }
-
-    async fetchCampaignRequests(res: Response) {
-        const requests = await this.prisma.campaignRequest.findMany({
-            orderBy: { createdAt: 'desc' }
-        })
-
-        this.response.sendSuccess(res, StatusCodes.OK, { data: requests })
-    }
-
-    async fetchCampaignRequest(res: Response, token_address: string) {
-        const request = await this.prisma.campaignRequest.findUnique({
-            where: { token_address }
-        })
-
-        if (!request) {
-            this.response.sendError(res, StatusCodes.NotFound, "Campaign Request not found")
-        }
-
-        this.response.sendSuccess(res, StatusCodes.OK, { data: request })
-    }
 }
