@@ -20,6 +20,7 @@ async function bootstrap() {
       'https://socialfi.memegoat.io',
       'https://api-socialfi.memegoat.io',
       'https://socialfi-admin.memegoat.io',
+      'https://test.memegoat.io',
     ],
     credentials: true,
     optionsSuccessStatus: 200,
