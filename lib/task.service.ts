@@ -2,7 +2,7 @@ import { StatusCodes } from 'enums/statusCodes'
 import { PrismaService } from 'prisma/prisma.service'
 import { Cron, CronExpression } from '@nestjs/schedule'
 import { HttpException, Injectable } from '@nestjs/common'
-import { TwitterApi, TwitterApiReadOnly } from 'twitter-api-v2'
+import { TwitterApi, TwitterApiReadOnly, ReferencedTweetV2 } from 'twitter-api-v2'
 
 @Injectable()
 export class TaskService {
@@ -87,7 +87,7 @@ export class TaskService {
         }
     }
 
-    private async checkReferencedTweets(referenced_tweets: any[], settingsProfileId: string): Promise<boolean> {
+    private async checkReferencedTweets(referenced_tweets: ReferencedTweetV2[], settingsProfileId: string): Promise<boolean> {
         for (const { id } of referenced_tweets) {
             const { data } = await this.x.v2.singleTweet(id, {
                 'tweet.fields': 'author_id',
