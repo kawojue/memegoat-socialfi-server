@@ -27,7 +27,7 @@ export class TaskService {
 
             await Promise.all(users.map(async (user) => {
                 const { data: { data: tweets } } = await this.x.v2.userTimeline(user.profileId, {
-                    max_results: 20,
+                    max_results: 30,
                     expansions: 'referenced_tweets.id',
                     'tweet.fields': 'author_id,public_metrics,created_at',
                 })
@@ -53,12 +53,12 @@ export class TaskService {
 
                         const tweetData = {
                             referenced,
+                            postedAt: new Date(created_at),
                             like: public_metrics.like_count,
                             reply: public_metrics.reply_count,
                             quote: public_metrics.quote_count,
                             retweet: public_metrics.retweet_count,
                             impression: public_metrics.impression_count,
-                            postedAt: created_at ? new Date(created_at) : undefined,
                         }
 
                         const existingTweet = existingTweetMap.get(id)
@@ -88,25 +88,31 @@ export class TaskService {
     }
 
     private async checkReferencedTweets(referenced_tweets: ReferencedTweetV2[], settingsProfileId: string): Promise<boolean> {
-        for (const { id } of referenced_tweets) {
-            const { data } = await this.x.v2.singleTweet(id, {
-                'tweet.fields': 'author_id',
+        const tweetIds = referenced_tweets.map(tweet => tweet.id)
+        const tweetChunks = this.chunkArray(tweetIds, 1000)
+
+        for (const chunk of tweetChunks) {
+            const { data: tweets } = await this.x.v2.tweets(chunk, {
                 expansions: 'referenced_tweets.id',
+                'tweet.fields': 'author_id',
             })
-            if (data.author_id === settingsProfileId) {
-                return true
-            }
-            if (data.referenced_tweets) {
-                const nestedReferenced = await this.checkReferencedTweets(data.referenced_tweets, settingsProfileId)
-                if (nestedReferenced) {
+
+            for (const tweet of tweets) {
+                if (tweet.author_id === settingsProfileId) {
                     return true
+                }
+                if (tweet.referenced_tweets) {
+                    const nestedReferenced = await this.checkReferencedTweets(tweet.referenced_tweets, settingsProfileId)
+                    if (nestedReferenced) {
+                        return true
+                    }
                 }
             }
         }
         return false
     }
 
-    @Cron(CronExpression.EVERY_2_HOURS)
+    @Cron(CronExpression.EVERY_HOUR)
     async processExistingTweets() {
         try {
             const settings = await this.prisma.settings.findFirst()
@@ -116,24 +122,31 @@ export class TaskService {
                 where: { referenced: false },
             })
 
-            const updatePromises = existingTweets.map(async (tweet) => {
-                const { data } = await this.x.v2.singleTweet(tweet.postId, {
-                    'tweet.fields': 'author_id',
+            if (existingTweets.length === 0) return
+
+            const tweetIds = existingTweets.map(tweet => tweet.postId)
+            const tweetChunks = this.chunkArray(tweetIds, 1000)
+
+            for (const chunk of tweetChunks) {
+                const { data: tweets } = await this.x.v2.tweets(chunk, {
                     expansions: 'referenced_tweets.id',
+                    'tweet.fields': 'author_id,public_metrics,created_at',
                 })
 
-                if (data.referenced_tweets) {
-                    const referenced = await this.checkReferencedTweets(data.referenced_tweets, settings.profileId)
-                    if (referenced) {
-                        await this.prisma.tweet.update({
-                            where: { postId: tweet.postId },
-                            data: { referenced },
-                        })
+                const updatePromises = tweets.map(async (tweet) => {
+                    if (tweet.referenced_tweets) {
+                        const referenced = await this.checkReferencedTweets(tweet.referenced_tweets, settings.profileId)
+                        if (referenced) {
+                            await this.prisma.tweet.update({
+                                where: { postId: tweet.id },
+                                data: { referenced },
+                            })
+                        }
                     }
-                }
-            })
+                })
 
-            await Promise.all(updatePromises)
+                await Promise.all(updatePromises)
+            }
         } catch (err) {
             console.error(err)
             throw new HttpException('Process existing tweets task failed', StatusCodes.InternalServerError)
@@ -159,5 +172,13 @@ export class TaskService {
             console.error(err)
             throw new HttpException('Update referral task failed', StatusCodes.InternalServerError)
         }
+    }
+
+    private chunkArray<T>(array: T[], size: number): T[][] {
+        const chunkedArr: T[][] = []
+        for (let i = 0; i < array.length; i += size) {
+            chunkedArr.push(array.slice(i, i + size))
+        }
+        return chunkedArr
     }
 }
