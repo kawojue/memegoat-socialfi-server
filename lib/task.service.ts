@@ -11,7 +11,7 @@ export class TaskService {
     private readonly x: TwitterApiReadOnly
 
     constructor() {
-        this.prisma = new PrismaService
+        this.prisma = new PrismaService()
         this.twit = new TwitterApi(`${process.env.X_BEARER_TOKEN}`)
         this.x = this.twit.readOnly
     }
@@ -47,45 +47,32 @@ export class TaskService {
 
                     if (containsTag) {
                         let referenced = false
-                        if (author_id !== settings.profileId) {
-                            if (referenced_tweets) {
-                                await Promise.all(referenced_tweets.map(async ({ id }) => {
-                                    const { data } = await this.x.v2.singleTweet(id, {
-                                        'tweet.fields': 'author_id',
-                                    })
-                                    if (data.author_id !== user.profileId) {
-                                        if (data.author_id === settings.profileId) {
-                                            referenced = true
-                                        }
-                                    }
-                                }))
-                            }
+                        if (author_id !== settings.profileId && referenced_tweets) {
+                            referenced = await this.checkReferencedTweets(referenced_tweets, user.profileId, settings.profileId)
+                        }
+
+                        const tweetData = {
+                            referenced,
+                            like: public_metrics.like_count,
+                            reply: public_metrics.reply_count,
+                            quote: public_metrics.quote_count,
+                            retweet: public_metrics.retweet_count,
+                            impression: public_metrics.impression_count,
+                            postedAt: created_at ? new Date(created_at) : undefined,
                         }
 
                         const existingTweet = existingTweetMap.get(id)
                         if (existingTweet) {
                             await this.prisma.tweet.update({
                                 where: { postId: id },
-                                data: {
-                                    referenced,
-                                    like: public_metrics.like_count,
-                                    reply: public_metrics.reply_count,
-                                    quote: public_metrics.quote_count,
-                                    retweet: public_metrics.retweet_count,
-                                    impression: public_metrics.impression_count,
-                                },
+                                data: tweetData,
                             })
                         } else {
                             await this.prisma.tweet.create({
                                 data: {
-                                    postId: id, referenced,
-                                    like: public_metrics.like_count,
-                                    reply: public_metrics.reply_count,
-                                    quote: public_metrics.quote_count,
-                                    retweet: public_metrics.retweet_count,
-                                    impression: public_metrics.impression_count,
+                                    ...tweetData,
+                                    postId: id,
                                     user: { connect: { id: user.id } },
-                                    postedAt: created_at ? new Date(created_at) : undefined,
                                 },
                             })
                         }
@@ -111,5 +98,24 @@ export class TaskService {
             console.error(err)
             throw new HttpException('Task is down', StatusCodes.InternalServerError)
         }
+    }
+
+    private async checkReferencedTweets(referenced_tweets: any[], userProfileId: string, settingsProfileId: string): Promise<boolean> {
+        for (const { id } of referenced_tweets) {
+            const { data } = await this.x.v2.singleTweet(id, {
+                'tweet.fields': 'author_id',
+                expansions: 'referenced_tweets.id',
+            })
+            if (data.author_id === settingsProfileId) {
+                return true
+            }
+            if (data.referenced_tweets) {
+                const nestedReferenced = await this.checkReferencedTweets(data.referenced_tweets, userProfileId, settingsProfileId)
+                if (nestedReferenced) {
+                    return true
+                }
+            }
+        }
+        return false
     }
 }
