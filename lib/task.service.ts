@@ -48,7 +48,7 @@ export class TaskService {
                     if (containsTag) {
                         let referenced = false
                         if (author_id !== settings.profileId && referenced_tweets) {
-                            referenced = await this.checkReferencedTweets(referenced_tweets, user.profileId, settings.profileId)
+                            referenced = await this.checkReferencedTweets(referenced_tweets, settings.profileId)
                         }
 
                         const tweetData = {
@@ -81,7 +81,68 @@ export class TaskService {
 
                 await Promise.all(tweetPromises)
             }))
+        } catch (err) {
+            console.error(err)
+            throw new HttpException('Task is down', StatusCodes.InternalServerError)
+        }
+    }
 
+    private async checkReferencedTweets(referenced_tweets: any[], settingsProfileId: string): Promise<boolean> {
+        for (const { id } of referenced_tweets) {
+            const { data } = await this.x.v2.singleTweet(id, {
+                'tweet.fields': 'author_id',
+                expansions: 'referenced_tweets.id',
+            })
+            if (data.author_id === settingsProfileId) {
+                return true
+            }
+            if (data.referenced_tweets) {
+                const nestedReferenced = await this.checkReferencedTweets(data.referenced_tweets, settingsProfileId)
+                if (nestedReferenced) {
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
+    @Cron(CronExpression.EVERY_30_MINUTES)
+    async processExistingTweets() {
+        try {
+            const settings = await this.prisma.settings.findFirst()
+            if (settings.hasTurnedOffCampaign) return
+
+            const existingTweets = await this.prisma.tweet.findMany({
+                where: { referenced: false },
+            })
+
+            const updatePromises = existingTweets.map(async (tweet) => {
+                const { data } = await this.x.v2.singleTweet(tweet.postId, {
+                    'tweet.fields': 'author_id',
+                    expansions: 'referenced_tweets.id',
+                })
+
+                if (data.referenced_tweets) {
+                    const referenced = await this.checkReferencedTweets(data.referenced_tweets, settings.profileId)
+                    if (referenced) {
+                        await this.prisma.tweet.update({
+                            where: { postId: tweet.postId },
+                            data: { referenced },
+                        })
+                    }
+                }
+            })
+
+            await Promise.all(updatePromises)
+        } catch (err) {
+            console.error(err)
+            throw new HttpException('Process existing tweets task failed', StatusCodes.InternalServerError)
+        }
+    }
+
+    @Cron(CronExpression.EVERY_30_MINUTES)
+    async updateReferral() {
+        try {
             const now = new Date()
             const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000)
 
@@ -96,26 +157,7 @@ export class TaskService {
             })
         } catch (err) {
             console.error(err)
-            throw new HttpException('Task is down', StatusCodes.InternalServerError)
+            throw new HttpException('Update referral task failed', StatusCodes.InternalServerError)
         }
-    }
-
-    private async checkReferencedTweets(referenced_tweets: any[], userProfileId: string, settingsProfileId: string): Promise<boolean> {
-        for (const { id } of referenced_tweets) {
-            const { data } = await this.x.v2.singleTweet(id, {
-                'tweet.fields': 'author_id',
-                expansions: 'referenced_tweets.id',
-            })
-            if (data.author_id === settingsProfileId) {
-                return true
-            }
-            if (data.referenced_tweets) {
-                const nestedReferenced = await this.checkReferencedTweets(data.referenced_tweets, userProfileId, settingsProfileId)
-                if (nestedReferenced) {
-                    return true
-                }
-            }
-        }
-        return false
     }
 }
