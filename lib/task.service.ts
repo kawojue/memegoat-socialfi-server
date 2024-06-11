@@ -154,6 +154,14 @@ export class TaskService {
         }
     }
 
+    private chunkArray<T>(array: T[], size: number): T[][] {
+        const chunkedArr: T[][] = []
+        for (let i = 0; i < array.length; i += size) {
+            chunkedArr.push(array.slice(i, i + size))
+        }
+        return chunkedArr
+    }
+
     @Cron(CronExpression.EVERY_30_MINUTES)
     async updateReferral() {
         try {
@@ -173,13 +181,5 @@ export class TaskService {
             console.error(err)
             throw new HttpException('Update referral task failed', StatusCodes.InternalServerError)
         }
-    }
-
-    private chunkArray<T>(array: T[], size: number): T[][] {
-        const chunkedArr: T[][] = []
-        for (let i = 0; i < array.length; i += size) {
-            chunkedArr.push(array.slice(i, i + size))
-        }
-        return chunkedArr
     }
 }
