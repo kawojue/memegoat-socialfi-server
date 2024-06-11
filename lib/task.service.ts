@@ -112,7 +112,7 @@ export class TaskService {
         return false
     }
 
-    @Cron(CronExpression.EVERY_HOUR)
+    @Cron(CronExpression.EVERY_2_HOURS)
     async processExistingTweets() {
         try {
             const settings = await this.prisma.settings.findFirst()
