@@ -120,6 +120,7 @@ export class TaskService {
 
             const existingTweets = await this.prisma.tweet.findMany({
                 where: { referenced: false },
+                select: { postId: true }
             })
 
             if (existingTweets.length === 0) return
