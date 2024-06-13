@@ -42,6 +42,12 @@ export class AppService {
       daysAgo.setDate(now.getDate() - days)
 
       const users = await this.prisma.user.findMany({
+        where: {
+          NOT: [
+            { username: { equals: '@DevCoinSTX', mode: 'insensitive' } },
+            { username: { equals: '@GoatCoinSTX', mode: 'insensitive' } },
+          ]
+        },
         select: {
           refPoint: true,
           tweets: {
@@ -139,6 +145,12 @@ export class AppService {
         daysAgo.setDate(now.getDate() - days)
 
         const users = await this.prisma.user.findMany({
+          where: {
+            NOT: [
+              { username: { equals: '@DevCoinSTX', mode: 'insensitive' } },
+              { username: { equals: '@GoatCoinSTX', mode: 'insensitive' } },
+            ]
+          },
           select: {
             id: true,
             refPoint: true,
