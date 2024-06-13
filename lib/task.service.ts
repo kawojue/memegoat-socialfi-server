@@ -16,7 +16,7 @@ export class TaskService {
         this.x = this.twit.readOnly
     }
 
-    @Cron(CronExpression.EVERY_HOUR)
+    // @Cron(CronExpression.EVERY_HOUR)
     async metrics() {
         try {
             const settings = await this.prisma.settings.findFirst()
@@ -112,7 +112,7 @@ export class TaskService {
         return false
     }
 
-    @Cron(CronExpression.EVERY_2_HOURS)
+    // @Cron(CronExpression.EVERY_2_HOURS)
     async processExistingTweets() {
         try {
             const settings = await this.prisma.settings.findFirst()
@@ -162,7 +162,7 @@ export class TaskService {
         return chunkedArr
     }
 
-    @Cron(CronExpression.EVERY_30_MINUTES)
+    // @Cron(CronExpression.EVERY_30_MINUTES)
     async updateReferral() {
         try {
             const now = new Date()
