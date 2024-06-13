@@ -64,14 +64,14 @@ export class AppService {
         let impressions = user.refPoint
 
         for (const tweet of user.tweets) {
-          if (tweet.referenced) {
-            impressions +=
-              tweet.like +
-              tweet.retweet +
-              tweet.reply +
-              tweet.impression +
-              tweet.quote
-          }
+          impressions +=
+            tweet.like +
+            tweet.retweet +
+            tweet.reply +
+            tweet.impression +
+            tweet.quote
+          // if (tweet.referenced) {
+          // }
         }
 
         if (impressions > 0) {
@@ -157,14 +157,14 @@ export class AppService {
           let impressions = u.refPoint
 
           for (const tweet of u.tweets) {
-            if (tweet.referenced) {
-              impressions +=
-                tweet.like +
-                tweet.retweet +
-                tweet.reply +
-                tweet.impression +
-                tweet.quote
-            }
+            impressions +=
+              tweet.like +
+              tweet.retweet +
+              tweet.reply +
+              tweet.impression +
+              tweet.quote
+            // if (tweet.referenced) {
+            // }
           }
 
           return {
