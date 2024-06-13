@@ -15,6 +15,7 @@ model User {
     avatar      String?
     smartKey    String   @unique
     tweets      Tweet[]
+    rewards     Reward[]
     useRef      Boolean  @default(false)
     refPoint    Float    @default(0)
     createdAt   DateTime @default(now())
@@ -35,6 +36,15 @@ model Tweet {
     updatedAt  DateTime  @updatedAt
     user       User      @relation(references: [id], fields: [userId])
     userId     String    @unique @db.ObjectId
+}
+
+model Reward {
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    earn      Float    @default(0.00)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    user      User     @relation(references: [id], fields: [userId])
+    userId    String   @unique @db.ObjectId
 }
 
 model Settings {

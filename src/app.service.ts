@@ -52,7 +52,7 @@ export class AppService {
           refPoint: true,
           tweets: {
             where: {
-              createdAt: {
+              postedAt: {
                 gte: daysAgo,
                 lte: now,
               },
@@ -76,8 +76,6 @@ export class AppService {
             tweet.reply +
             tweet.impression +
             tweet.quote
-          // if (tweet.referenced) {
-          // }
         }
 
         if (impressions > 0) {
@@ -106,6 +104,12 @@ export class AppService {
 
     const user = await this.prisma.user.findUnique({
       where: fieldName === 'profileId' ? { profileId: key } : { smartKey: key },
+      include: {
+        rewards: {
+          orderBy: { createdAt: 'desc' },
+          take: 1
+        }
+      }
     })
 
     if (!user) return
@@ -156,7 +160,7 @@ export class AppService {
             refPoint: true,
             tweets: {
               where: {
-                createdAt: {
+                postedAt: {
                   gte: daysAgo,
                   lte: now,
                 },
@@ -175,8 +179,6 @@ export class AppService {
               tweet.reply +
               tweet.impression +
               tweet.quote
-            // if (tweet.referenced) {
-            // }
           }
 
           return {
