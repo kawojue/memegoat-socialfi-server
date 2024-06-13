@@ -44,8 +44,8 @@ export class AppService {
       const users = await this.prisma.user.findMany({
         where: {
           NOT: [
-            { username: { equals: '@DevCoinSTX', mode: 'insensitive' } },
-            { username: { equals: '@GoatCoinSTX', mode: 'insensitive' } },
+            { username: { equals: 'devcoinstx', mode: 'insensitive' } },
+            { username: { equals: 'goatcoinstx', mode: 'insensitive' } },
           ]
         },
         select: {
@@ -147,8 +147,8 @@ export class AppService {
         const users = await this.prisma.user.findMany({
           where: {
             NOT: [
-              { username: { equals: '@DevCoinSTX', mode: 'insensitive' } },
-              { username: { equals: '@GoatCoinSTX', mode: 'insensitive' } },
+              { username: { equals: 'devcoinstx', mode: 'insensitive' } },
+              { username: { equals: 'goatcoinstx', mode: 'insensitive' } },
             ]
           },
           select: {
