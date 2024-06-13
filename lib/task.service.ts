@@ -16,7 +16,7 @@ export class TaskService {
         this.x = this.twit.readOnly
     }
 
-    // @Cron(CronExpression.EVERY_HOUR)
+    // @Cron(CronExpression.EVERY_MINUTE)
     async metrics() {
         try {
             const settings = await this.prisma.settings.findFirst()
@@ -25,9 +25,13 @@ export class TaskService {
             const users = await this.prisma.user.findMany()
             if (users.length === 0) return
 
+            const campaignStartDate = settings.campaignedAt
+            const campaignExpiryDate = new Date(campaignStartDate)
+            campaignExpiryDate.setDate(campaignStartDate.getDate() + settings.days)
+
             await Promise.all(users.map(async (user) => {
                 const { data: { data: tweets } } = await this.x.v2.userTimeline(user.profileId, {
-                    max_results: 30,
+                    max_results: 50,
                     expansions: 'referenced_tweets.id',
                     'tweet.fields': 'author_id,public_metrics,created_at',
                 })
@@ -42,6 +46,11 @@ export class TaskService {
                     id, author_id, text, created_at,
                     referenced_tweets, public_metrics,
                 }) => {
+                    const tweetCreatedAt = new Date(created_at)
+                    if (tweetCreatedAt < campaignStartDate || tweetCreatedAt > campaignExpiryDate) {
+                        return
+                    }
+
                     const tags = settings.tags.map((tag) => tag.toLowerCase().trim())
                     const containsTag = tags.some(tag => text.toLowerCase().trim().includes(tag))
 
@@ -53,7 +62,7 @@ export class TaskService {
 
                         const tweetData = {
                             referenced,
-                            postedAt: new Date(created_at),
+                            postedAt: tweetCreatedAt,
                             like: public_metrics.like_count,
                             reply: public_metrics.reply_count,
                             quote: public_metrics.quote_count,
@@ -89,7 +98,7 @@ export class TaskService {
 
     private async checkReferencedTweets(referenced_tweets: ReferencedTweetV2[], settingsProfileId: string): Promise<boolean> {
         const tweetIds = referenced_tweets.map(tweet => tweet.id)
-        const tweetChunks = this.chunkArray(tweetIds, 1000)
+        const tweetChunks = this.chunkArray(tweetIds, 100)
 
         for (const chunk of tweetChunks) {
             const { data: tweets } = await this.x.v2.tweets(chunk, {
@@ -112,21 +121,31 @@ export class TaskService {
         return false
     }
 
-    // @Cron(CronExpression.EVERY_2_HOURS)
+    // @Cron(CronExpression.EVERY_MINUTE)
     async processExistingTweets() {
         try {
             const settings = await this.prisma.settings.findFirst()
             if (settings.hasTurnedOffCampaign) return
 
+            const campaignStartDate = settings.campaignedAt
+            const campaignExpiryDate = new Date(campaignStartDate)
+            campaignExpiryDate.setDate(campaignStartDate.getDate() + settings.days)
+
             const existingTweets = await this.prisma.tweet.findMany({
-                where: { referenced: false },
-                select: { postId: true }
+                where: {
+                    referenced: false,
+                    postedAt: {
+                        gte: campaignStartDate,
+                        lte: campaignExpiryDate,
+                    }
+                },
+                select: { postId: true, postedAt: true }
             })
 
             if (existingTweets.length === 0) return
 
             const tweetIds = existingTweets.map(tweet => tweet.postId)
-            const tweetChunks = this.chunkArray(tweetIds, 1000)
+            const tweetChunks = this.chunkArray(tweetIds, 100)
 
             for (const chunk of tweetChunks) {
                 const { data: tweets } = await this.x.v2.tweets(chunk, {
@@ -162,7 +181,7 @@ export class TaskService {
         return chunkedArr
     }
 
-    // @Cron(CronExpression.EVERY_30_MINUTES)
+    @Cron(CronExpression.EVERY_30_MINUTES)
     async updateReferral() {
         try {
             const now = new Date()
@@ -183,3 +202,4 @@ export class TaskService {
         }
     }
 }
+
