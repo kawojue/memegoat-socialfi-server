@@ -106,6 +106,12 @@ export class AppService {
       where: fieldName === 'profileId' ? { profileId: key } : { smartKey: key },
       include: {
         rewards: {
+          select: {
+            id: true,
+            earn: true,
+            updatedAt: true,
+            createdAt: true,
+          },
           orderBy: { createdAt: 'desc' },
           take: 1
         }
