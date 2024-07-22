@@ -21,6 +21,7 @@ async function bootstrap() {
       'https://socialfi.memegoat.io',
       'https://api-socialfi.memegoat.io',
       'https://socialfi-admin.memegoat.io',
+      'https://socialfi-memegoat.vercel.app',
     ],
     credentials: true,
     optionsSuccessStatus: 200,
