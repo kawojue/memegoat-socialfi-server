@@ -1,6 +1,6 @@
 import { RefDTO } from './dto/ref.dto'
 import { Request, Response } from 'express'
-import { Injectable } from '@nestjs/common'
+import { ConflictException, Injectable } from '@nestjs/common'
 import { SmartKeyDTO } from './dto/key.dto'
 import { decryptKey } from 'helpers/smartKey'
 import { MiscService } from 'lib/misc.service'
@@ -8,6 +8,7 @@ import { StatusCodes } from 'enums/statusCodes'
 import { PrismaService } from 'prisma/prisma.service'
 import { ResponseService } from 'lib/response.service'
 import { CampaignRequestDTO } from './dto/compaign-req.dto'
+import { WaitListDTO } from './dto/waitlist.dto'
 
 @Injectable()
 export class AppService {
@@ -352,5 +353,26 @@ export class AppService {
     }
 
     this.response.sendSuccess(res, StatusCodes.OK, { data: request })
+  }
+
+  async waitlist(res: Response, { email }: WaitListDTO) {
+    const isExist = await this.prisma.waitList.findUnique({
+      where: { email }
+    })
+
+    if (isExist) {
+      return this.response.sendError(res, StatusCodes.OK, "You're already added to the waitlist")
+    }
+
+    await this.prisma.waitList.create({
+      data: { email }
+    })
+
+    const waitlistsCount = await this.prisma.waitList.count()
+    const lastDigit = waitlistsCount % 10
+
+    this.response.sendSuccess(res, StatusCodes.OK, {
+      message: `Congratulations! You're the ${waitlistsCount}${lastDigit === 3 ? `rd` : lastDigit === 2 ? 'nd' : lastDigit === 1 ? 'st' : 'th'} on the waitlist`
+    })
   }
 }

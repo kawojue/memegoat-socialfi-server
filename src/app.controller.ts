@@ -9,6 +9,7 @@ import { Request, Response } from 'express'
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import { CookieAuthGuard } from './jwt/cookie-auth.guard'
 import { CampaignRequestDTO } from './dto/compaign-req.dto'
+import { WaitListDTO } from './dto/waitlist.dto'
 
 @ApiTags('App')
 @Controller()
@@ -61,7 +62,6 @@ export class AppController {
     await this.appService.addCampaignRequest(res, body)
   }
 
-
   @Get('/campaign-requests')
   async fetchCampaignRequests(@Res() res: Response) {
     await this.appService.fetchCampaignRequests(res)
@@ -70,5 +70,10 @@ export class AppController {
   @Get('/campaign-requests/:token_addr')
   async fetchCampaignRequest(@Res() res: Response, @Param('token_addr') token_addr: string) {
     await this.appService.fetchCampaignRequest(res, token_addr)
+  }
+
+  @Post('waitlist')
+  async waitlist(@Res() res: Response, @Body() body: WaitListDTO) {
+    await this.appService.waitlist(res, body)
   }
 }

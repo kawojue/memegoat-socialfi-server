@@ -101,3 +101,8 @@ model CampaignRequest {
     end_date             DateTime
     createdAt            DateTime @default(now())
 }
+
+model WaitList {
+    id    String @id @default(auto()) @map("_id") @db.ObjectId
+    email String @unique
+}
