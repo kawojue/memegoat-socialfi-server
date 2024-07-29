@@ -17,6 +17,7 @@ async function bootstrap() {
       'http://localhost:3000',
       'https://app.memegoat.io',
       `http://localhost:${PORT}`,
+      'https://games.memegoat.io',
       'https://socialfi.memegoat.io',
       'https://api-socialfi.memegoat.io',
       'https://memegoat-games.vercel.app',
