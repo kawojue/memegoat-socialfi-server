@@ -370,9 +370,10 @@ export class AppService {
 
     const waitlistsCount = await this.prisma.waitList.count()
     const lastDigit = waitlistsCount % 10
+    const ommittedDigits = [11, 12, 13]
 
     this.response.sendSuccess(res, StatusCodes.OK, {
-      message: `Congratulations! You're the ${waitlistsCount}${lastDigit === 3 ? `rd` : lastDigit === 2 ? 'nd' : lastDigit === 1 ? 'st' : 'th'} on the waitlist`
+      message: `Congratulations! You're the ${waitlistsCount}${(ommittedDigits.includes(waitlistsCount)) ? 'th' : lastDigit === 3 ? `rd` : lastDigit === 2 ? 'nd' : lastDigit === 1 ? 'st' : 'th'} on the waitlist`
     })
   }
 }
