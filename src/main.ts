@@ -15,11 +15,11 @@ async function bootstrap() {
     origin: [
       'https://memegoat.io',
       'http://localhost:3000',
-      'http://localhost:5173',
       'https://app.memegoat.io',
       `http://localhost:${PORT}`,
       'https://socialfi.memegoat.io',
       'https://api-socialfi.memegoat.io',
+      'https://memegoat-games.vercel.app',
       'https://socialfi-admin.memegoat.io',
       'https://socialfi-memegoat.vercel.app',
     ],
