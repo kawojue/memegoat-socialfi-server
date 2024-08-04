@@ -97,6 +97,7 @@ model CampaignRequest {
     soft_cap             String?
     maximum_buy          String?
     minimum_buy          String?
+    is_campaign          Boolean
     start_date           DateTime
     end_date             DateTime
     createdAt            DateTime @default(now())
