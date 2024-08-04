@@ -161,7 +161,7 @@ export class CampaignRequestDTO {
     description: 'if request is a campaign or not',
   })
   @IsBoolean()
-  is_campaign?: boolean;
+  is_campaign: boolean;
 
   @ApiProperty({
     example: new Date(),
