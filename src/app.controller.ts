@@ -98,4 +98,19 @@ export class AppController {
   async waitlist(@Res() res: Response, @Body() body: WaitListDTO) {
     await this.appService.waitlist(res, body);
   }
+
+  @Get('/allTokens')
+  async fetchAllTokens(@Res() res: Response) {
+    await this.appService.getAllTokens(res);
+  }
+
+  @Get('/velarTokens')
+  async fetchVelarTokens(@Res() res: Response) {
+    await this.appService.getVelarTokens(res);
+  }
+
+  @Get('/alexTokens')
+  async fetchAlexTokens(@Res() res: Response) {
+    await this.appService.getAlexTokens(res);
+  }
 }
