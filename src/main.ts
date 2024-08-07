@@ -23,6 +23,7 @@ async function bootstrap() {
       'https://memegoat-games.vercel.app',
       'https://socialfi-admin.memegoat.io',
       'https://socialfi-memegoat.vercel.app',
+      'https://test-app.memegoat.io'
     ],
     credentials: true,
     optionsSuccessStatus: 200,
