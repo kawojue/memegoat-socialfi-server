@@ -111,6 +111,7 @@ model WaitList {
 
 model AlexTokens {
     id                      String  @id @map("_id") @db.ObjectId
+    tokenId                 String  @unique
     name                    String
     icon                    String
     wrapTokenDecimals       Int

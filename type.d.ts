@@ -1,0 +1,1 @@
+type POOL = 'ALEX' | 'VELAR';

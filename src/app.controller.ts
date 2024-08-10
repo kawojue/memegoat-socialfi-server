@@ -5,11 +5,13 @@ import {
   Post,
   Body,
   Param,
+  Query,
   UseGuards,
   Controller,
 } from '@nestjs/common';
 import { RefDTO } from './dto/ref.dto';
 import { AppService } from './app.service';
+import { ChartDTO } from './dto/chart.dto';
 import { SmartKeyDTO } from './dto/key.dto';
 import { Request, Response } from 'express';
 import { WaitListDTO } from './dto/waitlist.dto';
@@ -112,5 +114,10 @@ export class AppController {
   @Get('/alexTokens')
   async fetchAlexTokens(@Res() res: Response) {
     await this.appService.getAlexTokens(res);
+  }
+
+  @Get('/chart')
+  async fetchChart(@Res() res: Response, @Query() body: ChartDTO) {
+    await this.appService.getChartData(res, body);
   }
 }

@@ -1,8 +1,12 @@
+import {
+    TwitterApi,
+    ReferencedTweetV2,
+    TwitterApiReadOnly,
+} from 'twitter-api-v2'
 import { StatusCodes } from 'enums/statusCodes'
 import { PrismaService } from 'prisma/prisma.service'
 import { Cron, CronExpression } from '@nestjs/schedule'
 import { HttpException, Injectable } from '@nestjs/common'
-import { TwitterApi, TwitterApiReadOnly, ReferencedTweetV2 } from 'twitter-api-v2'
 
 @Injectable()
 export class TaskService {
@@ -16,7 +20,7 @@ export class TaskService {
         this.x = this.twit.readOnly
     }
 
-    // @Cron(CronExpression.EVERY_MINUTE)
+    @Cron(CronExpression.EVERY_30_MINUTES)
     async metrics() {
         try {
             const settings = await this.prisma.settings.findFirst()
@@ -121,7 +125,7 @@ export class TaskService {
         return false
     }
 
-    // @Cron(CronExpression.EVERY_MINUTE)
+    @Cron(CronExpression.EVERY_30_MINUTES)
     async processExistingTweets() {
         try {
             const settings = await this.prisma.settings.findFirst()
@@ -181,7 +185,7 @@ export class TaskService {
         return chunkedArr
     }
 
-    @Cron(CronExpression.EVERY_30_MINUTES)
+    @Cron(CronExpression.EVERY_HOUR)
     async updateReferral() {
         try {
             const now = new Date()

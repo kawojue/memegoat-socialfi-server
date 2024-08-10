@@ -1,14 +1,16 @@
 import { RefDTO } from './dto/ref.dto';
+import { ChartDTO } from './dto/chart.dto';
 import { Request, Response } from 'express';
 import { Injectable } from '@nestjs/common';
 import { SmartKeyDTO } from './dto/key.dto';
+import { ApiService } from 'lib/api.service';
 import { decryptKey } from 'helpers/smartKey';
 import { MiscService } from 'lib/misc.service';
 import { StatusCodes } from 'enums/statusCodes';
+import { WaitListDTO } from './dto/waitlist.dto';
 import { PrismaService } from 'prisma/prisma.service';
 import { ResponseService } from 'lib/response.service';
 import { CampaignRequestDTO } from './dto/compaign-req.dto';
-import { WaitListDTO } from './dto/waitlist.dto';
 
 @Injectable()
 export class AppService {
@@ -16,7 +18,8 @@ export class AppService {
     private readonly misc: MiscService,
     private readonly prisma: PrismaService,
     private readonly response: ResponseService,
-  ) {}
+    private readonly apiService: ApiService,
+  ) { }
 
   getHello(): string {
     return 'Memegoat!';
@@ -442,5 +445,14 @@ export class AppService {
   async getAlexTokens(res: Response) {
     const requests = await this.prisma.alexTokens.findMany();
     this.response.sendSuccess(res, StatusCodes.OK, { data: requests });
+  }
+
+  async getChartData(res: Response, chart: ChartDTO) {
+    const data = await this.apiService.getChart(
+      chart.pool,
+      chart.tokenA,
+      chart.tokenB,
+    );
+    this.response.sendSuccess(res, StatusCodes.OK, { data: data });
   }
 }
