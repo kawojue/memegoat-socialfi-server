@@ -16,6 +16,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CookieAuthGuard } from './jwt/cookie-auth.guard';
 import { CampaignRequestDTO } from './dto/compaign-req.dto';
 import { WaitListDTO } from './dto/waitlist.dto';
+import { ChartDTO } from './dto/chart.dto';
 
 @ApiTags('App')
 @Controller()
@@ -112,5 +113,10 @@ export class AppController {
   @Get('/alexTokens')
   async fetchAlexTokens(@Res() res: Response) {
     await this.appService.getAlexTokens(res);
+  }
+
+  @Get('/chart')
+  async fetchChart(@Res() res: Response, @Body() body: ChartDTO) {
+    await this.appService.getChartData(res, body);
   }
 }
