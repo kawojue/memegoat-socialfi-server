@@ -7,6 +7,7 @@ import {
   Post,
   Param,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { RefDTO } from './dto/ref.dto';
 import { AppService } from './app.service';
@@ -116,7 +117,7 @@ export class AppController {
   }
 
   @Get('/chart')
-  async fetchChart(@Res() res: Response, @Body() body: ChartDTO) {
+  async fetchChart(@Res() res: Response, @Query() body: ChartDTO) {
     await this.appService.getChartData(res, body);
   }
 }
