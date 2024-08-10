@@ -11,9 +11,16 @@ import { PrismaService } from 'prisma/prisma.service';
 import { ResponseService } from 'lib/response.service';
 import { SessionSerializer } from './jwt/session.serialize';
 import { ApiService } from 'lib/api.service';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
-  imports: [AuthModule, ScheduleModule.forRoot(), JwtModule, AdminModule],
+  imports: [
+    AuthModule,
+    ScheduleModule.forRoot(),
+    HttpModule,
+    JwtModule,
+    AdminModule,
+  ],
   controllers: [AppController],
   providers: [
     AppService,
