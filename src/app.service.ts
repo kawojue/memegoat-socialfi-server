@@ -448,11 +448,7 @@ export class AppService {
   }
 
   async getChartData(res: Response, chart: ChartDTO) {
-    const data = await this.apiService.getChart(
-      chart.pool,
-      chart.tokenA,
-      chart.tokenB,
-    );
+    const data = await this.apiService.getChartData(chart.token);
     this.response.sendSuccess(res, StatusCodes.OK, { data: data });
   }
 }
