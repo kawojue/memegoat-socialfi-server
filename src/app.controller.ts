@@ -18,6 +18,7 @@ import { WaitListDTO } from './dto/waitlist.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CookieAuthGuard } from './jwt/cookie-auth.guard';
 import { CampaignRequestDTO } from './dto/compaign-req.dto';
+import { BalanceDTO } from './dto/balance.dto';
 
 @Controller()
 @ApiTags('App')
@@ -119,5 +120,10 @@ export class AppController {
   @Get('/chart')
   async fetchChart(@Res() res: Response, @Query() body: ChartDTO) {
     await this.appService.getChartData(res, body);
+  }
+
+  @Get('/balance')
+  async fetchBalance(@Res() res: Response, @Query() body: BalanceDTO) {
+    await this.appService.getBalances(res, body);
   }
 }

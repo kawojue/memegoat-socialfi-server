@@ -6,6 +6,22 @@ import { Injectable, HttpException, BadGatewayException } from '@nestjs/common';
 @Injectable()
 export class ApiService {
   constructor(private readonly httpService: HttpService) {}
+
+  async getBalance(address: string) {
+    const url = `https://api.mainnet.hiro.so/extended/v1/address/${address}/balances`;
+    try {
+      const response = this.httpService.get(url);
+      const result = await lastValueFrom(response);
+      return result.data;
+    } catch (err) {
+      if (err?.response?.data?.message) {
+        throw new HttpException(err.response.data.message, err.response.status);
+      } else {
+        throw new HttpException('Something went wrong', StatusCodes.BadGateway);
+      }
+    }
+  }
+
   async getChartData(token: string) {
     const pools = await this.getPools();
     const poolId = this.getPoolIdWithFallback(pools, token);

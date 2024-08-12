@@ -11,6 +11,7 @@ import { WaitListDTO } from './dto/waitlist.dto';
 import { PrismaService } from 'prisma/prisma.service';
 import { ResponseService } from 'lib/response.service';
 import { CampaignRequestDTO } from './dto/compaign-req.dto';
+import { BalanceDTO } from './dto/balance.dto';
 
 @Injectable()
 export class AppService {
@@ -449,6 +450,11 @@ export class AppService {
 
   async getChartData(res: Response, chart: ChartDTO) {
     const data = await this.apiService.getChartData(chart.token);
+    this.response.sendSuccess(res, StatusCodes.OK, { data: data });
+  }
+
+  async getBalances(res: Response, chart: BalanceDTO) {
+    const data = await this.apiService.getBalance(chart.address);
     this.response.sendSuccess(res, StatusCodes.OK, { data: data });
   }
 }
