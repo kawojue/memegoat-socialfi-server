@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
+import { HttpModule } from '@nestjs/axios';
 import { AppService } from './app.service';
+import { ApiService } from 'lib/api.service';
 import { TaskService } from 'lib/task.service';
 import { MiscService } from 'lib/misc.service';
 import { AuthModule } from './auth/auth.module';
@@ -10,8 +12,6 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'prisma/prisma.service';
 import { ResponseService } from 'lib/response.service';
 import { SessionSerializer } from './jwt/session.serialize';
-import { ApiService } from 'lib/api.service';
-import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [

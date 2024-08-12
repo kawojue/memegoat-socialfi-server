@@ -15,7 +15,8 @@ enum StatusCodes {
     UnsupportedContent = 415,
     UnprocessableEntity = 422,
     TooManyRequests = 429,
-    InternalServerError = 500
+    InternalServerError = 500,
+    BadGateway = 502,
 }
 
 export { StatusCodes }

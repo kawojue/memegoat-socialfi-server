@@ -1,6 +1,7 @@
-import { Injectable, HttpException, BadGatewayException } from '@nestjs/common';
 import { lastValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
+import { StatusCodes } from 'enums/statusCodes';
+import { Injectable, HttpException, BadGatewayException } from '@nestjs/common';
 
 @Injectable()
 export class ApiService {
@@ -18,7 +19,7 @@ export class ApiService {
       if (err?.response?.data?.message) {
         throw new HttpException(err.response.data.message, err.response.status);
       } else {
-        throw new BadGatewayException('Something went wrong');
+        throw new HttpException('Something went wrong', StatusCodes.BadGateway);
       }
     }
   }

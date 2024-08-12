@@ -1,26 +1,26 @@
 import {
-  Body,
   Res,
-  Controller,
   Req,
   Get,
   Post,
+  Body,
   Param,
-  UseGuards,
   Query,
+  UseGuards,
+  Controller,
 } from '@nestjs/common';
 import { RefDTO } from './dto/ref.dto';
 import { AppService } from './app.service';
+import { ChartDTO } from './dto/chart.dto';
 import { SmartKeyDTO } from './dto/key.dto';
 import { Request, Response } from 'express';
+import { WaitListDTO } from './dto/waitlist.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CookieAuthGuard } from './jwt/cookie-auth.guard';
 import { CampaignRequestDTO } from './dto/compaign-req.dto';
-import { WaitListDTO } from './dto/waitlist.dto';
-import { ChartDTO } from './dto/chart.dto';
 
-@ApiTags('App')
 @Controller()
+@ApiTags('App')
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
