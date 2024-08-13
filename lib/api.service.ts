@@ -81,7 +81,7 @@ export class ApiService {
     try {
       const response = this.httpService.get(url);
       const result = await lastValueFrom(response);
-      return result.data as VelarToken[];
+      return result.data.data as VelarToken[];
     } catch (err) {
       if (err?.response?.data?.message) {
         throw new HttpException(err.response.data.message, err.response.status);
