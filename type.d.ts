@@ -38,3 +38,14 @@ type VelarToken = {
   assetName: string;
   vsymbol: string;
 };
+
+type AlexToken = {
+  id: Currency;
+  name: string;
+  icon: string;
+  wrapToken: string;
+  wrapTokenDecimals: number;
+  underlyingToken: string;
+  underlyingTokenDecimals: number;
+  isRebaseToken: boolean;
+};

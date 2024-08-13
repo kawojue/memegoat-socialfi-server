@@ -444,8 +444,8 @@ export class AppService {
   }
 
   async getAlexTokens(res: Response) {
-    const requests = await this.prisma.alexTokens.findMany();
-    this.response.sendSuccess(res, StatusCodes.OK, { data: requests });
+    const data = await this.apiService.getAlexTokens();
+    this.response.sendSuccess(res, StatusCodes.OK, { data: data });
   }
 
   async getChartData(res: Response, chart: ChartDTO) {

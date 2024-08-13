@@ -90,4 +90,19 @@ export class ApiService {
       }
     }
   }
+
+  async getAlexTokens() {
+    const url = 'https://alex-sdk-api.alexlab.co';
+    try {
+      const response = this.httpService.get(url);
+      const result = await lastValueFrom(response);
+      return result.data.tokens as AlexToken[];
+    } catch (err) {
+      if (err?.response?.data?.message) {
+        throw new HttpException(err.response.data.message, err.response.status);
+      } else {
+        throw new BadGatewayException('Something went wrong');
+      }
+    }
+  }
 }
