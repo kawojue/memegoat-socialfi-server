@@ -439,8 +439,8 @@ export class AppService {
   }
 
   async getVelarTokens(res: Response) {
-    const requests = await this.prisma.velarTokens.findMany();
-    this.response.sendSuccess(res, StatusCodes.OK, { data: requests });
+    const data = await this.apiService.getVelarTokens();
+    this.response.sendSuccess(res, StatusCodes.OK, { data: data });
   }
 
   async getAlexTokens(res: Response) {

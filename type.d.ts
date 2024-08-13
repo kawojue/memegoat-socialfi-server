@@ -28,3 +28,13 @@ type Pool = {
     price_change_30d: number | null;
   };
 };
+
+type VelarToken = {
+  symbol: string;
+  name: string;
+  contractAddress: string;
+  price: string;
+  tokenDecimalNum: number;
+  assetName: string;
+  vsymbol: string;
+};

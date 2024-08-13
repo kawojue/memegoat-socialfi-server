@@ -75,4 +75,19 @@ export class ApiService {
     );
     return fallbackPool?.pool_id;
   }
+
+  async getVelarTokens() {
+    const url = `https://sdk.velar.network/tokens`;
+    try {
+      const response = this.httpService.get(url);
+      const result = await lastValueFrom(response);
+      return result.data as VelarToken[];
+    } catch (err) {
+      if (err?.response?.data?.message) {
+        throw new HttpException(err.response.data.message, err.response.status);
+      } else {
+        throw new BadGatewayException('Something went wrong');
+      }
+    }
+  }
 }
