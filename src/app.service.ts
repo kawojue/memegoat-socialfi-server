@@ -456,7 +456,7 @@ export class AppService {
       y: item?.close
     }))
 
-    this.response.sendSuccess(res, StatusCodes.OK, { data: data });
+    this.response.sendSuccess(res, StatusCodes.OK, { data: transformedData });
   }
 
   async getBalances(res: Response, chart: BalanceDTO) {
