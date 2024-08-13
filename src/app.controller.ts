@@ -122,6 +122,11 @@ export class AppController {
     await this.appService.getChartData(res, body);
   }
 
+  @Get('/chartOld')
+  async fetchChartOld(@Res() res: Response, @Query() body: ChartDTO) {
+    await this.appService.getChartDataOld(res, body);
+  }
+
   @Get('/balance')
   async fetchBalance(@Res() res: Response, @Query() body: BalanceDTO) {
     await this.appService.getBalances(res, body);

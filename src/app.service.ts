@@ -20,7 +20,7 @@ export class AppService {
     private readonly prisma: PrismaService,
     private readonly response: ResponseService,
     private readonly apiService: ApiService,
-  ) { }
+  ) {}
 
   getHello(): string {
     return 'Memegoat!';
@@ -453,10 +453,16 @@ export class AppService {
 
     const transformedData = data.map((item: any) => ({
       x: item?.time,
-      y: item?.close
-    }))
+      y: item?.close,
+    }));
 
     this.response.sendSuccess(res, StatusCodes.OK, { data: transformedData });
+  }
+
+  async getChartDataOld(res: Response, chart: ChartDTO) {
+    const data = await this.apiService.getChartData(chart.token);
+
+    this.response.sendSuccess(res, StatusCodes.OK, { data: data });
   }
 
   async getBalances(res: Response, chart: BalanceDTO) {
