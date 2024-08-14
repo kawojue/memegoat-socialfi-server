@@ -463,11 +463,11 @@ export class AppService {
     const data = await this.apiService.getSTXData();
     const transformedData = data.map((item: any) => ({
       time: new Date(item[0]).toISOString(),
-      open: item[1],
-      high: item[2],
-      low: item[3],
-      close: item[4],
-      volume: item[5],
+      open: Number(item[1]),
+      high: Number(item[2]),
+      low: Number(item[3]),
+      close: Number(item[4]),
+      volume: Number(item[5]),
     }));
     this.response.sendSuccess(res, StatusCodes.OK, { data: transformedData });
   }
