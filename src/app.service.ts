@@ -461,7 +461,11 @@ export class AppService {
 
   async getChartDataOld(res: Response, chart: ChartDTO) {
     const data = await this.apiService.getChartData(chart.token);
+    this.response.sendSuccess(res, StatusCodes.OK, { data: data });
+  }
 
+  async getSTXChart(res: Response) {
+    const data = await this.apiService.getSTXChart();
     this.response.sendSuccess(res, StatusCodes.OK, { data: data });
   }
 

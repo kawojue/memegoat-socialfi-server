@@ -2,6 +2,7 @@ import { lastValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 import { StatusCodes } from 'enums/statusCodes';
 import { Injectable, HttpException, BadGatewayException } from '@nestjs/common';
+import ccxt from 'ccxt';
 
 @Injectable()
 export class ApiService {
@@ -38,6 +39,12 @@ export class ApiService {
         throw new HttpException('Something went wrong', StatusCodes.BadGateway);
       }
     }
+  }
+
+  async getSTXChart() {
+    const myex = new ccxt.binance({});
+    const ohlcv = await myex.fetchOHLCV('STX/USDT');
+    return ohlcv;
   }
 
   async getPools() {
