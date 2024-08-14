@@ -459,6 +459,19 @@ export class AppService {
     this.response.sendSuccess(res, StatusCodes.OK, { data: transformedData });
   }
 
+  async getSTXChart(res: Response) {
+    const data = await this.apiService.getSTXData();
+    const transformedData = data.map((item: any) => ({
+      time: item[0],
+      open: item[1],
+      high: item[2],
+      low: item[3],
+      close: item[4],
+      volume: item[5],
+    }));
+    this.response.sendSuccess(res, StatusCodes.OK, { data: transformedData });
+  }
+
   async getChartDataOld(res: Response, chart: ChartDTO) {
     const data = await this.apiService.getChartData(chart.token);
     this.response.sendSuccess(res, StatusCodes.OK, { data: data });

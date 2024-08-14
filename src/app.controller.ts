@@ -117,10 +117,10 @@ export class AppController {
     await this.appService.getAlexTokens(res);
   }
 
-  // @Get('/chart')
-  // async fetchChart(@Res() res: Response, @Query() body: ChartDTO) {
-  //   await this.appService.getChartData(res, body);
-  // }
+  @Get('/stxChart')
+  async fetchChart(@Res() res: Response) {
+    await this.appService.getSTXChart(res);
+  }
 
   @Get('/chart')
   async fetchChartOld(@Res() res: Response, @Query() body: ChartDTO) {

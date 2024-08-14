@@ -40,6 +40,21 @@ export class ApiService {
     }
   }
 
+  async getSTXData() {
+    const url = `https://data-api.binance.vision/api/v3/klines?symbol=STXUSDT&interval=15m&limit=5000`;
+    try {
+      const response = this.httpService.get(url);
+      const result = await lastValueFrom(response);
+      return result.data;
+    } catch (err) {
+      if (err?.response?.data?.message) {
+        throw new HttpException(err.response.data.message, err.response.status);
+      } else {
+        throw new HttpException('Something went wrong', StatusCodes.BadGateway);
+      }
+    }
+  }
+
   async getPools() {
     const url = `https://api.stxtools.io/pools`;
     try {
