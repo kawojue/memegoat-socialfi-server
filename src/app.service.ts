@@ -462,7 +462,7 @@ export class AppService {
   async getSTXChart(res: Response) {
     const data = await this.apiService.getSTXData();
     const transformedData = data.map((item: any) => ({
-      time: item[0],
+      time: new Date(item[0]).toISOString(),
       open: item[1],
       high: item[2],
       low: item[3],
