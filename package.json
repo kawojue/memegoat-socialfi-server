@@ -34,7 +34,6 @@
     "@prisma/client": "^5.13.0",
     "axios": "^1.7.2",
     "bcrypt": "^5.1.1",
-    "ccxt": "^4.3.82",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "cookie-parser": "^1.4.6",
