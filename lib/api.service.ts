@@ -41,7 +41,7 @@ export class ApiService {
   }
 
   async getSTXData() {
-    const url = `https://data-api.binance.vision/api/v3/klines?symbol=STXUSDT&interval=15m&limit=5000`;
+    const url = `https://data-api.binance.vision/api/v3/klines?symbol=STXUSDT&interval=15m&limit=10000`;
     try {
       const response = this.httpService.get(url);
       const result = await lastValueFrom(response);
