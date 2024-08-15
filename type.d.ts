@@ -51,8 +51,7 @@ type AlexToken = {
 };
 
 type AlexPool = {
-  pool_id: number;
-  token_x: string;
-  token_y: string;
+  tokenX: string;
+  tokenY: string;
   factor: number;
 };

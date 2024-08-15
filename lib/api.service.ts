@@ -122,11 +122,11 @@ export class ApiService {
   }
 
   async getAlexPools() {
-    const url = 'https://api.alexgo.io/v2/public/pools';
+    const url = 'https://alex-sdk-api.alexlab.co';
     try {
       const response = this.httpService.get(url);
       const result = await lastValueFrom(response);
-      return result.data.data as AlexPool[];
+      return result.data.pools as AlexPool[];
     } catch (err) {
       if (err?.response?.data?.message) {
         throw new HttpException(err.response.data.message, err.response.status);
