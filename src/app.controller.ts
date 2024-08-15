@@ -117,6 +117,11 @@ export class AppController {
     await this.appService.getAlexTokens(res);
   }
 
+  @Get('/alexPools')
+  async fetchAlexPools(@Res() res: Response) {
+    await this.appService.getAlexPools(res);
+  }
+
   @Get('/stxChart')
   async fetchChart(@Res() res: Response) {
     await this.appService.getSTXChart(res);

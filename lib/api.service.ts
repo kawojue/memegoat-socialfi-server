@@ -120,4 +120,19 @@ export class ApiService {
       }
     }
   }
+
+  async getAlexPools() {
+    const url = 'https://api.alexgo.io/v2/public/pools';
+    try {
+      const response = this.httpService.get(url);
+      const result = await lastValueFrom(response);
+      return result.data.tokens as AlexToken[];
+    } catch (err) {
+      if (err?.response?.data?.message) {
+        throw new HttpException(err.response.data.message, err.response.status);
+      } else {
+        throw new BadGatewayException('Something went wrong');
+      }
+    }
+  }
 }

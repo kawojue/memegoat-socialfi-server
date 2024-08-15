@@ -448,6 +448,11 @@ export class AppService {
     this.response.sendSuccess(res, StatusCodes.OK, { data: data });
   }
 
+  async getAlexPools(res: Response) {
+    const data = await this.apiService.getAlexPools();
+    this.response.sendSuccess(res, StatusCodes.OK, { data: data });
+  }
+
   async getChartData(res: Response, chart: ChartDTO) {
     const data = await this.apiService.getChartData(chart.token);
 
