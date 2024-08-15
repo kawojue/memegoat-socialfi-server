@@ -49,3 +49,10 @@ type AlexToken = {
   underlyingTokenDecimals: number;
   isRebaseToken: boolean;
 };
+
+type AlexPool = {
+  pool_id: number;
+  token_x: string;
+  token_y: string;
+  factor: number;
+};
