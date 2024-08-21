@@ -19,6 +19,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CookieAuthGuard } from './jwt/cookie-auth.guard';
 import { CampaignRequestDTO } from './dto/compaign-req.dto';
 import { BalanceDTO } from './dto/balance.dto';
+import { TokenMintDTO } from './dto/token-mint.dto';
 
 @Controller()
 @ApiTags('App')
@@ -84,6 +85,11 @@ export class AppController {
     await this.appService.fetchCampaignRequest(res, token_addr);
   }
 
+  @Post('/minted-tokens')
+  async addTokenMint(@Res() res: Response, @Body() body: TokenMintDTO) {
+    await this.appService.addTokenMint(res, body);
+  }
+
   @Get('/minted-tokens')
   async fetchMintedTokens(@Res() res: Response) {
     await this.appService.fetchMintedTokens(res);
@@ -117,9 +123,19 @@ export class AppController {
     await this.appService.getAlexTokens(res);
   }
 
+  @Get('/alexPools')
+  async fetchAlexPools(@Res() res: Response) {
+    await this.appService.getAlexPools(res);
+  }
+
+  @Get('/stxChart')
+  async fetchChart(@Res() res: Response) {
+    await this.appService.getSTXChart(res);
+  }
+
   @Get('/chart')
-  async fetchChart(@Res() res: Response, @Query() body: ChartDTO) {
-    await this.appService.getChartData(res, body);
+  async fetchChartOld(@Res() res: Response, @Query() body: ChartDTO) {
+    await this.appService.getChartDataOld(res, body);
   }
 
   @Get('/balance')

@@ -103,6 +103,18 @@ model CampaignRequest {
     createdAt            DateTime @default(now())
 }
 
+model MintedToken {
+    id            String   @id @default(auto()) @map("_id") @db.ObjectId
+    token_image   String?
+    token_name    String?
+    token_desc    String?
+    token_supply  String?
+    token_ticker  String?
+    token_address String   @unique
+    user_addr     String?
+    createdAt     DateTime @default(now())
+}
+
 model WaitList {
     id        String   @id @default(auto()) @map("_id") @db.ObjectId
     email     String   @unique

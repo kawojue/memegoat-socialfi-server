@@ -9,6 +9,7 @@ import { MiscService } from 'lib/misc.service';
 import { BalanceDTO } from './dto/balance.dto';
 import { StatusCodes } from 'enums/statusCodes';
 import { WaitListDTO } from './dto/waitlist.dto';
+import { TokenMintDTO } from './dto/token-mint.dto';
 import { PrismaService } from 'prisma/prisma.service';
 import { ResponseService } from 'lib/response.service';
 import { CampaignRequestDTO } from './dto/compaign-req.dto';
@@ -364,8 +365,25 @@ export class AppService {
     }
   }
 
+  async addTokenMint(res: Response, dto: TokenMintDTO) {
+    try {
+      await this.prisma.mintedToken.upsert({
+        where: { token_address: dto.token_address },
+        create: {
+          ...dto,
+        },
+        update: {
+          ...dto,
+        },
+      });
+      this.response.sendSuccess(res, StatusCodes.OK, { message: 'Saved' });
+    } catch (err) {
+      this.misc.handleServerError(res, err);
+    }
+  }
+
   async fetchMintedTokens(res: Response) {
-    const requests = await this.prisma.campaignRequest.findMany({
+    const requests = await this.prisma.mintedToken.findMany({
       orderBy: { createdAt: 'desc' },
     });
 
@@ -373,7 +391,7 @@ export class AppService {
   }
 
   async fetchMintedToken(res: Response, token_address: string) {
-    const request = await this.prisma.campaignRequest.findUnique({
+    const request = await this.prisma.mintedToken.findUnique({
       where: { token_address },
     });
 
@@ -454,15 +472,38 @@ export class AppService {
     this.response.sendSuccess(res, StatusCodes.OK, { data: data });
   }
 
+  async getAlexPools(res: Response) {
+    const data = await this.apiService.getAlexPools();
+    this.response.sendSuccess(res, StatusCodes.OK, { data: data });
+  }
+
   async getChartData(res: Response, chart: ChartDTO) {
     const data = await this.apiService.getChartData(chart.token);
 
     const transformedData = data.map((item: any) => ({
       x: item?.time,
-      y: item?.close
-    }))
+      y: item?.close,
+    }));
 
     this.response.sendSuccess(res, StatusCodes.OK, { data: transformedData });
+  }
+
+  async getSTXChart(res: Response) {
+    const data = await this.apiService.getSTXData();
+    const transformedData = data.map((item: any) => ({
+      time: new Date(item[0]).toISOString(),
+      open: Number(item[1]),
+      high: Number(item[2]),
+      low: Number(item[3]),
+      close: Number(item[4]),
+      volume: Number(item[5]),
+    }));
+    this.response.sendSuccess(res, StatusCodes.OK, { data: transformedData });
+  }
+
+  async getChartDataOld(res: Response, chart: ChartDTO) {
+    const data = await this.apiService.getChartData(chart.token);
+    this.response.sendSuccess(res, StatusCodes.OK, { data: data });
   }
 
   async getBalances(res: Response, chart: BalanceDTO) {

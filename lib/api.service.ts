@@ -6,8 +6,8 @@ import { Injectable, HttpException, BadGatewayException } from '@nestjs/common';
 @Injectable()
 export class ApiService {
   private apiKey: string
-  private cloudFlareBaseUrl: string
   private apiEmail: string
+  private cloudFlareBaseUrl: string
 
   constructor(private readonly httpService: HttpService) {
     this.apiKey = process.env.CLOUDFLARE_API_KEY
@@ -62,6 +62,21 @@ export class ApiService {
     }
   }
 
+  async getSTXData() {
+    const url = `https://data-api.binance.vision/api/v3/klines?symbol=STXUSDT&interval=15m&limit=10000`;
+    try {
+      const response = this.httpService.get(url);
+      const result = await lastValueFrom(response);
+      return result.data;
+    } catch (err) {
+      if (err?.response?.data?.message) {
+        throw new HttpException(err.response.data.message, err.response.status);
+      } else {
+        throw new HttpException('Something went wrong', StatusCodes.BadGateway);
+      }
+    }
+  }
+
   async getPools() {
     const url = `https://api.stxtools.io/pools`;
     try {
@@ -103,7 +118,7 @@ export class ApiService {
     try {
       const response = this.httpService.get(url);
       const result = await lastValueFrom(response);
-      return result.data as VelarToken[];
+      return result.data.data as VelarToken[];
     } catch (err) {
       if (err?.response?.data?.message) {
         throw new HttpException(err.response.data.message, err.response.status);
@@ -119,6 +134,21 @@ export class ApiService {
       const response = this.httpService.get(url);
       const result = await lastValueFrom(response);
       return result.data.tokens as AlexToken[];
+    } catch (err) {
+      if (err?.response?.data?.message) {
+        throw new HttpException(err.response.data.message, err.response.status);
+      } else {
+        throw new BadGatewayException('Something went wrong');
+      }
+    }
+  }
+
+  async getAlexPools() {
+    const url = 'https://alex-sdk-api.alexlab.co';
+    try {
+      const response = this.httpService.get(url);
+      const result = await lastValueFrom(response);
+      return result.data.pools as AlexPool[];
     } catch (err) {
       if (err?.response?.data?.message) {
         throw new HttpException(err.response.data.message, err.response.status);
