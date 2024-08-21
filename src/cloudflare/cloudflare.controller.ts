@@ -7,7 +7,7 @@ import {
   Controller,
 } from '@nestjs/common'
 import { Response } from 'express'
-import { StatusCodes } from 'enums/StatusCodes'
+import { StatusCodes } from 'enums/statusCodes'
 import { ResponseService } from 'lib/response.service'
 import { SignatureAuthGuard } from './cloudflare.guard'
 import { CloudflareService } from './cloudflare.service'
