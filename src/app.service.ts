@@ -341,14 +341,8 @@ export class AppService {
 
   async addCampaignRequest(res: Response, dto: CampaignRequestDTO) {
     try {
-      await this.prisma.campaignRequest.upsert({
-        where: { token_address: dto.token_address },
-        create: {
-          ...dto,
-          end_date: new Date(dto.end_date),
-          start_date: new Date(dto.start_date),
-        },
-        update: {
+      const campaign = await this.prisma.campaignRequest.create({
+        data: {
           ...dto,
           end_date: new Date(dto.end_date),
           start_date: new Date(dto.start_date),
@@ -356,7 +350,9 @@ export class AppService {
       });
 
       res.on('finish', async () => {
-        await this.cloudflare.createDeployment()
+        if (campaign) {
+          await this.cloudflare.createDeployment()
+        }
       })
 
       this.response.sendSuccess(res, StatusCodes.OK, { message: 'Saved' });
