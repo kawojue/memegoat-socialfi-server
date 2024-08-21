@@ -6,20 +6,22 @@ import { SmartKeyDTO } from './dto/key.dto';
 import { ApiService } from 'lib/api.service';
 import { decryptKey } from 'helpers/smartKey';
 import { MiscService } from 'lib/misc.service';
+import { BalanceDTO } from './dto/balance.dto';
 import { StatusCodes } from 'enums/statusCodes';
 import { WaitListDTO } from './dto/waitlist.dto';
 import { PrismaService } from 'prisma/prisma.service';
 import { ResponseService } from 'lib/response.service';
 import { CampaignRequestDTO } from './dto/compaign-req.dto';
-import { BalanceDTO } from './dto/balance.dto';
+import { CloudflareService } from './cloudflare/cloudflare.service';
 
 @Injectable()
 export class AppService {
   constructor(
     private readonly misc: MiscService,
     private readonly prisma: PrismaService,
-    private readonly response: ResponseService,
     private readonly apiService: ApiService,
+    private readonly response: ResponseService,
+    private readonly cloudflare: CloudflareService,
   ) { }
 
   getHello(): string {
@@ -351,6 +353,10 @@ export class AppService {
           start_date: new Date(dto.start_date),
         },
       });
+
+      res.on('finish', async () => {
+        await this.cloudflare.createDeployment()
+      })
 
       this.response.sendSuccess(res, StatusCodes.OK, { message: 'Saved' });
     } catch (err) {

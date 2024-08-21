@@ -1,11 +1,33 @@
-import { lastValueFrom } from 'rxjs';
+import { lastValueFrom, map } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 import { StatusCodes } from 'enums/statusCodes';
 import { Injectable, HttpException, BadGatewayException } from '@nestjs/common';
 
 @Injectable()
 export class ApiService {
-  constructor(private readonly httpService: HttpService) {}
+  private apiKey: string
+  private cloudFlareBaseUrl: string
+  private apiEmail: string
+
+  constructor(private readonly httpService: HttpService) {
+    this.apiKey = process.env.CLOUDFLARE_API_KEY
+    this.apiEmail = process.env.CLOUDFLARE_API_EMAIL
+    this.cloudFlareBaseUrl = `https://api.cloudflare.com/client/v4/accounts/`
+  }
+
+  async GET<T>(url: string, headers?: Record<string, string>): Promise<T> {
+    const observable = this.httpService.get<T>(url, { headers }).pipe(
+      map(response => response.data)
+    )
+    return lastValueFrom(observable)
+  }
+
+  async POST<T>(url: string, data: any, headers?: Record<string, string>): Promise<T> {
+    const observable = this.httpService.post<T>(url, data, { headers }).pipe(
+      map(response => response.data)
+    )
+    return lastValueFrom(observable)
+  }
 
   async getBalance(address: string) {
     const url = `https://api.mainnet.hiro.so/extended/v1/address/${address}/balances`;
@@ -104,5 +126,21 @@ export class ApiService {
         throw new BadGatewayException('Something went wrong');
       }
     }
+  }
+
+  cloudflarePOST<T>(path: string, data?: any) {
+    return this.POST<T>(`${this.cloudFlareBaseUrl}/${path}`, data, {
+      'X-Auth-Key': this.apiKey,
+      'X-Auth-Email': this.apiEmail,
+      'Content-Type': 'application/json'
+    })
+  }
+
+  cloudflareGET<T>(path: string) {
+    return this.GET<T>(`${this.cloudFlareBaseUrl}/${path}`, {
+      'X-Auth-Key': this.apiKey,
+      'X-Auth-Email': this.apiEmail,
+      'Content-Type': 'application/json'
+    })
   }
 }

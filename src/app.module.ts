@@ -12,6 +12,7 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'prisma/prisma.service';
 import { ResponseService } from 'lib/response.service';
 import { SessionSerializer } from './jwt/session.serialize';
+import { CloudflareModule } from './cloudflare/cloudflare.module';
 
 @Module({
   imports: [
@@ -20,17 +21,19 @@ import { SessionSerializer } from './jwt/session.serialize';
     HttpModule,
     JwtModule,
     AdminModule,
+    CloudflareModule,
   ],
   controllers: [AppController],
   providers: [
     AppService,
     JwtService,
+    ApiService,
     TaskService,
     MiscService,
     PrismaService,
     ResponseService,
     SessionSerializer,
-    ApiService,
   ],
+  exports: [AppService]
 })
-export class AppModule {}
+export class AppModule { }
