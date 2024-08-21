@@ -19,6 +19,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CookieAuthGuard } from './jwt/cookie-auth.guard';
 import { CampaignRequestDTO } from './dto/compaign-req.dto';
 import { BalanceDTO } from './dto/balance.dto';
+import { TokenMintDTO } from './dto/token-mint.dto';
 
 @Controller()
 @ApiTags('App')
@@ -82,6 +83,11 @@ export class AppController {
     @Param('token_addr') token_addr: string,
   ) {
     await this.appService.fetchCampaignRequest(res, token_addr);
+  }
+
+  @Post('/minted-tokens')
+  async addTokenMint(@Res() res: Response, @Body() body: TokenMintDTO) {
+    await this.appService.addTokenMint(res, body);
   }
 
   @Get('/minted-tokens')
