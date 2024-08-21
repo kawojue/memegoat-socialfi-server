@@ -12,6 +12,7 @@ import { PrismaService } from 'prisma/prisma.service';
 import { ResponseService } from 'lib/response.service';
 import { CampaignRequestDTO } from './dto/compaign-req.dto';
 import { BalanceDTO } from './dto/balance.dto';
+import { TokenMintDTO } from './dto/token-mint.dto';
 
 @Injectable()
 export class AppService {
@@ -358,8 +359,25 @@ export class AppService {
     }
   }
 
+  async addTokenMint(res: Response, dto: TokenMintDTO) {
+    try {
+      await this.prisma.mintedToken.upsert({
+        where: { token_address: dto.token_address },
+        create: {
+          ...dto,
+        },
+        update: {
+          ...dto,
+        },
+      });
+      this.response.sendSuccess(res, StatusCodes.OK, { message: 'Saved' });
+    } catch (err) {
+      this.misc.handleServerError(res, err);
+    }
+  }
+
   async fetchMintedTokens(res: Response) {
-    const requests = await this.prisma.campaignRequest.findMany({
+    const requests = await this.prisma.mintedToken.findMany({
       orderBy: { createdAt: 'desc' },
     });
 
@@ -367,7 +385,7 @@ export class AppService {
   }
 
   async fetchMintedToken(res: Response, token_address: string) {
-    const request = await this.prisma.campaignRequest.findUnique({
+    const request = await this.prisma.mintedToken.findUnique({
       where: { token_address },
     });
 
