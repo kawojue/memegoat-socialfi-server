@@ -150,7 +150,7 @@ model VelarTokens {
 model MemegoatVolume {
     id        String   @id @default(auto()) @map("_id") @db.ObjectId
     token     String   @unique
-    amount    String
+    amount    BigInt
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
