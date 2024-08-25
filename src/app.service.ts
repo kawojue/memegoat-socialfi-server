@@ -556,7 +556,9 @@ export class AppService {
         this.prisma.memegoatVolume.upsert({
           where: { token: vol.token },
           update: {
-            amount: vol.amount,
+            amount: {
+              increment: vol.amount,
+            },
           },
           create: {
             token: vol.token,
