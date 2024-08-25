@@ -16,6 +16,7 @@ import { ResponseService } from 'lib/response.service';
 import { TxnVolumeService } from 'lib/txVolume.service';
 import { SessionSerializer } from './jwt/session.serialize';
 import { CloudflareModule } from './cloudflare/cloudflare.module';
+import { ContractService } from 'lib/contract.service';
 
 @Module({
   imports: [
@@ -39,7 +40,8 @@ import { CloudflareModule } from './cloudflare/cloudflare.module';
     ResponseService,
     TxnVolumeService,
     SessionSerializer,
+    ContractService,
   ],
   exports: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

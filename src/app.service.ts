@@ -15,6 +15,7 @@ import { ResponseService } from 'lib/response.service';
 import { CampaignRequestDTO } from './dto/compaign-req.dto';
 import { CloudflareService } from './cloudflare/cloudflare.service';
 import { TxnVolumeService, txVolumeOutput } from 'lib/txVolume.service';
+import { contractDTO, ContractService } from 'lib/contract.service';
 
 @Injectable()
 export class AppService {
@@ -25,6 +26,7 @@ export class AppService {
     private readonly response: ResponseService,
     private readonly cloudflare: CloudflareService,
     private readonly txnVolumeService: TxnVolumeService,
+    private readonly contractService: ContractService,
   ) {}
 
   getHello(): string {
@@ -657,6 +659,31 @@ export class AppService {
     );
 
     this.response.sendSuccess(res, StatusCodes.OK, { data: record });
+  }
+
+  async getTotalstakedMemegoat() {
+    const data: contractDTO = {
+      contract: 'memegoat-staking-v1',
+      function: 'get-total-staked',
+      arguments: [],
+    };
+    const amount = await this.contractService.readContract(data);
+    return amount;
+  }
+
+  async getMemegoatVolume(res: Response) {
+    const volData = await this.prisma.memegoatVolume.findMany();
+    const stakedGoat = await this.getTotalstakedMemegoat();
+    const data = volData.map((data) => {
+      if (
+        data.token === 'SP2F4QC563WN0A0949WPH5W1YXVC4M1R46QKE0G14.memegoatstx'
+      ) {
+        return { ...data, amount: data.amount + stakedGoat };
+      } else {
+        return data;
+      }
+    });
+    this.response.sendSuccess(res, StatusCodes.OK, { data: data });
   }
 
   async updateDBVol(contractName: string, record: txVolumeOutput) {

@@ -119,6 +119,11 @@ export class AppController {
     await this.appService.waitlist(res, body);
   }
 
+  @Post('/memegoatVolume')
+  async getMemegoatVol(@Res() res: Response) {
+    await this.appService.getMemegoatVolume(res);
+  }
+
   @Post('/updatePoolsVolume')
   async updateCommunityPoolsVol(@Res() res: Response) {
     await this.appService.updateCommunityPoolsVolume(res);
