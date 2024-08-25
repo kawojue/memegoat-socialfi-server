@@ -31,14 +31,14 @@ export class TxnVolumeService {
       const txRecord = await this.getTxns(dto);
       for (const result of txRecord.results) {
         if (result.tx.tx_status !== 'success') continue;
-        if (excludedContracts.includes(result.tx.contract_call.contract_id))
-          continue;
-        // Process STX received
+        if (result.tx.tx_type === 'smart_contract') continue;
         if (result.stx_received !== '0') {
           const currentSTX = tokenMap.get('STX') || 0;
           tokenMap.set('STX', currentSTX + Number(result.stx_received));
         }
-
+        if (result.tx.tx_type === 'token_transfer') continue;
+        if (excludedContracts.includes(result.tx.contract_call.contract_id))
+          continue;
         // Process post conditions for fungible tokens
         for (const pc of result.tx.post_conditions) {
           if (pc.type === 'fungible') {
