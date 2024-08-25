@@ -1,4 +1,3 @@
-const fs = require('fs')
 import { SendMailClient } from 'zeptomail'
 import { Injectable } from '@nestjs/common'
 
@@ -10,7 +9,7 @@ export class MailService {
             const token = process.env.ZOHO_TOKEN
             const zohoClient = new SendMailClient({ url, token })
             const message = {
-                bounce_address: process.env.BOUNCE_EMAIL,
+                bounce_address: 'bounce.zem@memegoat.io',
                 from: {
                     address: data?.from,
                     name: data?.fromName || 'MemeGoat',
