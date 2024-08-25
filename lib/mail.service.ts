@@ -9,7 +9,7 @@ export class MailService {
             const token = process.env.ZOHO_TOKEN
             const zohoClient = new SendMailClient({ url, token })
             const message = {
-                bounce_address: 'bounce.zem@memegoat.io',
+                bounce_address: 'bounce-zem@memegoat.io',
                 from: {
                     address: data?.from,
                     name: data?.fromName || 'MemeGoat',
