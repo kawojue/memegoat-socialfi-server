@@ -32,7 +32,7 @@ export class MailService {
 
             return response
         } catch (err) {
-            console.error(err)
+            console.error(err?.error?.details)
         }
     }
 }

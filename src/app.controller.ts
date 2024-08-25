@@ -419,7 +419,7 @@ table, td { color: #000000; } #u_body a { color: #0000ee; text-decoration: under
           subject: 'Memegoat Nakamoto Begins',
           html: body,
           to: batch,
-          from: 'contact@memegoat.io'
+          from: 'info@memegoat.io'
         })
       }
     };
