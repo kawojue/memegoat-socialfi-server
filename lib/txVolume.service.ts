@@ -188,7 +188,7 @@ export const mapToObject = <K extends string | number | symbol, V>(
   map.forEach((value, key) => {
     volume.push({
       token: key as string,
-      amount: value as number,
+      amount: value as any,
     });
   });
   return volume;
@@ -196,7 +196,7 @@ export const mapToObject = <K extends string | number | symbol, V>(
 
 type token = {
   token: string;
-  amount: number;
+  amount: any;
 };
 
 const excludedContracts = [
