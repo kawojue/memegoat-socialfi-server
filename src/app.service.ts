@@ -16,6 +16,7 @@ import { CampaignRequestDTO } from './dto/compaign-req.dto';
 import { CloudflareService } from './cloudflare/cloudflare.service';
 import { TxnVolumeService, txVolumeOutput } from 'lib/txVolume.service';
 import { contractDTO, ContractService } from 'lib/contract.service';
+import BigNumber from 'bignumber.js';
 
 @Injectable()
 export class AppService {
@@ -678,9 +679,15 @@ export class AppService {
       if (
         data.token === 'SP2F4QC563WN0A0949WPH5W1YXVC4M1R46QKE0G14.memegoatstx'
       ) {
-        return { ...data, amount: data.amount + stakedGoat };
+        return {
+          ...data,
+          amount: new BigNumber(data.amount + stakedGoat).toFixed(),
+        };
       } else {
-        return data;
+        return {
+          ...data,
+          amount: new BigNumber(data.amount as any).toFixed(),
+        };
       }
     });
     this.response.sendSuccess(res, StatusCodes.OK, { data: data });
