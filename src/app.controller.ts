@@ -119,7 +119,7 @@ export class AppController {
     await this.appService.waitlist(res, body);
   }
 
-  @Post('/memegoatVolume')
+  @Get('/memegoatVolume')
   async getMemegoatVol(@Res() res: Response) {
     await this.appService.getMemegoatVolume(res);
   }
