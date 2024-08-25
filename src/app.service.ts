@@ -14,6 +14,7 @@ import { PrismaService } from 'prisma/prisma.service';
 import { ResponseService } from 'lib/response.service';
 import { CampaignRequestDTO } from './dto/compaign-req.dto';
 import { CloudflareService } from './cloudflare/cloudflare.service';
+import { recordDTO, TxnVolumeService } from 'lib/txVolume.service';
 
 @Injectable()
 export class AppService {
@@ -23,7 +24,8 @@ export class AppService {
     private readonly apiService: ApiService,
     private readonly response: ResponseService,
     private readonly cloudflare: CloudflareService,
-  ) { }
+    private readonly txnVolumeService: TxnVolumeService,
+  ) {}
 
   getHello(): string {
     return 'Memegoat!';
@@ -376,13 +378,13 @@ export class AppService {
 
       res.on('finish', async () => {
         if (campaign) {
-          await this.cloudflare.createDeployment()
+          await this.cloudflare.createDeployment();
         }
-      })
+      });
 
       this.response.sendSuccess(res, StatusCodes.OK, { message: 'Saved' });
     } catch (err) {
-      console.error(err)
+      console.error(err);
       this.misc.handleServerError(res, err);
     }
   }
@@ -531,5 +533,39 @@ export class AppService {
   async getBalances(res: Response, chart: BalanceDTO) {
     const data = await this.apiService.getBalance(chart.address);
     this.response.sendSuccess(res, StatusCodes.OK, { data: data });
+  }
+
+  async updateTxnVolume(res: Response, dto: recordDTO) {
+    const record = await this.txnVolumeService.recordTxnData(dto);
+
+    await this.prisma.contractOffsets.upsert({
+      where: { contract: dto.contractName },
+      update: {
+        totalTransactions: record.totalTxns,
+        nextOffset: record.nextOffset,
+      },
+      create: {
+        contract: dto.contractName,
+        totalTransactions: record.totalTxns,
+        nextOffset: record.nextOffset,
+      },
+    });
+
+    await this.prisma.$transaction(
+      record.data.map((vol) =>
+        this.prisma.memegoatVolume.upsert({
+          where: { token: vol.token },
+          update: {
+            amount: vol.amount,
+          },
+          create: {
+            token: vol.token,
+            amount: vol.amount,
+          },
+        }),
+      ),
+    );
+
+    this.response.sendSuccess(res, StatusCodes.OK, { data: record });
   }
 }

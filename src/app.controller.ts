@@ -24,6 +24,7 @@ import { ResponseService } from 'lib/response.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CookieAuthGuard } from './jwt/cookie-auth.guard';
 import { CampaignRequestDTO } from './dto/compaign-req.dto';
+import { recordDTO } from 'lib/txVolume.service';
 
 @Controller()
 @ApiTags('App')
@@ -33,7 +34,7 @@ export class AppController {
     private readonly prisma: PrismaService,
     private readonly appService: AppService,
     private readonly response: ResponseService,
-  ) { }
+  ) {}
 
   @Get()
   getHello(): string {
@@ -115,6 +116,11 @@ export class AppController {
   @Post('waitlist')
   async waitlist(@Res() res: Response, @Body() body: WaitListDTO) {
     await this.appService.waitlist(res, body);
+  }
+
+  @Post('/updateVolume')
+  async updateTxnVolume(@Res() res: Response, @Body() body: recordDTO) {
+    await this.appService.updateTxnVolume(res, body);
   }
 
   @Get('/allTokens')
@@ -398,11 +404,11 @@ table, td { color: #000000; } #u_body a { color: #0000ee; text-decoration: under
 </body>
 
 </html>
-`
+`;
 
-    const waitList = await this.prisma.waitList.findMany()
+    const waitList = await this.prisma.waitList.findMany();
 
-    const emails = waitList.map(w => w.email)
+    const emails = waitList.map((w) => w.email);
 
     const sendEmailsInBatches = async (emails: string[], batchSize: number) => {
       for (let i = 0; i < emails.length; i += batchSize) {
@@ -415,8 +421,8 @@ table, td { color: #000000; } #u_body a { color: #0000ee; text-decoration: under
       }
     };
 
-    await sendEmailsInBatches(emails, 50)
+    await sendEmailsInBatches(emails, 50);
 
-    this.response.sendSuccess(res, StatusCodes.OK, { message: "Successful" })
+    this.response.sendSuccess(res, StatusCodes.OK, { message: 'Successful' });
   }
 }
