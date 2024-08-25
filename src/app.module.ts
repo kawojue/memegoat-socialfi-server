@@ -14,6 +14,7 @@ import { PrismaService } from 'prisma/prisma.service';
 import { ResponseService } from 'lib/response.service';
 import { SessionSerializer } from './jwt/session.serialize';
 import { CloudflareModule } from './cloudflare/cloudflare.module';
+import { TxnVolumeService } from 'lib/txVolume.service';
 
 @Module({
   imports: [
@@ -35,7 +36,8 @@ import { CloudflareModule } from './cloudflare/cloudflare.module';
     PrismaService,
     ResponseService,
     SessionSerializer,
+    TxnVolumeService,
   ],
-  exports: [AppService]
+  exports: [AppService],
 })
-export class AppModule { }
+export class AppModule {}
