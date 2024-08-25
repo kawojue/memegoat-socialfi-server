@@ -15,26 +15,28 @@ import { ChartDTO } from './dto/chart.dto';
 import { SmartKeyDTO } from './dto/key.dto';
 import { Request, Response } from 'express';
 import { BalanceDTO } from './dto/balance.dto';
+import { MailService } from 'lib/mail.service';
 import { StatusCodes } from 'enums/statusCodes';
 import { WaitListDTO } from './dto/waitlist.dto';
 import { PlunkService } from 'lib/plunk.service';
+import { recordDTO } from 'lib/txVolume.service';
 import { TokenMintDTO } from './dto/token-mint.dto';
 import { PrismaService } from 'prisma/prisma.service';
 import { ResponseService } from 'lib/response.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CookieAuthGuard } from './jwt/cookie-auth.guard';
 import { CampaignRequestDTO } from './dto/compaign-req.dto';
-import { recordDTO } from 'lib/txVolume.service';
 
 @Controller()
 @ApiTags('App')
 export class AppController {
   constructor(
+    private readonly mail: MailService,
     private readonly plunk: PlunkService,
     private readonly prisma: PrismaService,
     private readonly appService: AppService,
     private readonly response: ResponseService,
-  ) {}
+  ) { }
 
   @Get()
   getHello(): string {
@@ -413,15 +415,16 @@ table, td { color: #000000; } #u_body a { color: #0000ee; text-decoration: under
     const sendEmailsInBatches = async (emails: string[], batchSize: number) => {
       for (let i = 0; i < emails.length; i += batchSize) {
         const batch = emails.slice(i, i + batchSize);
-        await this.plunk.sendPlunkEmail({
-          to: batch,
+        await this.mail.sendZeptoEmail({
           subject: 'Memegoat Nakamoto Begins',
-          body: body,
-        });
+          html: body,
+          to: batch,
+          from: 'contact@memegoat.io'
+        })
       }
     };
 
-    await sendEmailsInBatches(emails, 50);
+    await sendEmailsInBatches(emails, 5);
 
     this.response.sendSuccess(res, StatusCodes.OK, { message: 'Successful' });
   }

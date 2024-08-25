@@ -25,7 +25,7 @@ export class AppService {
     private readonly response: ResponseService,
     private readonly cloudflare: CloudflareService,
     private readonly txnVolumeService: TxnVolumeService,
-  ) {}
+  ) { }
 
   getHello(): string {
     return 'Memegoat!';

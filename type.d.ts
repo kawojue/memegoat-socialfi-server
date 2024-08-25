@@ -55,3 +55,15 @@ type AlexPool = {
   tokenY: string;
   factor: number;
 };
+
+
+interface ZeptomailConfig {
+  from?: string
+  subject?: string
+  to: string | string[]
+  html?: string
+  templateId?: string
+  dynamicData?: object
+  fromName?: string
+  attachments?: Attachment | Attachment[]
+}
