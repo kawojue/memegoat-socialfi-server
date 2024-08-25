@@ -6,6 +6,7 @@ import { TaskService } from 'lib/task.service';
 import { MiscService } from 'lib/misc.service';
 import { AuthModule } from './auth/auth.module';
 import { AppController } from './app.controller';
+import { PlunkService } from 'lib/plunk.service';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AdminModule } from './admin/admin.module';
 import { JwtModule, JwtService } from '@nestjs/jwt';
@@ -30,6 +31,7 @@ import { CloudflareModule } from './cloudflare/cloudflare.module';
     ApiService,
     TaskService,
     MiscService,
+    PlunkService,
     PrismaService,
     ResponseService,
     SessionSerializer,
