@@ -73,6 +73,12 @@ export class TxnVolumeService {
   }
 }
 
+export type txVolumeOutput = {
+  data: token[];
+  nextOffset: number;
+  totalTxns: number;
+};
+
 export class recordDTO {
   @IsNotEmpty()
   @IsString()
@@ -81,6 +87,12 @@ export class recordDTO {
   @IsOptional()
   @IsNumber()
   offset: number;
+}
+
+export class recordDTOV2 {
+  @IsNotEmpty()
+  @IsString()
+  contractName: string;
 }
 
 type TransactionEvent = {

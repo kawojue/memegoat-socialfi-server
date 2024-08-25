@@ -19,7 +19,6 @@ import { MailService } from 'lib/mail.service';
 import { StatusCodes } from 'enums/statusCodes';
 import { WaitListDTO } from './dto/waitlist.dto';
 import { PlunkService } from 'lib/plunk.service';
-import { recordDTO } from 'lib/txVolume.service';
 import { TokenMintDTO } from './dto/token-mint.dto';
 import { PrismaService } from 'prisma/prisma.service';
 import { ResponseService } from 'lib/response.service';
@@ -36,7 +35,7 @@ export class AppController {
     private readonly prisma: PrismaService,
     private readonly appService: AppService,
     private readonly response: ResponseService,
-  ) { }
+  ) {}
 
   @Get()
   getHello(): string {
@@ -120,9 +119,24 @@ export class AppController {
     await this.appService.waitlist(res, body);
   }
 
-  @Post('/updateVolume')
-  async updateTxnVolume(@Res() res: Response, @Body() body: recordDTO) {
-    await this.appService.updateTxnVolume(res, body);
+  @Post('/updatePoolsVolume')
+  async updateCommunityPoolsVol(@Res() res: Response) {
+    await this.appService.updateCommunityPoolsVolume(res);
+  }
+
+  @Post('/updateLockerVolume')
+  async updateLockerVol(@Res() res: Response) {
+    await this.appService.updateTokenLockerVolume(res);
+  }
+
+  @Post('/updateDexVolume')
+  async updateTxnVolume(@Res() res: Response) {
+    await this.appService.updateDexVolume(res);
+  }
+
+  @Post('/updateLaunchpadVolume')
+  async updateLaunchpadVol(@Res() res: Response) {
+    await this.appService.updateLaunchpadVolume(res);
   }
 
   @Get('/allTokens')
@@ -419,8 +433,8 @@ table, td { color: #000000; } #u_body a { color: #0000ee; text-decoration: under
           subject: 'Memegoat Nakamoto Begins',
           html: body,
           to: batch,
-          from: 'info@memegoat.io'
-        })
+          from: 'info@memegoat.io',
+        });
       }
     };
 
