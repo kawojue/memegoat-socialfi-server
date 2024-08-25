@@ -540,7 +540,7 @@ export class AppService {
     const contractOffsets = await this.prisma.contractOffsets.findUnique({
       where: { contract: contractName },
     });
-    const offset = contractOffsets.nextOffset || 0;
+    const offset = contractOffsets ? contractOffsets.nextOffset : 0;
     const record = await this.txnVolumeService.recordTxnData({
       contractName,
       offset,
@@ -571,9 +571,7 @@ export class AppService {
     const contractOffsets = await this.prisma.contractOffsets.findUnique({
       where: { contract: contractName },
     });
-
-    const offset = contractOffsets.nextOffset || 0;
-
+    const offset = contractOffsets ? contractOffsets.nextOffset : 0;
     const record = await this.txnVolumeService.recordTxnData({
       contractName,
       offset,
@@ -604,7 +602,7 @@ export class AppService {
     const contractOffsets = await this.prisma.contractOffsets.findUnique({
       where: { contract: contractName },
     });
-    const offset = contractOffsets.nextOffset || 0;
+    const offset = contractOffsets ? contractOffsets.nextOffset : 0;
     const record = await this.txnVolumeService.recordTxnData({
       contractName,
       offset,
@@ -635,7 +633,7 @@ export class AppService {
     const contractOffsets = await this.prisma.contractOffsets.findUnique({
       where: { contract: contractName },
     });
-    const offset = contractOffsets.nextOffset || 0;
+    const offset = contractOffsets ? contractOffsets.nextOffset : 0;
     const record = await this.txnVolumeService.recordTxnData({
       contractName,
       offset,
