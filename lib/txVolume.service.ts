@@ -51,7 +51,10 @@ export class TxnVolumeService {
           }
         }
       }
-      const nextOffset = dto.offset + limit;
+      let nextOffset = dto.offset + limit;
+      if (nextOffset > txRecord.total) {
+        nextOffset = txRecord.total;
+      }
       return {
         data: mapToObject(tokenMap),
         nextOffset: nextOffset,
