@@ -45,9 +45,10 @@ export class ApiService {
   }
 
   async getChartData(token: string) {
-    const pools = await this.getPools();
-    const poolId = this.getPoolIdWithFallback(pools, token);
-    const url = `https://api.stxtools.io/pools/${poolId}/ohlc`;
+    // const pools = await this.getPools();
+    // const poolId = this.getPoolIdWithFallback(pools, token);
+    const url = `https://api.stxtools.io/tokens/${token}/ohlc`;
+    // const url = https://api.stxtools.io/tokens/SP125J1ADVYWGWB9NQRCVGKYAG73R17ZNMV17XEJ7.slime-token/ohlc
     try {
       const response = this.httpService.get(url);
       const result = await lastValueFrom(response);
