@@ -533,6 +533,11 @@ export class AppService {
     this.response.sendSuccess(res, StatusCodes.OK, { data: data });
   }
 
+  async getChartDataV2(res: Response, chart: ChartDTO) {
+    const data = await this.apiService.getChartDataV2(chart.token);
+    this.response.sendSuccess(res, StatusCodes.OK, { data: data });
+  }
+
   async getBalances(res: Response, chart: BalanceDTO) {
     const data = await this.apiService.getBalance(chart.address);
     this.response.sendSuccess(res, StatusCodes.OK, { data: data });
