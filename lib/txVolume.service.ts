@@ -4,12 +4,14 @@ import { firstValueFrom } from 'rxjs';
 import { IsNotEmpty, IsString, IsOptional, IsNumber } from 'class-validator';
 import { ApiService } from './api.service';
 import BigNumber from 'bignumber.js';
+import { contractDTOV2, ContractService } from './contract.service';
 
 @Injectable()
 export class TxnVolumeService {
   constructor(
     private readonly httpService: HttpService,
     private readonly apiService: ApiService,
+    private readonly contractService: ContractService,
   ) {}
   async getTxns(dto: recordDTO) {
     let url = `https://api.hiro.so/extended/v2/addresses/SP2F4QC563WN0A0949WPH5W1YXVC4M1R46QKE0G14.${dto.contractName}/transactions?limit=50`;
@@ -29,12 +31,28 @@ export class TxnVolumeService {
     return response.data as TransactionResponse;
   }
 
+  async getTokenDecimal(token: string) {
+    const splitToken = token.split('.');
+    const data: contractDTOV2 = {
+      address: splitToken[0],
+      contract: splitToken[1],
+      function: 'get-decimals',
+      arguments: [],
+    };
+    const decimals = await this.contractService.readContractV2(data);
+    console.log(decimals);
+    return decimals;
+  }
+
   async getUSDValueToken(token: string, amount: string) {
     const chartData = await this.apiService.getChartDataV2(token);
     if (chartData.length > 0) {
       const lastPrice = chartData[chartData.length - 1];
+      const tokenDecimal = await this.getTokenDecimal(token);
       return new BigNumber(lastPrice)
-        .multipliedBy(new BigNumber(amount))
+        .multipliedBy(
+          new BigNumber(amount).dividedBy(new BigNumber(10).pow(tokenDecimal)),
+        )
         .toFixed();
     } else {
       return '0';
@@ -45,7 +63,7 @@ export class TxnVolumeService {
     const chartData = await this.apiService.getSTXData();
     const lastPrice = chartData[chartData.lenghth - 1];
     return new BigNumber(lastPrice)
-      .multipliedBy(new BigNumber(amount))
+      .multipliedBy(new BigNumber(amount).dividedBy(new BigNumber(10).pow(6)))
       .toFixed();
   }
 
