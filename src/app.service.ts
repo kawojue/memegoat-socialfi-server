@@ -674,6 +674,7 @@ export class AppService {
       arguments: [],
     };
     const amount = await this.contractService.readContract(data);
+    console.log(amount);
     return amount;
   }
 
@@ -686,7 +687,11 @@ export class AppService {
       ) {
         return {
           ...data,
-          amount: new BigNumber(data.amount + stakedGoat).toFixed(),
+          amount: new BigNumber(
+            new BigNumber(data.amount.toString()).plus(
+              new BigNumber(stakedGoat),
+            ),
+          ).toFixed(),
         };
       } else {
         return {
