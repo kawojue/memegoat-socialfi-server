@@ -228,6 +228,7 @@ const allowedFunctions = [
   'increment-lock',
   'create-pool',
   'stake',
+  'buy-otc',
   'dex-swap',
   'cross-dex-swap',
 ];

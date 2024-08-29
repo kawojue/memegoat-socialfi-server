@@ -543,6 +543,18 @@ export class AppService {
     this.response.sendSuccess(res, StatusCodes.OK, { data: data });
   }
 
+  //   TVL
+  // - Locker - done
+  // - Community Pool = done
+  // - Staking - done
+
+  // Volume
+  // - Dex - done
+  // - Presale - done
+  // - Launchpad - done
+  // - OTC - done
+  // - Games - coming
+
   async updateTokenLockerVolume(res: Response) {
     const contractName = 'memegoat-locker-vault-v1-1';
     const contractOffsets = await this.prisma.contractOffsets.findUnique({
@@ -553,7 +565,7 @@ export class AppService {
       contractName,
       offset,
     });
-    await this.updateDBVol(contractName, record);
+    await this.updateDBVol(contractName, record, true);
     await this.prisma.$transaction(
       record.data.map((vol) =>
         this.prisma.lockerVolume.upsert({
@@ -574,6 +586,20 @@ export class AppService {
     this.response.sendSuccess(res, StatusCodes.OK, { data: record });
   }
 
+  async updateOTCVolume(res: Response) {
+    const contractName = 'memegoat-vault-v1';
+    const contractOffsets = await this.prisma.contractOffsets.findUnique({
+      where: { contract: contractName },
+    });
+    const offset = contractOffsets ? contractOffsets.nextOffset : 0;
+    const record = await this.txnVolumeService.recordTxnData({
+      contractName,
+      offset,
+    });
+    await this.updateDBVol(contractName, record, false);
+    this.response.sendSuccess(res, StatusCodes.OK, { data: record });
+  }
+
   async updateCommunityPoolsVolume(res: Response) {
     const contractName = 'memegoat-stakepool-vault-v1';
     const contractOffsets = await this.prisma.contractOffsets.findUnique({
@@ -584,7 +610,7 @@ export class AppService {
       contractName,
       offset,
     });
-    await this.updateDBVol(contractName, record);
+    await this.updateDBVol(contractName, record, true);
     await this.prisma.$transaction(
       record.data.map((vol) =>
         this.prisma.communityPoolVolume.upsert({
@@ -615,7 +641,7 @@ export class AppService {
       contractName,
       offset,
     });
-    await this.updateDBVol(contractName, record);
+    await this.updateDBVol(contractName, record, false);
     await this.prisma.$transaction(
       record.data.map((vol) =>
         this.prisma.launchpadVolume.upsert({
@@ -646,7 +672,7 @@ export class AppService {
       contractName,
       offset,
     });
-    await this.updateDBVol(contractName, record);
+    await this.updateDBVol(contractName, record, false);
     await this.prisma.$transaction(
       record.data.map((vol) =>
         this.prisma.dexVolume.upsert({
@@ -680,6 +706,27 @@ export class AppService {
 
   async getMemegoatVolume(res: Response) {
     const volData = await this.prisma.memegoatVolume.findMany();
+    const data = volData.map((data) => {
+      if (data.token === 'STX') {
+        const presale = 50000000000;
+        return {
+          ...data,
+          amount: new BigNumber(
+            new BigNumber(data.amount.toString()).plus(new BigNumber(presale)),
+          ).toFixed(),
+        };
+      } else {
+        return {
+          ...data,
+          amount: new BigNumber(data.amount as any).toFixed(),
+        };
+      }
+    });
+    this.response.sendSuccess(res, StatusCodes.OK, { data: data });
+  }
+
+  async getTVL(res: Response) {
+    const volData = await this.prisma.tVL.findMany();
     const stakedGoat = await this.getTotalstakedMemegoat();
     const data = volData.map((data) => {
       if (
@@ -703,7 +750,11 @@ export class AppService {
     this.response.sendSuccess(res, StatusCodes.OK, { data: data });
   }
 
-  async updateDBVol(contractName: string, record: txVolumeOutput) {
+  async updateDBVol(
+    contractName: string,
+    record: txVolumeOutput,
+    isTvl: boolean,
+  ) {
     await this.prisma.contractOffsets.upsert({
       where: { contract: contractName },
       update: {
@@ -717,21 +768,40 @@ export class AppService {
       },
     });
 
-    await this.prisma.$transaction(
-      record.data.map((vol) =>
-        this.prisma.memegoatVolume.upsert({
-          where: { token: vol.token },
-          update: {
-            amount: {
-              increment: vol.amount,
+    if (isTvl) {
+      await this.prisma.$transaction(
+        record.data.map((vol) =>
+          this.prisma.tVL.upsert({
+            where: { token: vol.token },
+            update: {
+              amount: {
+                increment: vol.amount,
+              },
             },
-          },
-          create: {
-            token: vol.token,
-            amount: vol.amount,
-          },
-        }),
-      ),
-    );
+            create: {
+              token: vol.token,
+              amount: vol.amount,
+            },
+          }),
+        ),
+      );
+    } else {
+      await this.prisma.$transaction(
+        record.data.map((vol) =>
+          this.prisma.memegoatVolume.upsert({
+            where: { token: vol.token },
+            update: {
+              amount: {
+                increment: vol.amount,
+              },
+            },
+            create: {
+              token: vol.token,
+              amount: vol.amount,
+            },
+          }),
+        ),
+      );
+    }
   }
 }

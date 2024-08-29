@@ -124,6 +124,11 @@ export class AppController {
     await this.appService.getMemegoatVolume(res);
   }
 
+  @Get('/TVL')
+  async getTVL(@Res() res: Response) {
+    await this.appService.getTVL(res);
+  }
+
   @Post('/updatePoolsVolume')
   async updateCommunityPoolsVol(@Res() res: Response) {
     await this.appService.updateCommunityPoolsVolume(res);
@@ -142,6 +147,11 @@ export class AppController {
   @Post('/updateLaunchpadVolume')
   async updateLaunchpadVol(@Res() res: Response) {
     await this.appService.updateLaunchpadVolume(res);
+  }
+
+  @Post('/updateOTCVolume')
+  async updateOTCVolume(@Res() res: Response) {
+    await this.appService.updateOTCVolume(res);
   }
 
   @Get('/allTokens')
