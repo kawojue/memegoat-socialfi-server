@@ -138,40 +138,40 @@ export class AppController {
     await this.appService.getTVLUSDValue(res);
   }
 
-  @Post('/memegoatVolumeUSD')
-  async updateMemegoatVolUSD(@Res() res: Response) {
-    await this.appService.updateMemegoatUSDValue(res);
-  }
+  // @Post('/memegoatVolumeUSD')
+  // async updateMemegoatVolUSD(@Res() res: Response) {
+  //   await this.appService.updateMemegoatUSDValue(res);
+  // }
 
-  @Post('/tvlUSD')
-  async updateTVLUSD(@Res() res: Response) {
-    await this.appService.updateTVLUsdValue(res);
-  }
+  // @Post('/tvlUSD')
+  // async updateTVLUSD(@Res() res: Response) {
+  //   await this.appService.updateTVLUsdValue(res);
+  // }
 
-  @Post('/updatePoolsVolume')
-  async updateCommunityPoolsVol(@Res() res: Response) {
-    await this.appService.updateCommunityPoolsVolume(res);
-  }
+  // @Post('/updatePoolsVolume')
+  // async updateCommunityPoolsVol(@Res() res: Response) {
+  //   await this.appService.updateCommunityPoolsVolume(res);
+  // }
 
-  @Post('/updateLockerVolume')
-  async updateLockerVol(@Res() res: Response) {
-    await this.appService.updateTokenLockerVolume(res);
-  }
+  // @Post('/updateLockerVolume')
+  // async updateLockerVol(@Res() res: Response) {
+  //   await this.appService.updateTokenLockerVolume(res);
+  // }
 
-  @Post('/updateDexVolume')
-  async updateTxnVolume(@Res() res: Response) {
-    await this.appService.updateDexVolume(res);
-  }
+  // @Post('/updateDexVolume')
+  // async updateTxnVolume(@Res() res: Response) {
+  //   await this.appService.updateDexVolume(res);
+  // }
 
-  @Post('/updateLaunchpadVolume')
-  async updateLaunchpadVol(@Res() res: Response) {
-    await this.appService.updateLaunchpadVolume(res);
-  }
+  // @Post('/updateLaunchpadVolume')
+  // async updateLaunchpadVol(@Res() res: Response) {
+  //   await this.appService.updateLaunchpadVolume(res);
+  // }
 
-  @Post('/updateOTCVolume')
-  async updateOTCVolume(@Res() res: Response) {
-    await this.appService.updateOTCVolume(res);
-  }
+  // @Post('/updateOTCVolume')
+  // async updateOTCVolume(@Res() res: Response) {
+  //   await this.appService.updateOTCVolume(res);
+  // }
 
   @Get('/allTokens')
   async fetchAllTokens(@Res() res: Response) {

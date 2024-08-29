@@ -17,6 +17,7 @@ import { CloudflareService } from './cloudflare/cloudflare.service';
 import { TxnVolumeService, txVolumeOutput } from 'lib/txVolume.service';
 import { contractDTO, ContractService } from 'lib/contract.service';
 import BigNumber from 'bignumber.js';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class AppService {
@@ -555,35 +556,38 @@ export class AppService {
   // - OTC - done
   // - Games - coming
 
-  async updateTokenLockerVolume(res: Response) {
-    const contractName = 'memegoat-locker-vault-v1-1';
-    const contractOffsets = await this.prisma.contractOffsets.findUnique({
-      where: { contract: contractName },
-    });
-    const offset = contractOffsets ? contractOffsets.nextOffset : 0;
-    const record = await this.txnVolumeService.recordTxnData({
-      contractName,
-      offset,
-    });
-    await this.updateDBVol(contractName, record, true);
-    await this.prisma.$transaction(
-      record.data.map((vol) =>
-        this.prisma.lockerVolume.upsert({
-          where: { token: vol.token },
-          update: {
-            amount: {
-              increment: vol.amount,
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  async updateTokenLockerVolume() {
+    try {
+      const contractName = 'memegoat-locker-vault-v1-1';
+      const contractOffsets = await this.prisma.contractOffsets.findUnique({
+        where: { contract: contractName },
+      });
+      const offset = contractOffsets ? contractOffsets.nextOffset : 0;
+      const record = await this.txnVolumeService.recordTxnData({
+        contractName,
+        offset,
+      });
+      await this.updateDBVol(contractName, record, true);
+      await this.prisma.$transaction(
+        record.data.map((vol) =>
+          this.prisma.lockerVolume.upsert({
+            where: { token: vol.token },
+            update: {
+              amount: {
+                increment: vol.amount,
+              },
             },
-          },
-          create: {
-            token: vol.token,
-            amount: vol.amount,
-          },
-        }),
-      ),
-    );
-
-    this.response.sendSuccess(res, StatusCodes.OK, { data: record });
+            create: {
+              token: vol.token,
+              amount: vol.amount,
+            },
+          }),
+        ),
+      );
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   async updateOTCVolume(res: Response) {
@@ -600,97 +604,106 @@ export class AppService {
     this.response.sendSuccess(res, StatusCodes.OK, { data: record });
   }
 
-  async updateCommunityPoolsVolume(res: Response) {
-    const contractName = 'memegoat-stakepool-vault-v1';
-    const contractOffsets = await this.prisma.contractOffsets.findUnique({
-      where: { contract: contractName },
-    });
-    const offset = contractOffsets ? contractOffsets.nextOffset : 0;
-    const record = await this.txnVolumeService.recordTxnData({
-      contractName,
-      offset,
-    });
-    await this.updateDBVol(contractName, record, true);
-    await this.prisma.$transaction(
-      record.data.map((vol) =>
-        this.prisma.communityPoolVolume.upsert({
-          where: { token: vol.token },
-          update: {
-            amount: {
-              increment: vol.amount,
+  @Cron(CronExpression.EVERY_DAY_AT_1AM)
+  async updateCommunityPoolsVolume() {
+    try {
+      const contractName = 'memegoat-stakepool-vault-v1';
+      const contractOffsets = await this.prisma.contractOffsets.findUnique({
+        where: { contract: contractName },
+      });
+      const offset = contractOffsets ? contractOffsets.nextOffset : 0;
+      const record = await this.txnVolumeService.recordTxnData({
+        contractName,
+        offset,
+      });
+      await this.updateDBVol(contractName, record, true);
+      await this.prisma.$transaction(
+        record.data.map((vol) =>
+          this.prisma.communityPoolVolume.upsert({
+            where: { token: vol.token },
+            update: {
+              amount: {
+                increment: vol.amount,
+              },
             },
-          },
-          create: {
-            token: vol.token,
-            amount: vol.amount,
-          },
-        }),
-      ),
-    );
-
-    this.response.sendSuccess(res, StatusCodes.OK, { data: record });
+            create: {
+              token: vol.token,
+              amount: vol.amount,
+            },
+          }),
+        ),
+      );
+    } catch (err) {
+      console.error(err);
+    }
   }
 
-  async updateLaunchpadVolume(res: Response) {
-    const contractName = 'memegoat-launchpad-vault';
-    const contractOffsets = await this.prisma.contractOffsets.findUnique({
-      where: { contract: contractName },
-    });
-    const offset = contractOffsets ? contractOffsets.nextOffset : 0;
-    const record = await this.txnVolumeService.recordTxnData({
-      contractName,
-      offset,
-    });
-    await this.updateDBVol(contractName, record, false);
-    await this.prisma.$transaction(
-      record.data.map((vol) =>
-        this.prisma.launchpadVolume.upsert({
-          where: { token: vol.token },
-          update: {
-            amount: {
-              increment: vol.amount,
+  @Cron(CronExpression.EVERY_DAY_AT_2AM)
+  async updateLaunchpadVolume() {
+    try {
+      const contractName = 'memegoat-launchpad-vault';
+      const contractOffsets = await this.prisma.contractOffsets.findUnique({
+        where: { contract: contractName },
+      });
+      const offset = contractOffsets ? contractOffsets.nextOffset : 0;
+      const record = await this.txnVolumeService.recordTxnData({
+        contractName,
+        offset,
+      });
+      await this.updateDBVol(contractName, record, false);
+      await this.prisma.$transaction(
+        record.data.map((vol) =>
+          this.prisma.launchpadVolume.upsert({
+            where: { token: vol.token },
+            update: {
+              amount: {
+                increment: vol.amount,
+              },
             },
-          },
-          create: {
-            token: vol.token,
-            amount: vol.amount,
-          },
-        }),
-      ),
-    );
-
-    this.response.sendSuccess(res, StatusCodes.OK, { data: record });
+            create: {
+              token: vol.token,
+              amount: vol.amount,
+            },
+          }),
+        ),
+      );
+    } catch (err) {
+      console.error(err);
+    }
   }
 
-  async updateDexVolume(res: Response) {
-    const contractName = 'memegoat-aggregator-v1-1';
-    const contractOffsets = await this.prisma.contractOffsets.findUnique({
-      where: { contract: contractName },
-    });
-    const offset = contractOffsets ? contractOffsets.nextOffset : 0;
-    const record = await this.txnVolumeService.recordTxnData({
-      contractName,
-      offset,
-    });
-    await this.updateDBVol(contractName, record, false);
-    await this.prisma.$transaction(
-      record.data.map((vol) =>
-        this.prisma.dexVolume.upsert({
-          where: { token: vol.token },
-          update: {
-            amount: {
-              increment: vol.amount,
+  @Cron(CronExpression.EVERY_DAY_AT_3AM)
+  async updateDexVolume() {
+    try {
+      const contractName = 'memegoat-aggregator-v1-1';
+      const contractOffsets = await this.prisma.contractOffsets.findUnique({
+        where: { contract: contractName },
+      });
+      const offset = contractOffsets ? contractOffsets.nextOffset : 0;
+      const record = await this.txnVolumeService.recordTxnData({
+        contractName,
+        offset,
+      });
+      await this.updateDBVol(contractName, record, false);
+      await this.prisma.$transaction(
+        record.data.map((vol) =>
+          this.prisma.dexVolume.upsert({
+            where: { token: vol.token },
+            update: {
+              amount: {
+                increment: vol.amount,
+              },
             },
-          },
-          create: {
-            token: vol.token,
-            amount: vol.amount,
-          },
-        }),
-      ),
-    );
-
-    this.response.sendSuccess(res, StatusCodes.OK, { data: record });
+            create: {
+              token: vol.token,
+              amount: vol.amount,
+            },
+          }),
+        ),
+      );
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   async getTotalstakedMemegoat() {
@@ -739,40 +752,42 @@ export class AppService {
     });
   }
 
-  async updateMemegoatUSDValue(res: Response) {
-    const memegoatVol = await this.getMemegoatVol();
-    const memegoatVolUsdValue = await memegoatVol.reduce(
-      async (prevPromise, value) => {
-        const prev = await prevPromise;
-        let usdValue: any;
+  @Cron(CronExpression.EVERY_DAY_AT_4AM)
+  async updateMemegoatUSDValue() {
+    try {
+      const memegoatVol = await this.getMemegoatVol();
+      const memegoatVolUsdValue = await memegoatVol.reduce(
+        async (prevPromise, value) => {
+          const prev = await prevPromise;
+          let usdValue: any;
 
-        if (value.token === 'STX') {
-          usdValue = await this.txnVolumeService.getUSDValueSTX(
-            new BigNumber(value.amount).toFixed(),
-          );
-        } else {
-          usdValue = await this.txnVolumeService.getUSDValueToken(
-            value.token,
-            new BigNumber(value.amount).toFixed(),
-          );
-        }
-        return new BigNumber(prev).plus(new BigNumber(usdValue)).toFixed();
-      },
-      Promise.resolve('0'),
-    );
-    await this.prisma.uSDRecords.upsert({
-      where: { record: 'VOLUME' },
-      update: {
-        amount: memegoatVolUsdValue,
-      },
-      create: {
-        record: 'VOLUME',
-        amount: memegoatVolUsdValue,
-      },
-    });
-    this.response.sendSuccess(res, StatusCodes.OK, {
-      data: memegoatVolUsdValue,
-    });
+          if (value.token === 'STX') {
+            usdValue = await this.txnVolumeService.getUSDValueSTX(
+              new BigNumber(value.amount).toFixed(),
+            );
+          } else {
+            usdValue = await this.txnVolumeService.getUSDValueToken(
+              value.token,
+              new BigNumber(value.amount).toFixed(),
+            );
+          }
+          return new BigNumber(prev).plus(new BigNumber(usdValue)).toFixed();
+        },
+        Promise.resolve('0'),
+      );
+      await this.prisma.uSDRecords.upsert({
+        where: { record: 'VOLUME' },
+        update: {
+          amount: memegoatVolUsdValue,
+        },
+        create: {
+          record: 'VOLUME',
+          amount: memegoatVolUsdValue,
+        },
+      });
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   async getTVLRes(res: Response) {
@@ -814,35 +829,39 @@ export class AppService {
     });
   }
 
-  async updateTVLUsdValue(res: Response) {
-    const tvlData = await this.getTVL();
-    const tvlUSDValue = await tvlData.reduce(async (prevPromise, value) => {
-      const prev = await prevPromise;
-      let usdValue: any;
+  @Cron(CronExpression.EVERY_DAY_AT_5AM)
+  async updateTVLUsdValue() {
+    try {
+      const tvlData = await this.getTVL();
+      const tvlUSDValue = await tvlData.reduce(async (prevPromise, value) => {
+        const prev = await prevPromise;
+        let usdValue: any;
 
-      if (value.token === 'STX') {
-        usdValue = await this.txnVolumeService.getUSDValueSTX(
-          new BigNumber(value.amount).toFixed(),
-        );
-      } else {
-        usdValue = await this.txnVolumeService.getUSDValueToken(
-          value.token,
-          new BigNumber(value.amount).toFixed(),
-        );
-      }
-      return new BigNumber(prev).plus(new BigNumber(usdValue)).toFixed();
-    }, Promise.resolve('0'));
-    await this.prisma.uSDRecords.upsert({
-      where: { record: 'TVL' },
-      update: {
-        amount: tvlUSDValue,
-      },
-      create: {
-        record: 'TVL',
-        amount: tvlUSDValue,
-      },
-    });
-    this.response.sendSuccess(res, StatusCodes.OK, { data: tvlUSDValue });
+        if (value.token === 'STX') {
+          usdValue = await this.txnVolumeService.getUSDValueSTX(
+            new BigNumber(value.amount).toFixed(),
+          );
+        } else {
+          usdValue = await this.txnVolumeService.getUSDValueToken(
+            value.token,
+            new BigNumber(value.amount).toFixed(),
+          );
+        }
+        return new BigNumber(prev).plus(new BigNumber(usdValue)).toFixed();
+      }, Promise.resolve('0'));
+      await this.prisma.uSDRecords.upsert({
+        where: { record: 'TVL' },
+        update: {
+          amount: tvlUSDValue,
+        },
+        create: {
+          record: 'TVL',
+          amount: tvlUSDValue,
+        },
+      });
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   async updateDBVol(
