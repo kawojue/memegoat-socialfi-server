@@ -121,12 +121,21 @@ export class AppController {
 
   @Get('/memegoatVolume')
   async getMemegoatVol(@Res() res: Response) {
-    await this.appService.getMemegoatVolume(res);
+    await this.appService.getMemegoatVolumeRes(res);
   }
 
-  @Get('/TVL')
+  @Get('/tvl')
   async getTVL(@Res() res: Response) {
-    await this.appService.getTVL(res);
+    await this.appService.getTVLRes(res);
+  }
+  @Get('/memegoatVolumeUSD')
+  async getMemegoatVolUSD(@Res() res: Response) {
+    await this.appService.getMemegoatVolUSDValue(res);
+  }
+
+  @Get('/tvlUSD')
+  async getTVLUSD(@Res() res: Response) {
+    await this.appService.getTVLUSDValue(res);
   }
 
   @Post('/updatePoolsVolume')

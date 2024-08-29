@@ -546,11 +546,11 @@ export class AppService {
   //   TVL
   // - Locker - done
   // - Community Pool = done
-  // - Staking - done
+  // - Staking - done (from ca)
 
   // Volume
   // - Dex - done
-  // - Presale - done
+  // - Presale - done (from ca)
   // - Launchpad - done
   // - OTC - done
   // - Games - coming
@@ -704,7 +704,12 @@ export class AppService {
     return amount;
   }
 
-  async getMemegoatVolume(res: Response) {
+  async getMemegoatVolumeRes(res: Response) {
+    const data = await this.getMemegoatVol();
+    this.response.sendSuccess(res, StatusCodes.OK, { data: data });
+  }
+
+  async getMemegoatVol() {
     const volData = await this.prisma.memegoatVolume.findMany();
     const data = volData.map((data) => {
       if (data.token === 'STX') {
@@ -722,10 +727,41 @@ export class AppService {
         };
       }
     });
+    return data;
+  }
+
+  async getMemegoatVolUSDValue(res: Response) {
+    const memegoatVol = await this.getMemegoatVol();
+    const memegoatVolUsdValue = await memegoatVol.reduce(
+      async (prevPromise, value) => {
+        const prev = await prevPromise;
+        let usdValue: any;
+
+        if (value.token === 'STX') {
+          usdValue = await this.txnVolumeService.getUSDValueSTX(
+            new BigNumber(value.amount).toFixed(),
+          );
+        } else {
+          usdValue = await this.txnVolumeService.getUSDValueToken(
+            value.token,
+            new BigNumber(value.amount).toFixed(),
+          );
+        }
+        return new BigNumber(prev).plus(new BigNumber(usdValue)).toFixed();
+      },
+      Promise.resolve('0'),
+    );
+    this.response.sendSuccess(res, StatusCodes.OK, {
+      data: memegoatVolUsdValue,
+    });
+  }
+
+  async getTVLRes(res: Response) {
+    const data = await this.getTVL();
     this.response.sendSuccess(res, StatusCodes.OK, { data: data });
   }
 
-  async getTVL(res: Response) {
+  async getTVL() {
     const volData = await this.prisma.tVL.findMany();
     const stakedGoat = await this.getTotalstakedMemegoat();
     const data = volData.map((data) => {
@@ -747,7 +783,28 @@ export class AppService {
         };
       }
     });
-    this.response.sendSuccess(res, StatusCodes.OK, { data: data });
+    return data;
+  }
+
+  async getTVLUSDValue(res: Response) {
+    const tvlData = await this.getTVL();
+    const tvlUSDValue = await tvlData.reduce(async (prevPromise, value) => {
+      const prev = await prevPromise;
+      let usdValue: any;
+
+      if (value.token === 'STX') {
+        usdValue = await this.txnVolumeService.getUSDValueSTX(
+          new BigNumber(value.amount).toFixed(),
+        );
+      } else {
+        usdValue = await this.txnVolumeService.getUSDValueToken(
+          value.token,
+          new BigNumber(value.amount).toFixed(),
+        );
+      }
+      return new BigNumber(prev).plus(new BigNumber(usdValue)).toFixed();
+    }, Promise.resolve('0'));
+    this.response.sendSuccess(res, StatusCodes.OK, { data: tvlUSDValue });
   }
 
   async updateDBVol(

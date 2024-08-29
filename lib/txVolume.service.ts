@@ -2,10 +2,15 @@ import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
 import { IsNotEmpty, IsString, IsOptional, IsNumber } from 'class-validator';
+import { ApiService } from './api.service';
+import BigNumber from 'bignumber.js';
 
 @Injectable()
 export class TxnVolumeService {
-  constructor(private readonly httpService: HttpService) {}
+  constructor(
+    private readonly httpService: HttpService,
+    private readonly apiService: ApiService,
+  ) {}
   async getTxns(dto: recordDTO) {
     let url = `https://api.hiro.so/extended/v2/addresses/SP2F4QC563WN0A0949WPH5W1YXVC4M1R46QKE0G14.${dto.contractName}/transactions?limit=50`;
     if (dto.offset) {
@@ -22,6 +27,26 @@ export class TxnVolumeService {
       }),
     );
     return response.data as TransactionResponse;
+  }
+
+  async getUSDValueToken(token: string, amount: string) {
+    const chartData = await this.apiService.getChartDataV2(token);
+    if (chartData.length > 0) {
+      const lastPrice = chartData[chartData.length - 1];
+      return new BigNumber(lastPrice)
+        .multipliedBy(new BigNumber(amount))
+        .toFixed();
+    } else {
+      return '0';
+    }
+  }
+
+  async getUSDValueSTX(amount: string) {
+    const chartData = await this.apiService.getSTXData();
+    const lastPrice = chartData[chartData.lenghth - 1];
+    return new BigNumber(lastPrice)
+      .multipliedBy(new BigNumber(amount))
+      .toFixed();
   }
 
   async recordTxnData(dto: recordDTO) {

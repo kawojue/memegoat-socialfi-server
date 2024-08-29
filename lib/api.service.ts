@@ -69,18 +69,12 @@ export class ApiService {
 
   async getChartDataV2(token: string) {
     const url = `https://api.stxtools.io/tokens/${token}/ohlc`;
-    // const url = https://api.stxtools.io/tokens/SP125J1ADVYWGWB9NQRCVGKYAG73R17ZNMV17XEJ7.slime-token/ohlc
     try {
       const response = this.httpService.get(url);
       const result = await lastValueFrom(response);
-
       return result.data;
     } catch (err) {
-      if (err?.response?.data?.message) {
-        throw new HttpException(err.response.data.message, err.response.status);
-      } else {
-        throw new HttpException('Something went wrong', StatusCodes.BadGateway);
-      }
+      return [];
     }
   }
 
