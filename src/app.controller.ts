@@ -138,6 +138,16 @@ export class AppController {
     await this.appService.getTVLUSDValue(res);
   }
 
+  @Post('/memegoatVolumeUSD')
+  async updateMemegoatVolUSD(@Res() res: Response) {
+    await this.appService.updateMemegoatUSDValue(res);
+  }
+
+  @Post('/tvlUSD')
+  async updateTVLUSD(@Res() res: Response) {
+    await this.appService.updateTVLUsdValue(res);
+  }
+
   @Post('/updatePoolsVolume')
   async updateCommunityPoolsVol(@Res() res: Response) {
     await this.appService.updateCommunityPoolsVolume(res);

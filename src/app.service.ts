@@ -700,7 +700,6 @@ export class AppService {
       arguments: [],
     };
     const amount = await this.contractService.readContract(data);
-    console.log(amount);
     return amount;
   }
 
@@ -731,11 +730,20 @@ export class AppService {
   }
 
   async getMemegoatVolUSDValue(res: Response) {
+    const memegoatVolUsdValue = await this.prisma.uSDRecords.findUnique({
+      where: { record: 'VOLUME' },
+    });
+
+    this.response.sendSuccess(res, StatusCodes.OK, {
+      data: memegoatVolUsdValue.amount,
+    });
+  }
+
+  async updateMemegoatUSDValue(res: Response) {
     const memegoatVol = await this.getMemegoatVol();
     const memegoatVolUsdValue = await memegoatVol.reduce(
       async (prevPromise, value) => {
         const prev = await prevPromise;
-        console.log(prev);
         let usdValue: any;
 
         if (value.token === 'STX') {
@@ -752,6 +760,16 @@ export class AppService {
       },
       Promise.resolve('0'),
     );
+    await this.prisma.uSDRecords.upsert({
+      where: { record: 'VOLUME' },
+      update: {
+        amount: memegoatVolUsdValue,
+      },
+      create: {
+        record: 'VOLUME',
+        amount: memegoatVolUsdValue,
+      },
+    });
     this.response.sendSuccess(res, StatusCodes.OK, {
       data: memegoatVolUsdValue,
     });
@@ -788,6 +806,15 @@ export class AppService {
   }
 
   async getTVLUSDValue(res: Response) {
+    const tvlUSDValue = await this.prisma.uSDRecords.findUnique({
+      where: { record: 'TVL' },
+    });
+    this.response.sendSuccess(res, StatusCodes.OK, {
+      data: tvlUSDValue.amount,
+    });
+  }
+
+  async updateTVLUsdValue(res: Response) {
     const tvlData = await this.getTVL();
     const tvlUSDValue = await tvlData.reduce(async (prevPromise, value) => {
       const prev = await prevPromise;
@@ -805,6 +832,16 @@ export class AppService {
       }
       return new BigNumber(prev).plus(new BigNumber(usdValue)).toFixed();
     }, Promise.resolve('0'));
+    await this.prisma.uSDRecords.upsert({
+      where: { record: 'TVL' },
+      update: {
+        amount: tvlUSDValue,
+      },
+      create: {
+        record: 'VOLUME',
+        amount: tvlUSDValue,
+      },
+    });
     this.response.sendSuccess(res, StatusCodes.OK, { data: tvlUSDValue });
   }
 
