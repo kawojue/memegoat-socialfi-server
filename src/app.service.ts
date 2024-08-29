@@ -838,7 +838,7 @@ export class AppService {
         amount: tvlUSDValue,
       },
       create: {
-        record: 'VOLUME',
+        record: 'TVL',
         amount: tvlUSDValue,
       },
     });
