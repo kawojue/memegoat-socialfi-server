@@ -61,7 +61,7 @@ export class TxnVolumeService {
 
   async getUSDValueSTX(amount: string) {
     const chartData = await this.apiService.getSTXData();
-    const lastPrice = chartData[chartData.lenghth - 1][4];
+    const lastPrice = chartData[chartData.length - 1][4];
     return new BigNumber(lastPrice)
       .multipliedBy(new BigNumber(amount).dividedBy(new BigNumber(10).pow(6)))
       .toFixed();
