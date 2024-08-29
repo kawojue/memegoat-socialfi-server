@@ -35,6 +35,8 @@ export class TxnVolumeService {
         if (result.tx.tx_type === 'token_transfer') continue;
         if (excludedContracts.includes(result.tx.contract_call.contract_id))
           continue;
+        if (!allowedFunctions.includes(result.tx.contract_call.function_name))
+          continue;
         if (result.stx_received !== '0') {
           const currentSTX = tokenMap.get('STX') || 0;
           tokenMap.set('STX', currentSTX + Number(result.stx_received));
@@ -219,4 +221,13 @@ const excludedContracts = [
   'SP2F4QC563WN0A0949WPH5W1YXVC4M1R46QKE0G14.memegoat-launchpad-v1',
   'SP2F4QC563WN0A0949WPH5W1YXVC4M1R46QKE0G14.memegoat-launchpad-ext-v1',
   'SP2F4QC563WN0A0949WPH5W1YXVC4M1R46QKE0G14.memegoat-distributor-v2',
+];
+
+const allowedFunctions = [
+  'lock-token',
+  'increment-lock',
+  'create-pool',
+  'stake',
+  'dex-swap',
+  'cross-dex-swap',
 ];
