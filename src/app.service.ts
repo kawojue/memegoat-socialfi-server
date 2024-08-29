@@ -735,6 +735,7 @@ export class AppService {
     const memegoatVolUsdValue = await memegoatVol.reduce(
       async (prevPromise, value) => {
         const prev = await prevPromise;
+        console.log(prev);
         let usdValue: any;
 
         if (value.token === 'STX') {

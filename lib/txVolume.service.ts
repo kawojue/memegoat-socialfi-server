@@ -40,7 +40,6 @@ export class TxnVolumeService {
       arguments: [],
     };
     const decimals = await this.contractService.readContractV2(data);
-    console.log(decimals);
     return decimals;
   }
 
