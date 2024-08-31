@@ -767,19 +767,18 @@ export class AppService {
 
           if (value.token === 'STX') {
             usdValue = await this.txnVolumeService.getUSDValueSTX(
-              new BigNumber(value.amount)
-                .multipliedBy(new BigNumber(10).pow(6))
-                .toFixed(),
+              new BigNumber(value.amount).toFixed(6),
             );
           } else {
             usdValue = await this.txnVolumeService.getUSDValueToken(
               value.token,
-              new BigNumber(value.amount)
-                .multipliedBy(new BigNumber(10).pow(6))
-                .toFixed(),
+              new BigNumber(value.amount).toFixed(6),
             );
           }
-          return new BigNumber(prev).plus(new BigNumber(usdValue)).toFixed();
+          return new BigNumber(prev)
+            .plus(new BigNumber(usdValue))
+            .multipliedBy(new BigNumber(10).pow(6))
+            .toFixed();
         },
         Promise.resolve('0'),
       );
@@ -849,19 +848,18 @@ export class AppService {
 
         if (value.token === 'STX') {
           usdValue = await this.txnVolumeService.getUSDValueSTX(
-            new BigNumber(value.amount)
-              .multipliedBy(new BigNumber(10).pow(6))
-              .toFixed(),
+            new BigNumber(value.amount).toFixed(6),
           );
         } else {
           usdValue = await this.txnVolumeService.getUSDValueToken(
             value.token,
-            new BigNumber(value.amount)
-              .multipliedBy(new BigNumber(10).pow(6))
-              .toFixed(),
+            new BigNumber(value.amount).toFixed(6),
           );
         }
-        return new BigNumber(prev).plus(new BigNumber(usdValue)).toFixed();
+        return new BigNumber(prev)
+          .plus(new BigNumber(usdValue))
+          .multipliedBy(new BigNumber(10).pow(6))
+          .toFixed();
       }, Promise.resolve('0'));
       await this.prisma.uSDRecords.upsert({
         where: { record: 'TVL' },
