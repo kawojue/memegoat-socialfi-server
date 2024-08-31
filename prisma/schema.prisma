@@ -215,5 +215,5 @@ model ContractOffsets {
 model USDRecords {
     id     String @id @default(auto()) @map("_id") @db.ObjectId
     record String @unique
-    amount String
+    amount BigInt
 }

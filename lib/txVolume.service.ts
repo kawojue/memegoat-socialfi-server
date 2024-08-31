@@ -253,7 +253,7 @@ export const mapToObject = <K extends string | number | symbol, V>(
   return volume;
 };
 
-type token = {
+export type token = {
   token: string;
   amount: any;
 };

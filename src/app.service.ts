@@ -14,7 +14,7 @@ import { PrismaService } from 'prisma/prisma.service';
 import { ResponseService } from 'lib/response.service';
 import { CampaignRequestDTO } from './dto/compaign-req.dto';
 import { CloudflareService } from './cloudflare/cloudflare.service';
-import { TxnVolumeService, txVolumeOutput } from 'lib/txVolume.service';
+import { token, TxnVolumeService, txVolumeOutput } from 'lib/txVolume.service';
 import { contractDTO, ContractService } from 'lib/contract.service';
 import BigNumber from 'bignumber.js';
 import { Cron, CronExpression } from '@nestjs/schedule';
@@ -569,6 +569,7 @@ export class AppService {
         offset,
       });
       await this.updateDBVol(contractName, record, true);
+      await this.updateTVLUsdValue(record.data);
       await this.prisma.$transaction(
         record.data.map((vol) =>
           this.prisma.lockerVolume.upsert({
@@ -617,6 +618,7 @@ export class AppService {
         offset,
       });
       await this.updateDBVol(contractName, record, true);
+      await this.updateTVLUsdValue(record.data);
       await this.prisma.$transaction(
         record.data.map((vol) =>
           this.prisma.communityPoolVolume.upsert({
@@ -651,6 +653,7 @@ export class AppService {
         offset,
       });
       await this.updateDBVol(contractName, record, false);
+      await this.updateMemegoatVolUSDValue(record.data);
       await this.prisma.$transaction(
         record.data.map((vol) =>
           this.prisma.launchpadVolume.upsert({
@@ -685,6 +688,7 @@ export class AppService {
         offset,
       });
       await this.updateDBVol(contractName, record, false);
+      await this.updateMemegoatVolUSDValue(record.data);
       await this.prisma.$transaction(
         record.data.map((vol) =>
           this.prisma.dexVolume.upsert({
@@ -748,14 +752,12 @@ export class AppService {
     });
 
     this.response.sendSuccess(res, StatusCodes.OK, {
-      data: memegoatVolUsdValue.amount,
+      data: new BigNumber(memegoatVolUsdValue.amount.toString()).toFixed(),
     });
   }
 
-  @Cron(CronExpression.EVERY_DAY_AT_4AM)
-  async updateMemegoatUSDValue() {
+  async updateMemegoatVolUSDValue(memegoatVol: token[]) {
     try {
-      const memegoatVol = await this.getMemegoatVol();
       const memegoatVolUsdValue = await memegoatVol.reduce(
         async (prevPromise, value) => {
           const prev = await prevPromise;
@@ -778,11 +780,13 @@ export class AppService {
       await this.prisma.uSDRecords.upsert({
         where: { record: 'VOLUME' },
         update: {
-          amount: memegoatVolUsdValue,
+          amount: {
+            increment: BigInt(memegoatVolUsdValue) as any,
+          },
         },
         create: {
           record: 'VOLUME',
-          amount: memegoatVolUsdValue,
+          amount: BigInt(memegoatVolUsdValue) as any,
         },
       });
     } catch (err) {
@@ -825,14 +829,12 @@ export class AppService {
       where: { record: 'TVL' },
     });
     this.response.sendSuccess(res, StatusCodes.OK, {
-      data: tvlUSDValue.amount,
+      data: new BigNumber(tvlUSDValue.amount.toString()).toFixed(),
     });
   }
 
-  @Cron(CronExpression.EVERY_DAY_AT_5AM)
-  async updateTVLUsdValue() {
+  async updateTVLUsdValue(tvlData: token[]) {
     try {
-      const tvlData = await this.getTVL();
       const tvlUSDValue = await tvlData.reduce(async (prevPromise, value) => {
         const prev = await prevPromise;
         let usdValue: any;
@@ -852,11 +854,13 @@ export class AppService {
       await this.prisma.uSDRecords.upsert({
         where: { record: 'TVL' },
         update: {
-          amount: tvlUSDValue,
+          amount: {
+            increment: BigInt(tvlUSDValue) as any,
+          },
         },
         create: {
           record: 'TVL',
-          amount: tvlUSDValue,
+          amount: BigInt(tvlUSDValue) as any,
         },
       });
     } catch (err) {
