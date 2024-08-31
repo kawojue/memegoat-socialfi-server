@@ -752,7 +752,9 @@ export class AppService {
     });
 
     this.response.sendSuccess(res, StatusCodes.OK, {
-      data: new BigNumber(memegoatVolUsdValue.amount.toString()).toFixed(),
+      data: new BigNumber(memegoatVolUsdValue.amount.toString())
+        .dividedBy(new BigNumber(10).pow(6))
+        .toFixed(),
     });
   }
 
@@ -765,12 +767,16 @@ export class AppService {
 
           if (value.token === 'STX') {
             usdValue = await this.txnVolumeService.getUSDValueSTX(
-              new BigNumber(value.amount).toFixed(),
+              new BigNumber(value.amount)
+                .multipliedBy(new BigNumber(10).pow(6))
+                .toFixed(),
             );
           } else {
             usdValue = await this.txnVolumeService.getUSDValueToken(
               value.token,
-              new BigNumber(value.amount).toFixed(),
+              new BigNumber(value.amount)
+                .multipliedBy(new BigNumber(10).pow(6))
+                .toFixed(),
             );
           }
           return new BigNumber(prev).plus(new BigNumber(usdValue)).toFixed();
@@ -829,7 +835,9 @@ export class AppService {
       where: { record: 'TVL' },
     });
     this.response.sendSuccess(res, StatusCodes.OK, {
-      data: new BigNumber(tvlUSDValue.amount.toString()).toFixed(),
+      data: new BigNumber(tvlUSDValue.amount.toString())
+        .dividedBy(new BigNumber(10).pow(6))
+        .toFixed(),
     });
   }
 
@@ -841,12 +849,16 @@ export class AppService {
 
         if (value.token === 'STX') {
           usdValue = await this.txnVolumeService.getUSDValueSTX(
-            new BigNumber(value.amount).toFixed(),
+            new BigNumber(value.amount)
+              .multipliedBy(new BigNumber(10).pow(6))
+              .toFixed(),
           );
         } else {
           usdValue = await this.txnVolumeService.getUSDValueToken(
             value.token,
-            new BigNumber(value.amount).toFixed(),
+            new BigNumber(value.amount)
+              .multipliedBy(new BigNumber(10).pow(6))
+              .toFixed(),
           );
         }
         return new BigNumber(prev).plus(new BigNumber(usdValue)).toFixed();
