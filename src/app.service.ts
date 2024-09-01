@@ -767,18 +767,19 @@ export class AppService {
 
           if (value.token === 'STX') {
             usdValue = await this.txnVolumeService.getUSDValueSTX(
-              new BigNumber(value.amount).toFixed(6),
+              new BigNumber(value.amount)
+                .multipliedBy(new BigNumber(10).pow(6))
+                .toFixed(0),
             );
           } else {
             usdValue = await this.txnVolumeService.getUSDValueToken(
               value.token,
-              new BigNumber(value.amount).toFixed(6),
+              new BigNumber(value.amount)
+                .multipliedBy(new BigNumber(10).pow(6))
+                .toFixed(0),
             );
           }
-          return new BigNumber(prev)
-            .plus(new BigNumber(usdValue))
-            .multipliedBy(new BigNumber(10).pow(6))
-            .toFixed();
+          return new BigNumber(prev).plus(new BigNumber(usdValue)).toFixed(0);
         },
         Promise.resolve('0'),
       );
@@ -836,7 +837,7 @@ export class AppService {
     this.response.sendSuccess(res, StatusCodes.OK, {
       data: new BigNumber(tvlUSDValue.amount.toString())
         .dividedBy(new BigNumber(10).pow(6))
-        .toFixed(),
+        .toFixed(0),
     });
   }
 
@@ -848,18 +849,19 @@ export class AppService {
 
         if (value.token === 'STX') {
           usdValue = await this.txnVolumeService.getUSDValueSTX(
-            new BigNumber(value.amount).toFixed(6),
+            new BigNumber(value.amount)
+              .multipliedBy(new BigNumber(10).pow(6))
+              .toFixed(0),
           );
         } else {
           usdValue = await this.txnVolumeService.getUSDValueToken(
             value.token,
-            new BigNumber(value.amount).toFixed(6),
+            new BigNumber(value.amount)
+              .multipliedBy(new BigNumber(10).pow(6))
+              .toFixed(0),
           );
         }
-        return new BigNumber(prev)
-          .plus(new BigNumber(usdValue))
-          .multipliedBy(new BigNumber(10).pow(6))
-          .toFixed();
+        return new BigNumber(prev).plus(new BigNumber(usdValue)).toFixed(0);
       }, Promise.resolve('0'));
       await this.prisma.uSDRecords.upsert({
         where: { record: 'TVL' },

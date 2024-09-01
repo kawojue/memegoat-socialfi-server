@@ -106,7 +106,7 @@ export class AppController {
     await this.appService.fetchMintedTokens(res);
   }
 
-  @Get('/minted-tokens/:token_addr')
+  @Get('/minted-tokens/token/:token_addr')
   async fetchMintedToken(
     @Res() res: Response,
     @Param('token_addr') token_addr: string,
@@ -114,7 +114,7 @@ export class AppController {
     await this.appService.fetchMintedToken(res, token_addr);
   }
 
-  @Get('/minted-tokens/:user_addr')
+  @Get('/minted-tokens/user/:user_addr')
   async fetchMintedUserToken(
     @Res() res: Response,
     @Param('user_addr') user_addr: string,
