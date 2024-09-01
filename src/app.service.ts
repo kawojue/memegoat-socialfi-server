@@ -424,10 +424,10 @@ export class AppService {
     });
 
     if (!request) {
-      this.response.sendError(
+      return this.response.sendError(
         res,
         StatusCodes.NotFound,
-        'Campaign Request not found',
+        'Token not found',
       );
     }
 
