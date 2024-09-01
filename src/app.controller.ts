@@ -114,6 +114,14 @@ export class AppController {
     await this.appService.fetchMintedToken(res, token_addr);
   }
 
+  @Get('/minted-tokens/:user_addr')
+  async fetchMintedUserToken(
+    @Res() res: Response,
+    @Param('user_addr') user_addr: string,
+  ) {
+    await this.appService.fetchUserMintedTokens(res, user_addr);
+  }
+
   @Post('waitlist')
   async waitlist(@Res() res: Response, @Body() body: WaitListDTO) {
     await this.appService.waitlist(res, body);

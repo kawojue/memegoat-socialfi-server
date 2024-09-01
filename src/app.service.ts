@@ -423,13 +423,13 @@ export class AppService {
       where: { token_address },
     });
 
-    if (!request) {
-      return this.response.sendError(
-        res,
-        StatusCodes.NotFound,
-        'Token not found',
-      );
-    }
+    this.response.sendSuccess(res, StatusCodes.OK, { data: request });
+  }
+
+  async fetchUserMintedTokens(res: Response, user_addr: string) {
+    const request = await this.prisma.mintedToken.findMany({
+      where: { user_addr },
+    });
 
     this.response.sendSuccess(res, StatusCodes.OK, { data: request });
   }
