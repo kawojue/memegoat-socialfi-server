@@ -653,6 +653,7 @@ export class AppService {
         offset,
       });
       await this.updateDBVol(contractName, record, false);
+      console.log(record.data);
       await this.updateMemegoatVolUSDValue(record.data);
       await this.prisma.$transaction(
         record.data.map((vol) =>
@@ -688,6 +689,7 @@ export class AppService {
         offset,
       });
       await this.updateDBVol(contractName, record, false);
+      console.log(record.data);
       await this.updateMemegoatVolUSDValue(record.data);
       await this.prisma.$transaction(
         record.data.map((vol) =>
