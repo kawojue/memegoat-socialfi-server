@@ -147,11 +147,11 @@ export class AppController {
     await this.appService.getTVLUSDValue(res);
   }
 
-  @Post('/memegoatVolumeUSD')
-  async updateMemegoatVolUSD(@Res() res: Response, @Body() body: token[]) {
-    await this.appService.updateMemegoatVolUSDValue(body);
-    this.response.sendSuccess(res, StatusCodes.OK, { data: 'ok' });
-  }
+  // @Post('/memegoatVolumeUSD')
+  // async updateMemegoatVolUSD(@Res() res: Response, @Body() body: token[]) {
+  //   await this.appService.updateMemegoatVolUSDValue(body);
+  //   this.response.sendSuccess(res, StatusCodes.OK, { data: 'ok' });
+  // }
 
   // @Post('/tvlUSD')
   // async updateTVLUSD(@Res() res: Response) {
@@ -168,10 +168,11 @@ export class AppController {
   //   await this.appService.updateTokenLockerVolume(res);
   // }
 
-  // @Post('/updateDexVolume')
-  // async updateTxnVolume(@Res() res: Response) {
-  //   await this.appService.updateDexVolume(res);
-  // }
+  @Post('/updateDexVolume')
+  async updateTxnVolume(@Res() res: Response) {
+    const record = await this.appService.updateDexVolume();
+    this.response.sendSuccess(res, StatusCodes.OK, { data: record });
+  }
 
   // @Post('/updateLaunchpadVolume')
   // async updateLaunchpadVol(@Res() res: Response) {

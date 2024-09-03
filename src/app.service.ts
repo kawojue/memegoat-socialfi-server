@@ -688,25 +688,25 @@ export class AppService {
         contractName,
         offset,
       });
-      await this.updateDBVol(contractName, record, false);
-      console.log(record.data);
+      // await this.updateDBVol(contractName, record, false);
+      console.log(record);
       await this.updateMemegoatVolUSDValue(record.data);
-      await this.prisma.$transaction(
-        record.data.map((vol) =>
-          this.prisma.dexVolume.upsert({
-            where: { token: vol.token },
-            update: {
-              amount: {
-                increment: vol.amount,
-              },
-            },
-            create: {
-              token: vol.token,
-              amount: vol.amount,
-            },
-          }),
-        ),
-      );
+      // await this.prisma.$transaction(
+      //   record.data.map((vol) =>
+      //     this.prisma.dexVolume.upsert({
+      //       where: { token: vol.token },
+      //       update: {
+      //         amount: {
+      //           increment: vol.amount,
+      //         },
+      //       },
+      //       create: {
+      //         token: vol.token,
+      //         amount: vol.amount,
+      //       },
+      //     }),
+      //   ),
+      // );
     } catch (err) {
       console.error(err);
     }
