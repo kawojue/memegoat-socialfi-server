@@ -14,7 +14,7 @@ export class TxnVolumeService {
     private readonly contractService: ContractService,
   ) {}
   async getTxns(dto: recordDTO) {
-    const limit = dto.offset >= 50 ? 50 : dto.offset;
+    const limit = dto.offset == 0 ? 50 : dto.offset >= 50 ? 50 : dto.offset;
     const offset = dto.offset >= 50 ? dto.offset : 0;
     let url = `https://api.hiro.so/extended/v2/addresses/SP2F4QC563WN0A0949WPH5W1YXVC4M1R46QKE0G14.${dto.contractName}/transactions?limit=${limit}`;
     if (offset > 0) {
