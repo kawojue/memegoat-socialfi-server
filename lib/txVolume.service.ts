@@ -139,7 +139,7 @@ export class TxnVolumeService {
       const tokenMap = new Map<string, number>();
       const limit = 50;
       const txRecord = await this.getRecentTxns(dto);
-      let lastTxTime = Date.now() / 1000;
+      let lastTxTime = dto.lastTxTime;
       for (const result of txRecord.results) {
         if (result.tx.tx_status !== 'success') continue;
         if (result.tx.tx_type === 'smart_contract') continue;
