@@ -785,6 +785,7 @@ export class AppService {
         },
         Promise.resolve('0'),
       );
+      console.log(memegoatVolUsdValue);
       await this.prisma.uSDRecords.upsert({
         where: { record: 'VOLUME' },
         update: {

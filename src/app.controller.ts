@@ -25,6 +25,7 @@ import { ResponseService } from 'lib/response.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CookieAuthGuard } from './jwt/cookie-auth.guard';
 import { CampaignRequestDTO } from './dto/compaign-req.dto';
+import { token } from 'lib/txVolume.service';
 
 @Controller()
 @ApiTags('App')
@@ -146,10 +147,11 @@ export class AppController {
     await this.appService.getTVLUSDValue(res);
   }
 
-  // @Post('/memegoatVolumeUSD')
-  // async updateMemegoatVolUSD(@Res() res: Response) {
-  //   await this.appService.updateMemegoatUSDValue(res);
-  // }
+  @Post('/memegoatVolumeUSD')
+  async updateMemegoatVolUSD(@Res() res: Response, @Body() body: token[]) {
+    await this.appService.updateMemegoatVolUSDValue(body);
+    this.response.sendSuccess(res, StatusCodes.OK, { data: 'ok' });
+  }
 
   // @Post('/tvlUSD')
   // async updateTVLUSD(@Res() res: Response) {
