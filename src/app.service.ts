@@ -564,28 +564,29 @@ export class AppService {
         where: { contract: contractName },
       });
       const offset = contractOffsets ? contractOffsets.nextOffset : 0;
-      const record = await this.txnVolumeService.recordTxnData({
+      const record = await this.txnVolumeService.recordRecentTxData({
         contractName,
         offset,
+        lastTxTime: contractOffsets.lastTxTime,
       });
-      await this.updateDBVol(contractName, record, true);
+      // await this.updateDBVol(contractName, record, true);
       // await this.updateTVLUsdValue(record.data);
-      await this.prisma.$transaction(
-        record.data.map((vol) =>
-          this.prisma.lockerVolume.upsert({
-            where: { token: vol.token },
-            update: {
-              amount: {
-                increment: vol.amount,
-              },
-            },
-            create: {
-              token: vol.token,
-              amount: vol.amount,
-            },
-          }),
-        ),
-      );
+      // await this.prisma.$transaction(
+      //   record.data.map((vol) =>
+      //     this.prisma.lockerVolume.upsert({
+      //       where: { token: vol.token },
+      //       update: {
+      //         amount: {
+      //           increment: vol.amount,
+      //         },
+      //       },
+      //       create: {
+      //         token: vol.token,
+      //         amount: vol.amount,
+      //       },
+      //     }),
+      //   ),
+      // );
       return record;
     } catch (err) {
       console.error(err);
@@ -614,28 +615,29 @@ export class AppService {
         where: { contract: contractName },
       });
       const offset = contractOffsets ? contractOffsets.nextOffset : 0;
-      const record = await this.txnVolumeService.recordTxnData({
+      const record = await this.txnVolumeService.recordRecentTxData({
         contractName,
         offset,
+        lastTxTime: contractOffsets.lastTxTime,
       });
-      await this.updateDBVol(contractName, record, true);
+      // await this.updateDBVol(contractName, record, true);
       // await this.updateTVLUsdValue(record.data);
-      await this.prisma.$transaction(
-        record.data.map((vol) =>
-          this.prisma.communityPoolVolume.upsert({
-            where: { token: vol.token },
-            update: {
-              amount: {
-                increment: vol.amount,
-              },
-            },
-            create: {
-              token: vol.token,
-              amount: vol.amount,
-            },
-          }),
-        ),
-      );
+      // await this.prisma.$transaction(
+      //   record.data.map((vol) =>
+      //     this.prisma.communityPoolVolume.upsert({
+      //       where: { token: vol.token },
+      //       update: {
+      //         amount: {
+      //           increment: vol.amount,
+      //         },
+      //       },
+      //       create: {
+      //         token: vol.token,
+      //         amount: vol.amount,
+      //       },
+      //     }),
+      //   ),
+      // );
       return record;
     } catch (err) {
       console.error(err);
@@ -650,28 +652,29 @@ export class AppService {
         where: { contract: contractName },
       });
       const offset = contractOffsets ? contractOffsets.nextOffset : 0;
-      const record = await this.txnVolumeService.recordTxnData({
+      const record = await this.txnVolumeService.recordRecentTxData({
         contractName,
         offset,
+        lastTxTime: contractOffsets.lastTxTime,
       });
-      await this.updateDBVol(contractName, record, false);
+      // await this.updateDBVol(contractName, record, false);
       // await this.updateMemegoatVolUSDValue(record.data);
-      await this.prisma.$transaction(
-        record.data.map((vol) =>
-          this.prisma.launchpadVolume.upsert({
-            where: { token: vol.token },
-            update: {
-              amount: {
-                increment: vol.amount,
-              },
-            },
-            create: {
-              token: vol.token,
-              amount: vol.amount,
-            },
-          }),
-        ),
-      );
+      // await this.prisma.$transaction(
+      //   record.data.map((vol) =>
+      //     this.prisma.launchpadVolume.upsert({
+      //       where: { token: vol.token },
+      //       update: {
+      //         amount: {
+      //           increment: vol.amount,
+      //         },
+      //       },
+      //       create: {
+      //         token: vol.token,
+      //         amount: vol.amount,
+      //       },
+      //     }),
+      //   ),
+      // );
       return record;
     } catch (err) {
       console.error(err);
@@ -686,28 +689,29 @@ export class AppService {
         where: { contract: contractName },
       });
       const offset = contractOffsets ? contractOffsets.nextOffset : 0;
-      const record = await this.txnVolumeService.recordTxnData({
+      const record = await this.txnVolumeService.recordRecentTxData({
         contractName,
         offset,
+        lastTxTime: contractOffsets.lastTxTime,
       });
-      await this.updateDBVol(contractName, record, false);
+      // await this.updateDBVol(contractName, record, false);
       // await this.updateMemegoatVolUSDValue(record.data);
-      await this.prisma.$transaction(
-        record.data.map((vol) =>
-          this.prisma.dexVolume.upsert({
-            where: { token: vol.token },
-            update: {
-              amount: {
-                increment: vol.amount,
-              },
-            },
-            create: {
-              token: vol.token,
-              amount: vol.amount,
-            },
-          }),
-        ),
-      );
+      // await this.prisma.$transaction(
+      //   record.data.map((vol) =>
+      //     this.prisma.dexVolume.upsert({
+      //       where: { token: vol.token },
+      //       update: {
+      //         amount: {
+      //           increment: vol.amount,
+      //         },
+      //       },
+      //       create: {
+      //         token: vol.token,
+      //         amount: vol.amount,
+      //       },
+      //     }),
+      //   ),
+      // );
       return record;
     } catch (err) {
       console.error(err);
@@ -894,11 +898,13 @@ export class AppService {
       update: {
         totalTransactions: record.totalTxns,
         nextOffset: record.nextOffset,
+        lastTxTime: record.lastTxTime,
       },
       create: {
         contract: contractName,
         totalTransactions: record.totalTxns,
         nextOffset: record.nextOffset,
+        lastTxTime: record.lastTxTime,
       },
     });
 

@@ -31,6 +31,21 @@ export class TxnVolumeService {
     return response.data as TransactionResponse;
   }
 
+  async getRecentTxns(dto: recordDTOV3) {
+    const url = `https://api.hiro.so/extended/v1/tx?limit=50&contract_id=SP2F4QC563WN0A0949WPH5W1YXVC4M1R46QKE0G14.${dto.contractName}&start_time=${dto.lastTxTime}`;
+    const response = await firstValueFrom(
+      this.httpService.get(url, {
+        headers: {
+          'Accept-Encoding': 'gzip, deflate, br, zstd',
+          'Content-Type': 'application/json',
+          'x-api-key': '10a0b6d06387564651f3c26a75474a82',
+        },
+        timeout: 500000,
+      }),
+    );
+    return response.data as TransactionResponse;
+  }
+
   async getTokenDecimal(token: string) {
     const splitToken = token.split('.');
     const data: contractDTOV2 = {
@@ -71,6 +86,7 @@ export class TxnVolumeService {
       const tokenMap = new Map<string, number>();
       const limit = 50;
       const txRecord = await this.getTxns(dto);
+      let lastTxTime = Date.now() / 1000;
       for (const result of txRecord.results) {
         if (result.tx.tx_status !== 'success') continue;
         if (result.tx.tx_type === 'smart_contract') continue;
@@ -79,8 +95,6 @@ export class TxnVolumeService {
           continue;
         if (!allowedFunctions.includes(result.tx.contract_call.function_name))
           continue;
-        console.log(result.tx.contract_call.function_name);
-        console.log(result.stx_received);
         if (result.stx_received !== '0') {
           const currentSTX = tokenMap.get('STX') || 0;
           tokenMap.set('STX', currentSTX + Number(result.stx_received));
@@ -96,6 +110,7 @@ export class TxnVolumeService {
             tokenMap.set('STX', currentSTX + Number(pc.amount));
           }
         }
+        lastTxTime = result.tx.block_time;
       }
       let nextOffset = dto.offset + limit;
       if (nextOffset > txRecord.total) {
@@ -105,6 +120,60 @@ export class TxnVolumeService {
         data: mapToObject(tokenMap),
         nextOffset: nextOffset,
         totalTxns: txRecord.total,
+        lastTxTime: lastTxTime,
+      };
+    } catch (error) {
+      if (error instanceof AggregateError) {
+        for (const individualError of error.errors) {
+          console.error(individualError); // Handle each error
+        }
+      } else {
+        console.error(error); // Handle a single error
+      }
+      return null;
+    }
+  }
+
+  async recordRecentTxData(dto: recordDTOV3) {
+    try {
+      const tokenMap = new Map<string, number>();
+      const limit = 50;
+      const txRecord = await this.getRecentTxns(dto);
+      let lastTxTime = Date.now() / 1000;
+      for (const result of txRecord.results) {
+        if (result.tx.tx_status !== 'success') continue;
+        if (result.tx.tx_type === 'smart_contract') continue;
+        if (result.tx.tx_type === 'token_transfer') continue;
+        if (excludedContracts.includes(result.tx.contract_call.contract_id))
+          continue;
+        if (!allowedFunctions.includes(result.tx.contract_call.function_name))
+          continue;
+        if (result.stx_received !== '0') {
+          const currentSTX = tokenMap.get('STX') || 0;
+          tokenMap.set('STX', currentSTX + Number(result.stx_received));
+        }
+        // Process post conditions for fungible tokens
+        for (const pc of result.tx.post_conditions) {
+          if (pc.type === 'fungible') {
+            const token = `${pc.asset.contract_address}.${pc.asset.contract_name}`;
+            const currentTokenAmount = tokenMap.get(token) || 0;
+            tokenMap.set(token, currentTokenAmount + Number(pc.amount));
+          } else if (pc.type === 'stx') {
+            const currentSTX = tokenMap.get('STX') || 0;
+            tokenMap.set('STX', currentSTX + Number(pc.amount));
+          }
+        }
+        lastTxTime = result.tx.block_time;
+      }
+      let nextOffset = dto.offset + limit;
+      if (nextOffset > txRecord.total) {
+        nextOffset = txRecord.total;
+      }
+      return {
+        data: mapToObject(tokenMap),
+        nextOffset: nextOffset,
+        totalTxns: txRecord.total,
+        lastTxTime: lastTxTime,
       };
     } catch (error) {
       if (error instanceof AggregateError) {
@@ -123,6 +192,7 @@ export type txVolumeOutput = {
   data: token[];
   nextOffset: number;
   totalTxns: number;
+  lastTxTime: number;
 };
 
 export class recordDTO {
@@ -133,6 +203,20 @@ export class recordDTO {
   @IsOptional()
   @IsNumber()
   offset: number;
+}
+
+export class recordDTOV3 {
+  @IsNotEmpty()
+  @IsString()
+  contractName: string;
+
+  @IsOptional()
+  @IsNumber()
+  offset: number;
+
+  @IsOptional()
+  @IsNumber()
+  lastTxTime: number;
 }
 
 export class recordDTOV2 {
