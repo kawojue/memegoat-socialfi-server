@@ -564,10 +564,11 @@ export class AppService {
         where: { contract: contractName },
       });
       const offset = contractOffsets ? contractOffsets.nextOffset : 0;
-      const record = await this.txnVolumeService.recordRecentTxData({
+      const record = await this.txnVolumeService.recordTxnData({
         contractName,
         offset,
-        lastTxTime: contractOffsets.lastTxTime,
+        totalTx: contractOffsets.totalTransactions,
+        // lastTxTime: contractOffsets.lastTxTime,
       });
       // await this.updateDBVol(contractName, record, true);
       // await this.updateTVLUsdValue(record.data);
@@ -602,6 +603,7 @@ export class AppService {
     const record = await this.txnVolumeService.recordTxnData({
       contractName,
       offset,
+      totalTx: contractOffsets.totalTransactions,
     });
     await this.updateDBVol(contractName, record, false);
     this.response.sendSuccess(res, StatusCodes.OK, { data: record });
@@ -615,10 +617,11 @@ export class AppService {
         where: { contract: contractName },
       });
       const offset = contractOffsets ? contractOffsets.nextOffset : 0;
-      const record = await this.txnVolumeService.recordRecentTxData({
+      const record = await this.txnVolumeService.recordTxnData({
         contractName,
         offset,
-        lastTxTime: contractOffsets.lastTxTime,
+        totalTx: contractOffsets.totalTransactions,
+        // lastTxTime: contractOffsets.lastTxTime,
       });
       // await this.updateDBVol(contractName, record, true);
       // await this.updateTVLUsdValue(record.data);
@@ -652,10 +655,11 @@ export class AppService {
         where: { contract: contractName },
       });
       const offset = contractOffsets ? contractOffsets.nextOffset : 0;
-      const record = await this.txnVolumeService.recordRecentTxData({
+      const record = await this.txnVolumeService.recordTxnData({
         contractName,
         offset,
-        lastTxTime: contractOffsets.lastTxTime,
+        totalTx: contractOffsets.totalTransactions,
+        // lastTxTime: contractOffsets.lastTxTime,
       });
       // await this.updateDBVol(contractName, record, false);
       // await this.updateMemegoatVolUSDValue(record.data);
@@ -689,10 +693,11 @@ export class AppService {
         where: { contract: contractName },
       });
       const offset = contractOffsets ? contractOffsets.nextOffset : 0;
-      const record = await this.txnVolumeService.recordRecentTxData({
+      const record = await this.txnVolumeService.recordTxnData({
         contractName,
         offset,
-        lastTxTime: contractOffsets.lastTxTime,
+        totalTx: contractOffsets.totalTransactions,
+        // lastTxTime: contractOffsets.lastTxTime,
       });
       // await this.updateDBVol(contractName, record, false);
       // await this.updateMemegoatVolUSDValue(record.data);
@@ -898,13 +903,11 @@ export class AppService {
       update: {
         totalTransactions: record.totalTxns,
         nextOffset: record.nextOffset,
-        lastTxTime: record.lastTxTime,
       },
       create: {
         contract: contractName,
         totalTransactions: record.totalTxns,
         nextOffset: record.nextOffset,
-        lastTxTime: record.lastTxTime,
       },
     });
 

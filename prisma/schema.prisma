@@ -208,7 +208,6 @@ model ContractOffsets {
     contract          String   @unique
     nextOffset        Int
     totalTransactions Int
-    lastTxTime        Int
     createdAt         DateTime @default(now())
     updatedAt         DateTime @updatedAt
 }
