@@ -602,7 +602,6 @@ export class AppService {
       contractName,
       offset,
     });
-    console.log(record);
     await this.updateDBVol(contractName, record, false);
     this.response.sendSuccess(res, StatusCodes.OK, { data: record });
   }
