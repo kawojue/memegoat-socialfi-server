@@ -786,18 +786,18 @@ export class AppService {
         Promise.resolve('0'),
       );
       console.log(memegoatVolUsdValue);
-      await this.prisma.uSDRecords.upsert({
-        where: { record: 'VOLUME' },
-        update: {
-          amount: {
-            increment: BigInt(memegoatVolUsdValue) as any,
-          },
-        },
-        create: {
-          record: 'VOLUME',
-          amount: BigInt(memegoatVolUsdValue) as any,
-        },
-      });
+      // await this.prisma.uSDRecords.upsert({
+      //   where: { record: 'VOLUME' },
+      //   update: {
+      //     amount: {
+      //       increment: BigInt(memegoatVolUsdValue) as any,
+      //     },
+      //   },
+      //   create: {
+      //     record: 'VOLUME',
+      //     amount: BigInt(memegoatVolUsdValue) as any,
+      //   },
+      // });
     } catch (err) {
       console.error(err);
     }

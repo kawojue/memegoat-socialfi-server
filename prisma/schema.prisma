@@ -213,7 +213,8 @@ model ContractOffsets {
 }
 
 model USDRecords {
-    id     String @id @default(auto()) @map("_id") @db.ObjectId
-    record String @unique
-    amount BigInt
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    record    String   @unique
+    amount    BigInt
+    updatedAt DateTime @updatedAt
 }
