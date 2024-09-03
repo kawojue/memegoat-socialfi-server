@@ -79,6 +79,7 @@ export class TxnVolumeService {
           continue;
         if (!allowedFunctions.includes(result.tx.contract_call.function_name))
           continue;
+        console.log(result.tx.contract_call.function_name);
         if (result.stx_received !== '0') {
           const currentSTX = tokenMap.get('STX') || 0;
           tokenMap.set('STX', currentSTX + Number(result.stx_received));
