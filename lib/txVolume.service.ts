@@ -73,9 +73,9 @@ export class TxnVolumeService {
       const offset = diff > 50 ? diff - 50 : diff;
       console.log(offset);
       const txRecord = await this.getTxns({ ...dto, offset });
-      let lastTxTime = Date.now() / 1000;
       let count = 0;
       for (const result of txRecord.results) {
+        count++;
         if (dto.offset === txRecord.total) {
           return {
             data: [],
@@ -105,14 +105,11 @@ export class TxnVolumeService {
             tokenMap.set('STX', currentSTX + Number(pc.amount));
           }
         }
-        lastTxTime = result.tx.block_time;
-        count++;
       }
       return {
         data: mapToObject(tokenMap),
         nextOffset: dto.offset + count,
         totalTxns: txRecord.total,
-        lastTxTime: lastTxTime,
       };
     } catch (error) {
       if (error instanceof AggregateError) {
