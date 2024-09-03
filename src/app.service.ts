@@ -571,22 +571,22 @@ export class AppService {
       });
       await this.updateDBVol(contractName, record, true);
       await this.updateTVLUsdValue(record.data);
-      // await this.prisma.$transaction(
-      //   record.data.map((vol) =>
-      //     this.prisma.lockerVolume.upsert({
-      //       where: { token: vol.token },
-      //       update: {
-      //         amount: {
-      //           increment: vol.amount,
-      //         },
-      //       },
-      //       create: {
-      //         token: vol.token,
-      //         amount: vol.amount,
-      //       },
-      //     }),
-      //   ),
-      // );
+      await this.prisma.$transaction(
+        record.data.map((vol) =>
+          this.prisma.lockerVolume.upsert({
+            where: { token: vol.token },
+            update: {
+              amount: {
+                increment: vol.amount,
+              },
+            },
+            create: {
+              token: vol.token,
+              amount: vol.amount,
+            },
+          }),
+        ),
+      );
       return record;
     } catch (err) {
       console.error(err);
@@ -623,22 +623,22 @@ export class AppService {
       });
       await this.updateDBVol(contractName, record, true);
       await this.updateTVLUsdValue(record.data);
-      // await this.prisma.$transaction(
-      //   record.data.map((vol) =>
-      //     this.prisma.communityPoolVolume.upsert({
-      //       where: { token: vol.token },
-      //       update: {
-      //         amount: {
-      //           increment: vol.amount,
-      //         },
-      //       },
-      //       create: {
-      //         token: vol.token,
-      //         amount: vol.amount,
-      //       },
-      //     }),
-      //   ),
-      // );
+      await this.prisma.$transaction(
+        record.data.map((vol) =>
+          this.prisma.communityPoolVolume.upsert({
+            where: { token: vol.token },
+            update: {
+              amount: {
+                increment: vol.amount,
+              },
+            },
+            create: {
+              token: vol.token,
+              amount: vol.amount,
+            },
+          }),
+        ),
+      );
       return record;
     } catch (err) {
       console.error(err);
@@ -660,22 +660,22 @@ export class AppService {
       });
       await this.updateDBVol(contractName, record, false);
       await this.updateMemegoatVolUSDValue(record.data);
-      // await this.prisma.$transaction(
-      //   record.data.map((vol) =>
-      //     this.prisma.launchpadVolume.upsert({
-      //       where: { token: vol.token },
-      //       update: {
-      //         amount: {
-      //           increment: vol.amount,
-      //         },
-      //       },
-      //       create: {
-      //         token: vol.token,
-      //         amount: vol.amount,
-      //       },
-      //     }),
-      //   ),
-      // );
+      await this.prisma.$transaction(
+        record.data.map((vol) =>
+          this.prisma.launchpadVolume.upsert({
+            where: { token: vol.token },
+            update: {
+              amount: {
+                increment: vol.amount,
+              },
+            },
+            create: {
+              token: vol.token,
+              amount: vol.amount,
+            },
+          }),
+        ),
+      );
       return record;
     } catch (err) {
       console.error(err);
@@ -697,22 +697,22 @@ export class AppService {
       });
       await this.updateDBVol(contractName, record, false);
       await this.updateMemegoatVolUSDValue(record.data);
-      // await this.prisma.$transaction(
-      //   record.data.map((vol) =>
-      //     this.prisma.dexVolume.upsert({
-      //       where: { token: vol.token },
-      //       update: {
-      //         amount: {
-      //           increment: vol.amount,
-      //         },
-      //       },
-      //       create: {
-      //         token: vol.token,
-      //         amount: vol.amount,
-      //       },
-      //     }),
-      //   ),
-      // );
+      await this.prisma.$transaction(
+        record.data.map((vol) =>
+          this.prisma.dexVolume.upsert({
+            where: { token: vol.token },
+            update: {
+              amount: {
+                increment: vol.amount,
+              },
+            },
+            create: {
+              token: vol.token,
+              amount: vol.amount,
+            },
+          }),
+        ),
+      );
       return record;
     } catch (err) {
       console.error(err);
@@ -909,40 +909,40 @@ export class AppService {
       },
     });
 
-    // if (isTvl) {
-    //   await this.prisma.$transaction(
-    //     record.data.map((vol) =>
-    //       this.prisma.tVL.upsert({
-    //         where: { token: vol.token },
-    //         update: {
-    //           amount: {
-    //             increment: vol.amount,
-    //           },
-    //         },
-    //         create: {
-    //           token: vol.token,
-    //           amount: vol.amount,
-    //         },
-    //       }),
-    //     ),
-    //   );
-    // } else {
-    //   await this.prisma.$transaction(
-    //     record.data.map((vol) =>
-    //       this.prisma.memegoatVolume.upsert({
-    //         where: { token: vol.token },
-    //         update: {
-    //           amount: {
-    //             increment: vol.amount,
-    //           },
-    //         },
-    //         create: {
-    //           token: vol.token,
-    //           amount: vol.amount,
-    //         },
-    //       }),
-    //     ),
-    //   );
-    // }
+    if (isTvl) {
+      await this.prisma.$transaction(
+        record.data.map((vol) =>
+          this.prisma.tVL.upsert({
+            where: { token: vol.token },
+            update: {
+              amount: {
+                increment: vol.amount,
+              },
+            },
+            create: {
+              token: vol.token,
+              amount: vol.amount,
+            },
+          }),
+        ),
+      );
+    } else {
+      await this.prisma.$transaction(
+        record.data.map((vol) =>
+          this.prisma.memegoatVolume.upsert({
+            where: { token: vol.token },
+            update: {
+              amount: {
+                increment: vol.amount,
+              },
+            },
+            create: {
+              token: vol.token,
+              amount: vol.amount,
+            },
+          }),
+        ),
+      );
+    }
   }
 }
