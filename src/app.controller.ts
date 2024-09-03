@@ -25,7 +25,6 @@ import { ResponseService } from 'lib/response.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CookieAuthGuard } from './jwt/cookie-auth.guard';
 import { CampaignRequestDTO } from './dto/compaign-req.dto';
-import { token } from 'lib/txVolume.service';
 
 @Controller()
 @ApiTags('App')
@@ -158,15 +157,17 @@ export class AppController {
   //   await this.appService.updateTVLUsdValue(res);
   // }
 
-  // @Post('/updatePoolsVolume')
-  // async updateCommunityPoolsVol(@Res() res: Response) {
-  //   await this.appService.updateCommunityPoolsVolume(res);
-  // }
+  @Post('/updatePoolsVolume')
+  async updateCommunityPoolsVol(@Res() res: Response) {
+    const record = await this.appService.updateCommunityPoolsVolume();
+    this.response.sendSuccess(res, StatusCodes.OK, { data: record });
+  }
 
-  // @Post('/updateLockerVolume')
-  // async updateLockerVol(@Res() res: Response) {
-  //   await this.appService.updateTokenLockerVolume(res);
-  // }
+  @Post('/updateLockerVolume')
+  async updateLockerVol(@Res() res: Response) {
+    const record = await this.appService.updateTokenLockerVolume();
+    this.response.sendSuccess(res, StatusCodes.OK, { data: record });
+  }
 
   @Post('/updateDexVolume')
   async updateTxnVolume(@Res() res: Response) {
@@ -174,15 +175,16 @@ export class AppController {
     this.response.sendSuccess(res, StatusCodes.OK, { data: record });
   }
 
-  // @Post('/updateLaunchpadVolume')
-  // async updateLaunchpadVol(@Res() res: Response) {
-  //   await this.appService.updateLaunchpadVolume(res);
-  // }
+  @Post('/updateLaunchpadVolume')
+  async updateLaunchpadVol(@Res() res: Response) {
+    const record = await this.appService.updateLaunchpadVolume();
+    this.response.sendSuccess(res, StatusCodes.OK, { data: record });
+  }
 
-  // @Post('/updateOTCVolume')
-  // async updateOTCVolume(@Res() res: Response) {
-  //   await this.appService.updateOTCVolume(res);
-  // }
+  @Post('/updateOTCVolume')
+  async updateOTCVolume(@Res() res: Response) {
+    await this.appService.updateOTCVolume(res);
+  }
 
   @Get('/allTokens')
   async fetchAllTokens(@Res() res: Response) {
