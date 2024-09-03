@@ -86,7 +86,6 @@ export class TxnVolumeService {
         }
         // Process post conditions for fungible tokens
         for (const pc of result.tx.post_conditions) {
-          console.log(pc);
           if (pc.type === 'fungible') {
             const token = `${pc.asset.contract_address}.${pc.asset.contract_name}`;
             const currentTokenAmount = tokenMap.get(token) || 0;
