@@ -17,6 +17,7 @@ import { TxnVolumeService } from 'lib/txVolume.service';
 import { SessionSerializer } from './jwt/session.serialize';
 import { CloudflareModule } from './cloudflare/cloudflare.module';
 import { ContractService } from 'lib/contract.service';
+import { GoogleSheetsService } from 'lib/gsheet.service';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { ContractService } from 'lib/contract.service';
     TxnVolumeService,
     SessionSerializer,
     ContractService,
+    GoogleSheetsService,
   ],
   exports: [AppService],
 })
