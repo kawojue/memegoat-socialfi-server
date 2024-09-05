@@ -6,4 +6,16 @@ export class LockerDTO {
   @IsOptional()
   @IsString()
   tokenAddress?: string;
+
+  @IsOptional()
+  @IsString()
+  tokenName?: string;
+
+  @IsOptional()
+  @IsString()
+  tokenSymbol?: string;
+
+  @IsOptional()
+  @IsString()
+  tokenImg?: string;
 }

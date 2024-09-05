@@ -222,5 +222,8 @@ model USDRecords {
 model LockerData {
     id           String @id @default(auto()) @map("_id") @db.ObjectId
     tokenAddress String @unique
+    tokenName    String
+    tokenImg     String
+    tokenSymbol  String
     count        Int
 }

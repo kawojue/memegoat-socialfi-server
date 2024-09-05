@@ -902,6 +902,9 @@ export class AppService {
       },
       create: {
         tokenAddress: dto.tokenAddress,
+        tokenName: dto.tokenName,
+        tokenImg: dto.tokenImg,
+        tokenSymbol: dto.tokenSymbol,
         count: 1,
       },
     });
