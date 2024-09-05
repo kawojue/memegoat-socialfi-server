@@ -910,6 +910,13 @@ export class AppService {
     });
   }
 
+  async getLockerToken(res: Response) {
+    const data = await this.prisma.lockerData.findMany();
+    this.response.sendSuccess(res, StatusCodes.OK, {
+      data: data,
+    });
+  }
+
   async updateDBVol(
     contractName: string,
     record: txVolumeOutput,

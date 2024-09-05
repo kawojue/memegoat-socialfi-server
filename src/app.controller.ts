@@ -212,9 +212,14 @@ export class AppController {
     await this.appService.getSTXChart(res);
   }
 
-  @Get('/addLockerToken')
+  @Post('/lockerToken')
   async recordTOken(@Res() res: Response, @Body() body: LockerDTO) {
     await this.appService.recordToken(res, body);
+  }
+
+  @Get('/lockerToken')
+  async getLockerTokens(@Res() res: Response) {
+    await this.appService.getLockerToken(res);
   }
 
   @Get('/chart')
