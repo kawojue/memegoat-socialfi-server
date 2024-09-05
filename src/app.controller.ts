@@ -25,6 +25,7 @@ import { ResponseService } from 'lib/response.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CookieAuthGuard } from './jwt/cookie-auth.guard';
 import { CampaignRequestDTO } from './dto/compaign-req.dto';
+import { LockerDTO } from './dto/locker.dto';
 
 @Controller()
 @ApiTags('App')
@@ -209,6 +210,11 @@ export class AppController {
   @Get('/stxChart')
   async fetchChart(@Res() res: Response) {
     await this.appService.getSTXChart(res);
+  }
+
+  @Get('/addLockerToken')
+  async recordTOken(@Res() res: Response, @Body() body: LockerDTO) {
+    await this.appService.recordToken(res, body);
   }
 
   @Get('/chart')

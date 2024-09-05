@@ -218,3 +218,9 @@ model USDRecords {
     amount    BigInt
     updatedAt DateTime @updatedAt
 }
+
+model LockerData {
+    id           String @id @default(auto()) @map("_id") @db.ObjectId
+    tokenAddress String @unique
+    count        Int
+}

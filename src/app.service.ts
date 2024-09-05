@@ -18,6 +18,7 @@ import { token, TxnVolumeService, txVolumeOutput } from 'lib/txVolume.service';
 import { contractDTO, ContractService } from 'lib/contract.service';
 import BigNumber from 'bignumber.js';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { LockerDTO } from './dto/locker.dto';
 
 @Injectable()
 export class AppService {
@@ -889,6 +890,24 @@ export class AppService {
     } catch (err) {
       console.error(err);
     }
+  }
+
+  async recordToken(res: Response, dto: LockerDTO) {
+    await this.prisma.lockerData.upsert({
+      where: { tokenAddress: dto.tokenAddress },
+      update: {
+        count: {
+          increment: 1,
+        },
+      },
+      create: {
+        tokenAddress: dto.tokenAddress,
+        count: 1,
+      },
+    });
+    this.response.sendSuccess(res, StatusCodes.OK, {
+      data: `${dto.tokenAddress} added`,
+    });
   }
 
   async updateDBVol(
