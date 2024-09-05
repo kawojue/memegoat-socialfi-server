@@ -556,7 +556,7 @@ export class AppService {
   // - OTC - done
   // - Games - coming
 
-  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  @Cron(CronExpression.EVERY_8_HOURS)
   async updateTokenLockerVolume() {
     try {
       const contractName = 'memegoat-locker-vault-v1-1';
@@ -608,7 +608,7 @@ export class AppService {
     this.response.sendSuccess(res, StatusCodes.OK, { data: record });
   }
 
-  @Cron(CronExpression.EVERY_DAY_AT_1AM)
+  @Cron(CronExpression.EVERY_5_HOURS)
   async updateCommunityPoolsVolume() {
     try {
       const contractName = 'memegoat-stakepool-vault-v1';
@@ -645,7 +645,7 @@ export class AppService {
     }
   }
 
-  @Cron(CronExpression.EVERY_DAY_AT_2AM)
+  @Cron(CronExpression.EVERY_7_HOURS)
   async updateLaunchpadVolume() {
     try {
       const contractName = 'memegoat-launchpad-vault';
@@ -682,7 +682,7 @@ export class AppService {
     }
   }
 
-  @Cron(CronExpression.EVERY_DAY_AT_3AM)
+  @Cron(CronExpression.EVERY_6_HOURS)
   async updateDexVolume() {
     try {
       const contractName = 'memegoat-aggregator-v1-1';
