@@ -72,6 +72,13 @@ export class TxnVolumeService {
     try {
       const tokenMap = new Map<string, number>();
       const diff = dto.totalTx - dto.offset;
+      if (diff < 0) {
+        return {
+          data: [],
+          nextOffset: dto.offset,
+          totalTxns: dto.offset,
+        };
+      }
       const offset = diff > 50 ? diff - 50 : diff;
       const txRecord = await this.getTxns({ ...dto, offset });
       let count = 0;

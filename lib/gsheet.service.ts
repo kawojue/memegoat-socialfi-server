@@ -4,7 +4,6 @@ import { google, sheets_v4 } from 'googleapis';
 @Injectable()
 export class GoogleSheetsService {
   private sheets: sheets_v4.Sheets;
-  private sheedId: string;
 
   constructor() {
     this.auth();
@@ -24,16 +23,20 @@ export class GoogleSheetsService {
     });
     const sheets = google.sheets({ version: 'v4', auth });
     this.sheets = sheets;
-    this.sheedId = process.env.GOOGLE_SHEET_ID;
   }
 
   /**
    * Find list of rows in a specific range
+   * @param spreadSheetId
    * @param sheetName
    * @param range
    * @returns list of rows
    */
-  async findAll(sheetName: string, range: string): Promise<string[][]> {
+  async findAll(
+    spreadSheetId: string,
+    sheetName: string,
+    range: string,
+  ): Promise<string[][]> {
     try {
       if (!sheetName)
         throw new HttpException(
@@ -44,7 +47,7 @@ export class GoogleSheetsService {
         throw new HttpException('range is required', HttpStatus.BAD_REQUEST);
 
       const result = await this.sheets.spreadsheets.values.get({
-        spreadsheetId: this.sheedId,
+        spreadsheetId: spreadSheetId,
         range: `${sheetName}!${range}`,
       });
 
@@ -68,6 +71,7 @@ export class GoogleSheetsService {
   /**
    * Filter row by column and value.
    * NOTE: spreadsheets cannot contain more than 1000 rows
+   * @param spreadSheetId
    * @param sheetName
    * @param range
    * @param column
@@ -75,13 +79,14 @@ export class GoogleSheetsService {
    * @returns list of rows
    */
   async filter(
+    spreadSheetId: string,
     sheetName: string,
     range: string,
     column: number,
     valueToSearch: string,
   ): Promise<string[][]> {
     try {
-      const rows = await this.findAll(sheetName, range);
+      const rows = await this.findAll(spreadSheetId, sheetName, range);
 
       const filteredData: string[][] = rows.filter(
         (row) =>
@@ -107,19 +112,21 @@ export class GoogleSheetsService {
   /**
    * Append a Row at the end of the Sheet
    * Note: range not matter
+   * @param spreadSheetId
    * @param sheetName
    * @param range
    * @param fields
    * @returns message and range
    */
   async append(
+    spreadSheetId: string,
     sheetName: string,
     range: string,
     fields: unknown[],
   ): Promise<{ updatedRange: string }> {
     try {
       const result = await this.sheets.spreadsheets.values.append({
-        spreadsheetId: this.sheedId,
+        spreadsheetId: spreadSheetId,
         range: `${sheetName}!${range}`,
         valueInputOption: 'USER_ENTERED', // or RAW
         requestBody: {
@@ -139,19 +146,21 @@ export class GoogleSheetsService {
   /**
    * Update a field Row in a specific range
    * Note: range is very important
+   * @param sheetId
    * @param sheetName
    * @param range
    * @param fields
    * @returns message and range
    */
   async update(
+    spreadSheetId: string,
     sheetName: string,
     range: string,
     fields: unknown[],
   ): Promise<{ updatedRange: string }> {
     try {
       const result = await this.sheets.spreadsheets.values.update({
-        spreadsheetId: this.sheedId,
+        spreadsheetId: spreadSheetId,
         range: `${sheetName}!${range}`,
         valueInputOption: 'USER_ENTERED',
         requestBody: {
@@ -180,14 +189,19 @@ export class GoogleSheetsService {
 
   /**
    * Delete a specific Row
+   * @param spreadSheetId
    * @param sheetName
    * @param rowNumber
    * @returns message
    */
-  async delete(sheetName: string, rowNumber: number): Promise<void> {
+  async delete(
+    spreadSheetId: string,
+    sheetName: string,
+    rowNumber: number,
+  ): Promise<void> {
     try {
       const response = await this.sheets.spreadsheets.get({
-        spreadsheetId: this.sheedId,
+        spreadsheetId: spreadSheetId,
         includeGridData: false,
       });
       const sheetList = response.data.sheets;
@@ -210,7 +224,7 @@ export class GoogleSheetsService {
       };
 
       await this.sheets.spreadsheets.batchUpdate({
-        spreadsheetId: this.sheedId,
+        spreadsheetId: spreadSheetId,
         requestBody: {
           requests: [request],
         },
