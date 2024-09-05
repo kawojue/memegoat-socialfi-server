@@ -81,8 +81,12 @@ export class TxnVolumeService {
       }
       const offset = diff > 50 ? diff - 50 : diff;
       const txRecord = await this.getTxns({ ...dto, offset });
+      const expected = txRecord.total - dto.offset;
       let count = 0;
       for (const result of txRecord.results) {
+        if (count >= expected) {
+          continue;
+        }
         count++;
         if (dto.offset === txRecord.total) {
           return {
