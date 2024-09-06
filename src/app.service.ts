@@ -1149,7 +1149,7 @@ export class AppService {
       const sheetId = '1XzIzi0gj-KVw3I_3OAN63caduZhURn58l1vutPqEoWg';
       const sheetData = await this.gSheetService.findAll(
         sheetId,
-        'DEX FEES 2024',
+        'Sheet1',
         'A:D',
       );
       return this.response.sendSuccess(res, StatusCodes.OK, {
