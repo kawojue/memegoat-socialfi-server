@@ -1146,7 +1146,7 @@ export class AppService {
 
   async getSheet(res: Response) {
     try {
-      const sheetId = '/1XzIzi0gj-KVw3I_3OAN63caduZhURn58l1vutPqEoWg';
+      const sheetId = '1XzIzi0gj-KVw3I_3OAN63caduZhURn58l1vutPqEoWg';
       const sheetData = await this.gSheetService.findAll(
         sheetId,
         'DEX FEES 2024',
