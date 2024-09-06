@@ -20,6 +20,7 @@ import BigNumber from 'bignumber.js';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { LockerDTO } from './dto/locker.dto';
 import { FeeVolumeService } from 'lib/feeVol.service';
+import { GoogleSheetsService } from 'lib/gsheet.service';
 
 @Injectable()
 export class AppService {
@@ -32,6 +33,7 @@ export class AppService {
     private readonly txnVolumeService: TxnVolumeService,
     private readonly contractService: ContractService,
     private readonly feeService: FeeVolumeService,
+    private readonly gSheetService: GoogleSheetsService,
   ) {}
 
   getHello(): string {
@@ -1137,6 +1139,22 @@ export class AppService {
         ),
       );
       return record;
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  async getSheet(res: Response) {
+    try {
+      const sheetId = '/1XzIzi0gj-KVw3I_3OAN63caduZhURn58l1vutPqEoWg';
+      const sheetData = await this.gSheetService.findAll(
+        sheetId,
+        'DEX FEES 2024',
+        'A:D',
+      );
+      return this.response.sendSuccess(res, StatusCodes.OK, {
+        data: sheetData,
+      });
     } catch (err) {
       console.error(err);
     }
