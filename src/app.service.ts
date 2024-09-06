@@ -1157,6 +1157,7 @@ export class AppService {
       });
     } catch (err) {
       console.error(err);
+      return this.response.sendError(res, StatusCodes.BadRequest, err);
     }
   }
 }
