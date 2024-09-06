@@ -227,3 +227,37 @@ model LockerData {
     tokenSymbol  String?
     count        Int
 }
+
+// FEES
+
+model DexFees {
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    token     String   @unique
+    amount    BigInt
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model LockerFees {
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    token     String   @unique
+    amount    BigInt
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model LaunchpadFees {
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    token     String   @unique
+    amount    BigInt
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model PoolFees {
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    token     String   @unique
+    amount    BigInt
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}

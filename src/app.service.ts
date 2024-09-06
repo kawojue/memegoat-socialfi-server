@@ -19,6 +19,7 @@ import { contractDTO, ContractService } from 'lib/contract.service';
 import BigNumber from 'bignumber.js';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { LockerDTO } from './dto/locker.dto';
+import { FeeVolumeService } from 'lib/feeVol.service';
 
 @Injectable()
 export class AppService {
@@ -30,6 +31,7 @@ export class AppService {
     private readonly cloudflare: CloudflareService,
     private readonly txnVolumeService: TxnVolumeService,
     private readonly contractService: ContractService,
+    private readonly feeService: FeeVolumeService,
   ) {}
 
   getHello(): string {
@@ -557,10 +559,10 @@ export class AppService {
   // - OTC - done
   // - Games - coming
 
-  @Cron(CronExpression.EVERY_8_HOURS)
+  @Cron(CronExpression.EVERY_6_HOURS)
   async updateTokenLockerVolume() {
     try {
-      const contractName = 'memegoat-locker-vault-v1-1';
+      const contractName = 'memegoat-locker-vault-v3';
       const contractOffsets = await this.prisma.contractOffsets.findUnique({
         where: { contract: contractName },
       });
@@ -609,7 +611,7 @@ export class AppService {
     this.response.sendSuccess(res, StatusCodes.OK, { data: record });
   }
 
-  @Cron(CronExpression.EVERY_5_HOURS)
+  @Cron(CronExpression.EVERY_4_HOURS)
   async updateCommunityPoolsVolume() {
     try {
       const contractName = 'memegoat-stakepool-vault-v1';
@@ -646,7 +648,7 @@ export class AppService {
     }
   }
 
-  @Cron(CronExpression.EVERY_7_HOURS)
+  @Cron(CronExpression.EVERY_6_HOURS)
   async updateLaunchpadVolume() {
     try {
       const contractName = 'memegoat-launchpad-vault';
@@ -683,7 +685,7 @@ export class AppService {
     }
   }
 
-  @Cron(CronExpression.EVERY_6_HOURS)
+  @Cron(CronExpression.EVERY_5_HOURS)
   async updateDexVolume() {
     try {
       const contractName = 'memegoat-aggregator-v1-1';
@@ -924,6 +926,7 @@ export class AppService {
     contractName: string,
     record: txVolumeOutput,
     isTvl: boolean,
+    isFees: boolean = false,
   ) {
     await this.prisma.contractOffsets.upsert({
       where: { contract: contractName },
@@ -938,10 +941,68 @@ export class AppService {
       },
     });
 
-    if (isTvl) {
+    if (!isFees) {
+      if (isTvl) {
+        await this.prisma.$transaction(
+          record.data.map((vol) =>
+            this.prisma.tVL.upsert({
+              where: { token: vol.token },
+              update: {
+                amount: {
+                  increment: vol.amount,
+                },
+              },
+              create: {
+                token: vol.token,
+                amount: vol.amount,
+              },
+            }),
+          ),
+        );
+      } else {
+        await this.prisma.$transaction(
+          record.data.map((vol) =>
+            this.prisma.memegoatVolume.upsert({
+              where: { token: vol.token },
+              update: {
+                amount: {
+                  increment: vol.amount,
+                },
+              },
+              create: {
+                token: vol.token,
+                amount: vol.amount,
+              },
+            }),
+          ),
+        );
+      }
+    }
+  }
+
+  // FEE Calculations
+
+  @Cron(CronExpression.EVERY_7_HOURS)
+  async updateDexFees() {
+    try {
+      const contractName = 'memegoat-treasury';
+      const dexName = 'memegoat-aggregator-v1-1';
+      const contractOffsets = await this.prisma.contractOffsets.findUnique({
+        where: { contract: contractName },
+      });
+      const offset = contractOffsets ? contractOffsets.nextOffset : 0;
+      const record = await this.feeService.recordTxnData(
+        {
+          contractName,
+          offset,
+          totalTx: contractOffsets.totalTransactions,
+        },
+        dexName,
+      );
+      await this.updateDBVol(contractName, record, false, true);
       await this.prisma.$transaction(
         record.data.map((vol) =>
-          this.prisma.tVL.upsert({
+          this.prisma.dexFees.upsert({
             where: { token: vol.token },
             update: {
               amount: {
@@ -955,10 +1016,33 @@ export class AppService {
           }),
         ),
       );
-    } else {
+      return record;
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  @Cron(CronExpression.EVERY_8_HOURS)
+  async updateLockerFees() {
+    try {
+      const contractName = 'memegoat-treasury';
+      const dexName = 'memegoat-token-locker-v3';
+      const contractOffsets = await this.prisma.contractOffsets.findUnique({
+        where: { contract: contractName },
+      });
+      const offset = contractOffsets ? contractOffsets.nextOffset : 0;
+      const record = await this.feeService.recordTxnData(
+        {
+          contractName,
+          offset,
+          totalTx: contractOffsets.totalTransactions,
+        },
+        dexName,
+      );
+      await this.updateDBVol(contractName, record, false, true);
       await this.prisma.$transaction(
         record.data.map((vol) =>
-          this.prisma.memegoatVolume.upsert({
+          this.prisma.lockerFees.upsert({
             where: { token: vol.token },
             update: {
               amount: {
@@ -972,6 +1056,89 @@ export class AppService {
           }),
         ),
       );
+      return record;
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  @Cron(CronExpression.EVERY_9_HOURS)
+  async updateLaunchpadFees() {
+    try {
+      const contractName = 'memegoat-treasury';
+      const dexName = 'memegoat-launchpad';
+      const contractOffsets = await this.prisma.contractOffsets.findUnique({
+        where: { contract: contractName },
+      });
+      const offset = contractOffsets ? contractOffsets.nextOffset : 0;
+      const record = await this.feeService.recordTxnData(
+        {
+          contractName,
+          offset,
+          totalTx: contractOffsets.totalTransactions,
+        },
+        dexName,
+      );
+      await this.updateDBVol(contractName, record, false, true);
+      await this.prisma.$transaction(
+        record.data.map((vol) =>
+          this.prisma.launchpadFees.upsert({
+            where: { token: vol.token },
+            update: {
+              amount: {
+                increment: vol.amount,
+              },
+            },
+            create: {
+              token: vol.token,
+              amount: vol.amount,
+            },
+          }),
+        ),
+      );
+      return record;
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  @Cron(CronExpression.EVERY_10_HOURS)
+  async updatePoolFees() {
+    try {
+      const contractName = 'memegoat-treasury-v1';
+      const dexName = 'memegoat-stake-pool-v2';
+      const contractOffsets = await this.prisma.contractOffsets.findUnique({
+        where: { contract: contractName },
+      });
+      const offset = contractOffsets ? contractOffsets.nextOffset : 0;
+      const record = await this.feeService.recordTxnData(
+        {
+          contractName,
+          offset,
+          totalTx: contractOffsets.totalTransactions,
+        },
+        dexName,
+      );
+      await this.updateDBVol(contractName, record, false, true);
+      await this.prisma.$transaction(
+        record.data.map((vol) =>
+          this.prisma.poolFees.upsert({
+            where: { token: vol.token },
+            update: {
+              amount: {
+                increment: vol.amount,
+              },
+            },
+            create: {
+              token: vol.token,
+              amount: vol.amount,
+            },
+          }),
+        ),
+      );
+      return record;
+    } catch (err) {
+      console.error(err);
     }
   }
 }
