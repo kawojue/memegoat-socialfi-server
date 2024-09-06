@@ -1150,7 +1150,25 @@ export class AppService {
       const sheetData = await this.gSheetService.findAll(
         sheetId,
         'Sheet1',
-        'A:D',
+        'A',
+      );
+      return this.response.sendSuccess(res, StatusCodes.OK, {
+        data: sheetData,
+      });
+    } catch (err) {
+      console.error(err);
+      return this.response.sendError(res, StatusCodes.BadRequest, err);
+    }
+  }
+
+  async updateSheet(res: Response) {
+    try {
+      const sheetId = '1XzIzi0gj-KVw3I_3OAN63caduZhURn58l1vutPqEoWg';
+      const sheetData = await this.gSheetService.update(
+        sheetId,
+        'Sheet1',
+        'B2',
+        [1000],
       );
       return this.response.sendSuccess(res, StatusCodes.OK, {
         data: sheetData,
