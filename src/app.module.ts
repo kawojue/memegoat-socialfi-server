@@ -18,6 +18,7 @@ import { SessionSerializer } from './jwt/session.serialize';
 import { CloudflareModule } from './cloudflare/cloudflare.module';
 import { ContractService } from 'lib/contract.service';
 import { GoogleSheetsService } from 'lib/gsheet.service';
+import { FeeVolumeService } from 'lib/feeVol.service';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { GoogleSheetsService } from 'lib/gsheet.service';
     SessionSerializer,
     ContractService,
     GoogleSheetsService,
+    FeeVolumeService,
   ],
   exports: [AppService],
 })
