@@ -1150,7 +1150,7 @@ export class AppService {
       const sheetData = await this.gSheetService.findAll(
         sheetId,
         'Sheet1',
-        'A',
+        'A:A',
       );
       return this.response.sendSuccess(res, StatusCodes.OK, {
         data: sheetData,
