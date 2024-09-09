@@ -1,5 +1,5 @@
+import { Request } from 'express'
 import { JwtService } from '@nestjs/jwt'
-import { Request, Response } from 'express'
 import { Injectable } from '@nestjs/common'
 import { encryptKey } from 'helpers/smartKey'
 import { PrismaService } from 'prisma/prisma.service'

@@ -3,12 +3,12 @@ generator client {
 }
 
 datasource db {
-    provider = "mongodb"
+    provider = "postgres"
     url      = env("DATABASE_URI")
 }
 
 model User {
-    id          String   @id @default(auto()) @map("_id") @db.ObjectId
+    id          String   @id @default(uuid()) @db.Uuid
     profileId   String   @unique
     username    String   @unique
     displayName String
@@ -20,11 +20,15 @@ model User {
     refPoint    Float    @default(0)
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
+
+    @@index([username])
+    @@index([displayName])
+    @@index([createdAt, updatedAt])
 }
 
 model Tweet {
-    id         String    @id @default(auto()) @map("_id") @db.ObjectId
-    postId     String    @unique
+    id         String    @id @default(uuid()) @db.Uuid
+    postId     String
     postedAt   DateTime?
     like       Int       @default(0)
     reply      Int       @default(0)
@@ -34,21 +38,29 @@ model Tweet {
     referenced Boolean   @default(false)
     createdAt  DateTime  @default(now())
     updatedAt  DateTime  @updatedAt
-    user       User      @relation(references: [id], fields: [userId])
-    userId     String    @unique @db.ObjectId
+
+    user   User   @relation(references: [id], fields: [userId], onDelete: Cascade)
+    userId String @db.Uuid
+
+    @@unique([postId, userId])
+    @@index([createdAt, updatedAt])
+    @@index([like, reply, quote, retweet, impression])
 }
 
 model Reward {
-    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    id        String   @id @default(uuid()) @db.Uuid
     earn      Float    @default(0.00)
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
-    user      User     @relation(references: [id], fields: [userId])
-    userId    String   @unique @db.ObjectId
+
+    user   User   @relation(references: [id], fields: [userId], onDelete: Cascade)
+    userId String @db.Uuid
+
+    @@index([createdAt, updatedAt])
 }
 
 model Settings {
-    id                   String    @id @default(auto()) @map("_id") @db.ObjectId
+    id                   String    @id @default(uuid()) @db.Uuid
     profileId            String    @default("1765374788577398784")
     hasTurnedOffCampaign Boolean   @default(false)
     campaignedAt         DateTime?
@@ -58,20 +70,20 @@ model Settings {
 }
 
 model Admin {
-    id       String @id @default(auto()) @map("_id") @db.ObjectId
+    id       String @id @default(uuid()) @db.Uuid
     email    String @unique
     password String
 }
 
 model Task {
-    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    id        String   @id @default(uuid()) @db.Uuid
     content   String
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
 
 model CampaignRequest {
-    id                   String   @id @default(auto()) @map("_id") @db.ObjectId
+    id                   String   @id @default(uuid()) @db.Uuid
     step                 String?
     tx_id                String?
     tx_status            String?
@@ -104,7 +116,7 @@ model CampaignRequest {
 }
 
 model MintedToken {
-    id            String   @id @default(auto()) @map("_id") @db.ObjectId
+    id            String   @id @default(uuid()) @db.Uuid
     token_image   String?
     token_name    String?
     token_desc    String?
@@ -116,13 +128,13 @@ model MintedToken {
 }
 
 model WaitList {
-    id    String @id @default(auto()) @map("_id") @db.ObjectId
+    id    String @id @default(uuid()) @db.Uuid
     email String @unique
     // createdAt DateTime @default(now())
 }
 
 model AlexTokens {
-    id                      String  @id @map("_id") @db.ObjectId
+    id                      String  @id @default(uuid()) @db.Uuid
     tokenId                 String  @unique
     name                    String
     icon                    String
@@ -134,72 +146,272 @@ model AlexTokens {
 }
 
 model AllTokens {
-    id       String @id @default(auto()) @map("_id") @db.ObjectId
-    symbol   String @unique
+    id       String @id @default(uuid()) @db.Uuid
+    symbol   String
     name     String
     address  String @unique
     icon     String
     decimals Int
+
+    @@index([symbol])
 }
 
 model VelarTokens {
-    id     String @id @default(auto()) @map("_id") @db.ObjectId
+    id     String @id @default(uuid()) @db.Uuid
     symbol String @unique
 }
 
 model MemegoatVolume {
-    id        String   @id @default(auto()) @map("_id") @db.ObjectId
-    token     String   @unique
-    amount    BigInt
+    id     String  @id @default(uuid()) @db.Uuid
+    token  String  @unique
+    amount Decimal @db.Decimal(63, 2)
+
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
 
 model CommunityPoolVolume {
-    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    id        String   @id @default(uuid()) @db.Uuid
     token     String   @unique
-    amount    BigInt
+    amount    Decimal  @db.Decimal(63, 2)
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
 
 model LockerVolume {
-    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    id        String   @id @default(uuid()) @db.Uuid
     token     String   @unique
-    amount    BigInt
+    amount    Decimal  @db.Decimal(63, 2)
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
 
 model DexVolume {
-    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    id        String   @id @default(uuid()) @db.Uuid
     token     String   @unique
-    amount    BigInt
+    amount    Decimal  @db.Decimal(63, 2)
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
 
 model LaunchpadVolume {
-    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    id        String   @id @default(uuid()) @db.Uuid
     token     String   @unique
-    amount    BigInt
+    amount    Decimal  @db.Decimal(63, 2)
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
 
 model GamesVolume {
-    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    id        String   @id @default(uuid()) @db.Uuid
     token     String   @unique
-    amount    BigInt
+    amount    Decimal  @db.Decimal(63, 2)
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
 
 model ContractOffsets {
-    id                String   @id @default(auto()) @map("_id") @db.ObjectId
+    id                String   @id @default(uuid()) @db.Uuid
     contract          String   @unique
     nextOffset        Int
     totalTransactions Int
     createdAt         DateTime @default(now())
     updatedAt         DateTime @updatedAt
 }
+
+// model User {
+//     id          String   @id @default(auto()) @map("_id") @db.ObjectId
+//     profileId   String   @unique
+//     username    String   @unique
+//     displayName String
+//     avatar      String?
+//     smartKey    String   @unique
+//     tweets      Tweet[]
+//     rewards     Reward[]
+//     useRef      Boolean  @default(false)
+//     refPoint    Float    @default(0)
+//     createdAt   DateTime @default(now())
+//     updatedAt   DateTime @updatedAt
+// }
+
+// model Tweet {
+//     id         String    @id @default(auto()) @map("_id") @db.ObjectId
+//     postId     String    @unique
+//     postedAt   DateTime?
+//     like       Int       @default(0)
+//     reply      Int       @default(0)
+//     quote      Int       @default(0)
+//     retweet    Int       @default(0)
+//     impression Int       @default(0)
+//     referenced Boolean   @default(false)
+//     createdAt  DateTime  @default(now())
+//     updatedAt  DateTime  @updatedAt
+//     user       User      @relation(references: [id], fields: [userId])
+//     userId     String    @unique @db.ObjectId
+// }
+
+// model Reward {
+//     id        String   @id @default(auto()) @map("_id") @db.ObjectId
+//     earn      Float    @default(0.00)
+//     createdAt DateTime @default(now())
+//     updatedAt DateTime @updatedAt
+//     user      User     @relation(references: [id], fields: [userId])
+//     userId    String   @unique @db.ObjectId
+// }
+
+// model Settings {
+//     id                   String    @id @default(auto()) @map("_id") @db.ObjectId
+//     profileId            String    @default("1765374788577398784")
+//     hasTurnedOffCampaign Boolean   @default(false)
+//     campaignedAt         DateTime?
+//     days                 Int       @default(7)
+//     tags                 String[]
+//     point                Float
+// }
+
+// model Admin {
+//     id       String @id @default(auto()) @map("_id") @db.ObjectId
+//     email    String @unique
+//     password String
+// }
+
+// model Task {
+//     id        String   @id @default(auto()) @map("_id") @db.ObjectId
+//     content   String
+//     createdAt DateTime @default(now())
+//     updatedAt DateTime @updatedAt
+// }
+
+// model CampaignRequest {
+//     id                   String   @id @default(auto()) @map("_id") @db.ObjectId
+//     step                 String?
+//     tx_id                String?
+//     tx_status            String?
+//     action               String?
+//     user_addr            String?
+//     token_image          String?
+//     token_name           String?
+//     token_desc           String?
+//     token_supply         String?
+//     token_ticker         String?
+//     token_address        String   @unique
+//     token_website        String?
+//     twitter              String?
+//     discord              String?
+//     campaign_allocation  String?
+//     campaign_description String?
+//     campaign_twitter     String?
+//     campaign_hashtags    String?
+//     listing_allocation   String?
+//     sale_allocation      String?
+//     sale_description     String?
+//     hard_cap             String?
+//     soft_cap             String?
+//     maximum_buy          String?
+//     minimum_buy          String?
+//     is_campaign          Boolean
+//     start_date           DateTime
+//     end_date             DateTime
+//     createdAt            DateTime @default(now())
+// }
+
+// model MintedToken {
+//     id            String   @id @default(auto()) @map("_id") @db.ObjectId
+//     token_image   String?
+//     token_name    String?
+//     token_desc    String?
+//     token_supply  String?
+//     token_ticker  String?
+//     token_address String   @unique
+//     user_addr     String?
+//     createdAt     DateTime @default(now())
+// }
+
+// model WaitList {
+//     id    String @id @default(auto()) @map("_id") @db.ObjectId
+//     email String @unique
+//     // createdAt DateTime @default(now())
+// }
+
+// model AlexTokens {
+//     id                      String  @id @map("_id") @db.ObjectId
+//     tokenId                 String  @unique
+//     name                    String
+//     icon                    String
+//     wrapTokenDecimals       Int
+//     wrapToken               String
+//     underlyingToken         String
+//     underlyingTokenDecimals Int
+//     isRebaseToken           Boolean
+// }
+
+// model AllTokens {
+//     id       String @id @default(auto()) @map("_id") @db.ObjectId
+//     symbol   String @unique
+//     name     String
+//     address  String @unique
+//     icon     String
+//     decimals Int
+// }
+
+// model VelarTokens {
+//     id     String @id @default(auto()) @map("_id") @db.ObjectId
+//     symbol String @unique
+// }
+
+// model MemegoatVolume {
+//     id        String   @id @default(auto()) @map("_id") @db.ObjectId
+//     token     String   @unique
+//     amount    BigInt
+//     createdAt DateTime @default(now())
+//     updatedAt DateTime @updatedAt
+// }
+
+// model CommunityPoolVolume {
+//     id        String   @id @default(auto()) @map("_id") @db.ObjectId
+//     token     String   @unique
+//     amount    BigInt
+//     createdAt DateTime @default(now())
+//     updatedAt DateTime @updatedAt
+// }
+
+// model LockerVolume {
+//     id        String   @id @default(auto()) @map("_id") @db.ObjectId
+//     token     String   @unique
+//     amount    BigInt
+//     createdAt DateTime @default(now())
+//     updatedAt DateTime @updatedAt
+// }
+
+// model DexVolume {
+//     id        String   @id @default(auto()) @map("_id") @db.ObjectId
+//     token     String   @unique
+//     amount    BigInt
+//     createdAt DateTime @default(now())
+//     updatedAt DateTime @updatedAt
+// }
+
+// model LaunchpadVolume {
+//     id        String   @id @default(auto()) @map("_id") @db.ObjectId
+//     token     String   @unique
+//     amount    BigInt
+//     createdAt DateTime @default(now())
+//     updatedAt DateTime @updatedAt
+// }
+
+// model GamesVolume {
+//     id        String   @id @default(auto()) @map("_id") @db.ObjectId
+//     token     String   @unique
+//     amount    BigInt
+//     createdAt DateTime @default(now())
+//     updatedAt DateTime @updatedAt
+// }
+
+// model ContractOffsets {
+//     id                String   @id @default(auto()) @map("_id") @db.ObjectId
+//     contract          String   @unique
+//     nextOffset        Int
+//     totalTransactions Int
+//     createdAt         DateTime @default(now())
+//     updatedAt         DateTime @updatedAt
+// }

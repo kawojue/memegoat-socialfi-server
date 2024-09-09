@@ -14,9 +14,8 @@ import { PrismaService } from 'prisma/prisma.service';
 import { ResponseService } from 'lib/response.service';
 import { CampaignRequestDTO } from './dto/compaign-req.dto';
 import { CloudflareService } from './cloudflare/cloudflare.service';
-import { TxnVolumeService, txVolumeOutput } from 'lib/txVolume.service';
 import { contractDTO, ContractService } from 'lib/contract.service';
-import BigNumber from 'bignumber.js';
+import { TxnVolumeService, txVolumeOutput } from 'lib/txVolume.service';
 
 @Injectable()
 export class AppService {
@@ -28,7 +27,7 @@ export class AppService {
     private readonly cloudflare: CloudflareService,
     private readonly txnVolumeService: TxnVolumeService,
     private readonly contractService: ContractService,
-  ) {}
+  ) { }
 
   getHello(): string {
     return 'Memegoat!';
@@ -681,12 +680,12 @@ export class AppService {
       ) {
         return {
           ...data,
-          amount: new BigNumber(data.amount + stakedGoat).toFixed(),
+          amount: data.amount + stakedGoat,
         };
       } else {
         return {
           ...data,
-          amount: new BigNumber(data.amount as any).toFixed(),
+          amount: data.amount,
         };
       }
     });
