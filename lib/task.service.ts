@@ -94,7 +94,7 @@ export class TaskService {
 
                 const existingTweet = existingTweetMap.get(id);
                 if (existingTweet) {
-                  await this.prisma.tweet.update({
+                  await this.prisma.tweet.updateMany({
                     where: { postId: id },
                     data: tweetData,
                   });
@@ -190,7 +190,7 @@ export class TaskService {
               settings.profileId,
             );
             if (referenced) {
-              await this.prisma.tweet.update({
+              await this.prisma.tweet.updateMany({
                 where: { postId: tweet.id },
                 data: { referenced },
               });
