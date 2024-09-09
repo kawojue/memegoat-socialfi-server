@@ -25,6 +25,7 @@ import { ResponseService } from 'lib/response.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CookieAuthGuard } from './jwt/cookie-auth.guard';
 import { CampaignRequestDTO } from './dto/compaign-req.dto';
+import { LockerDTO } from './dto/locker.dto';
 
 @Controller()
 @ApiTags('App')
@@ -106,12 +107,20 @@ export class AppController {
     await this.appService.fetchMintedTokens(res);
   }
 
-  @Get('/minted-tokens/:token_addr')
+  @Get('/minted-tokens/token/:token_addr')
   async fetchMintedToken(
     @Res() res: Response,
     @Param('token_addr') token_addr: string,
   ) {
     await this.appService.fetchMintedToken(res, token_addr);
+  }
+
+  @Get('/minted-tokens/user/:user_addr')
+  async fetchMintedUserToken(
+    @Res() res: Response,
+    @Param('user_addr') user_addr: string,
+  ) {
+    await this.appService.fetchUserMintedTokens(res, user_addr);
   }
 
   @Post('waitlist')
@@ -121,27 +130,61 @@ export class AppController {
 
   @Get('/memegoatVolume')
   async getMemegoatVol(@Res() res: Response) {
-    await this.appService.getMemegoatVolume(res);
+    await this.appService.getMemegoatVolumeRes(res);
   }
+
+  @Get('/tvl')
+  async getTVL(@Res() res: Response) {
+    await this.appService.getTVLRes(res);
+  }
+  @Get('/memegoatVolumeUSD')
+  async getMemegoatVolUSD(@Res() res: Response) {
+    await this.appService.getMemegoatVolUSDValue(res);
+  }
+
+  @Get('/tvlUSD')
+  async getTVLUSD(@Res() res: Response) {
+    await this.appService.getTVLUSDValue(res);
+  }
+
+  // @Post('/memegoatVolumeUSD')
+  // async updateMemegoatVolUSD(@Res() res: Response, @Body() body: token[]) {
+  //   await this.appService.updateMemegoatVolUSDValue(body);
+  //   this.response.sendSuccess(res, StatusCodes.OK, { data: 'ok' });
+  // }
+
+  // @Post('/tvlUSD')
+  // async updateTVLUSD(@Res() res: Response) {
+  //   await this.appService.updateTVLUsdValue(res);
+  // }
 
   @Post('/updatePoolsVolume')
   async updateCommunityPoolsVol(@Res() res: Response) {
-    await this.appService.updateCommunityPoolsVolume(res);
+    const record = await this.appService.updateCommunityPoolsVolume();
+    this.response.sendSuccess(res, StatusCodes.OK, { data: record });
   }
 
   @Post('/updateLockerVolume')
   async updateLockerVol(@Res() res: Response) {
-    await this.appService.updateTokenLockerVolume(res);
+    const record = await this.appService.updateTokenLockerVolume();
+    this.response.sendSuccess(res, StatusCodes.OK, { data: record });
   }
 
   @Post('/updateDexVolume')
   async updateTxnVolume(@Res() res: Response) {
-    await this.appService.updateDexVolume(res);
+    const record = await this.appService.updateDexVolume();
+    this.response.sendSuccess(res, StatusCodes.OK, { data: record });
   }
 
   @Post('/updateLaunchpadVolume')
   async updateLaunchpadVol(@Res() res: Response) {
-    await this.appService.updateLaunchpadVolume(res);
+    const record = await this.appService.updateLaunchpadVolume();
+    this.response.sendSuccess(res, StatusCodes.OK, { data: record });
+  }
+
+  @Post('/updateOTCVolume')
+  async updateOTCVolume(@Res() res: Response) {
+    await this.appService.updateOTCVolume(res);
   }
 
   @Get('/allTokens')
@@ -169,14 +212,39 @@ export class AppController {
     await this.appService.getSTXChart(res);
   }
 
+  @Post('/lockerToken')
+  async recordTOken(@Res() res: Response, @Body() body: LockerDTO) {
+    await this.appService.recordToken(res, body);
+  }
+
+  @Get('/lockerToken')
+  async getLockerTokens(@Res() res: Response) {
+    await this.appService.getLockerToken(res);
+  }
+
   @Get('/chart')
   async fetchChartOld(@Res() res: Response, @Query() body: ChartDTO) {
     await this.appService.getChartDataOld(res, body);
   }
 
+  @Get('/chartV2')
+  async fetchChartV2(@Res() res: Response, @Query() body: ChartDTO) {
+    await this.appService.getChartDataV2(res, body);
+  }
+
   @Get('/balance')
   async fetchBalance(@Res() res: Response, @Query() body: BalanceDTO) {
     await this.appService.getBalances(res, body);
+  }
+
+  @Get('/testSheetsAPI')
+  async getSheet(@Res() res: Response) {
+    await this.appService.getSheet(res);
+  }
+
+  @Post('/testSheetsAPI')
+  async updateSheet(@Res() res: Response) {
+    await this.appService.updateSheet(res);
   }
 
   @Post('send-email')

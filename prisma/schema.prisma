@@ -170,6 +170,14 @@ model MemegoatVolume {
     updatedAt DateTime @updatedAt
 }
 
+model TVL {
+    id        String   @id @default(uuid()) @db.Uuid
+    token     String   @unique
+    amount    BigInt
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
 model CommunityPoolVolume {
     id        String   @id @default(uuid()) @db.Uuid
     token     String   @unique
@@ -217,6 +225,54 @@ model ContractOffsets {
     totalTransactions Int
     createdAt         DateTime @default(now())
     updatedAt         DateTime @updatedAt
+}
+
+model USDRecords {
+    id        String   @id @default(uuid()) @db.Uuid
+    record    String   @unique
+    amount    Decimal  @db.Decimal(63, 2)
+    updatedAt DateTime @updatedAt
+}
+
+model LockerData {
+    id           String  @id @default(uuid()) @db.Uuid
+    tokenAddress String  @unique
+    tokenName    String?
+    tokenImg     String?
+    tokenSymbol  String?
+    count        Int
+}
+
+model DexFees {
+    id        String   @id @default(uuid()) @db.Uuid
+    token     String   @unique
+    amount    Decimal  @db.Decimal(63, 2)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model LockerFees {
+    id        String   @id @default(uuid()) @db.Uuid
+    token     String   @unique
+    amount    Decimal  @db.Decimal(63, 2)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model LaunchpadFees {
+    id        String   @id @default(uuid()) @db.Uuid
+    token     String   @unique
+    amount    Decimal  @db.Decimal(63, 2)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model PoolFees {
+    id        String   @id @default(uuid()) @db.Uuid
+    token     String   @unique
+    amount    Decimal  @db.Decimal(63, 2)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
 
 // model User {

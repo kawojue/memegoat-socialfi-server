@@ -35,6 +35,35 @@ export class ContractService {
       return null;
     }
   }
+
+  async readContractV2(dto: contractDTOV2) {
+    const args: Uint8Array[] = [];
+    if (dto.arguments) {
+      const argsC = dto.arguments.map((data) => Cl.serialize(filterArg(data)));
+      args.push(...argsC);
+    }
+    const response = await firstValueFrom(
+      this.httpService.post(
+        `https://api.hiro.so/v2/contracts/call-read/${dto.address}/${dto.contract}/${dto.function}`,
+        {
+          sender: 'SP2F4QC563WN0A0949WPH5W1YXVC4M1R46QKE0G14',
+          arguments: args,
+        },
+        {
+          headers: {
+            'Accept-Encoding': 'gzip, deflate, br, zstd',
+            'Content-Type': 'application/json',
+          },
+        },
+      ),
+    );
+    const data = response.data as apiResponse;
+    if (data.result) {
+      return cvToValue(Cl.deserialize(data.result)).value;
+    } else {
+      return null;
+    }
+  }
 }
 
 function filterArg(args: contractArgs) {
@@ -71,6 +100,23 @@ function splitCA(pair: string) {
 }
 
 export class contractDTO {
+  @IsNotEmpty()
+  @IsString()
+  contract: string;
+
+  @IsNotEmpty()
+  @IsString()
+  function: string;
+
+  @IsArray()
+  arguments?: contractArgs[];
+}
+
+export class contractDTOV2 {
+  @IsNotEmpty()
+  @IsString()
+  address: string;
+
   @IsNotEmpty()
   @IsString()
   contract: string;

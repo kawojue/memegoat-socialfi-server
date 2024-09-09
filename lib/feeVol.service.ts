@@ -7,7 +7,7 @@ import BigNumber from 'bignumber.js';
 import { contractDTOV2, ContractService } from './contract.service';
 
 @Injectable()
-export class TxnVolumeService {
+export class FeeVolumeService {
   constructor(
     private readonly httpService: HttpService,
     private readonly apiService: ApiService,
@@ -68,7 +68,7 @@ export class TxnVolumeService {
       .toFixed();
   }
 
-  async recordTxnData(dto: recordDTOV3) {
+  async recordTxnData(dto: recordDTOV3, contract: string) {
     try {
       const tokenMap = new Map<string, number>();
       const diff = dto.totalTx - dto.offset;
@@ -98,7 +98,10 @@ export class TxnVolumeService {
         if (result.tx.tx_status !== 'success') continue;
         if (result.tx.tx_type === 'smart_contract') continue;
         if (result.tx.tx_type === 'token_transfer') continue;
-        if (excludedContracts.includes(result.tx.contract_call.contract_id))
+        if (
+          contract.toLowerCase() !==
+          result.tx.contract_call.contract_id.toLowerCase()
+        )
           continue;
         if (!allowedFunctions.includes(result.tx.contract_call.function_name))
           continue;
@@ -150,12 +153,6 @@ export class recordDTO {
   @IsOptional()
   @IsNumber()
   offset: number;
-}
-
-export class recordDTOV2 {
-  @IsNotEmpty()
-  @IsString()
-  contractName: string;
 }
 
 export class recordDTOV3 {
@@ -290,13 +287,6 @@ export type token = {
   token: string;
   amount: any;
 };
-
-const excludedContracts = [
-  'SP2F4QC563WN0A0949WPH5W1YXVC4M1R46QKE0G14.memegoat-staking-v1',
-  'SP2F4QC563WN0A0949WPH5W1YXVC4M1R46QKE0G14.memegoat-launchpad-v1',
-  'SP2F4QC563WN0A0949WPH5W1YXVC4M1R46QKE0G14.memegoat-launchpad-ext-v1',
-  'SP2F4QC563WN0A0949WPH5W1YXVC4M1R46QKE0G14.memegoat-distributor-v2',
-];
 
 const allowedFunctions = [
   'lock-token',
