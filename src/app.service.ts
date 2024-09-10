@@ -21,7 +21,7 @@ import { LockerDTO } from './dto/locker.dto';
 import { FeeVolumeService } from 'lib/feeVol.service';
 import { GoogleSheetsService } from 'lib/gsheet.service';
 import { PoolService, recordDTOV3 } from 'lib/pool.service';
-import BigNumber from 'bignumber.js'
+import BigNumber from 'bignumber.js';
 
 @Injectable()
 export class AppService {
@@ -34,13 +34,9 @@ export class AppService {
     private readonly contractService: ContractService,
     private readonly feeService: FeeVolumeService,
     private readonly gSheetService: GoogleSheetsService,
-<<<<<<< HEAD
     private readonly poolService: PoolService,
-  ) {}
-=======
     private readonly txnVolumeService: TxnVolumeService,
-  ) { }
->>>>>>> 847df9c69054236575d46d3843b4e09694703542
+  ) {}
 
   getHello(): string {
     return 'Memegoat!';
@@ -749,7 +745,7 @@ export class AppService {
     const volData = await this.prisma.memegoatVolume.findMany();
     const data = volData.map((data) => {
       if (data.token === 'STX') {
-        const presale: number = 50000000000
+        const presale: number = 50000000000;
         return {
           ...data,
           amount: Number(data.amount) + Number(presale),
