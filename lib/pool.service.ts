@@ -90,11 +90,9 @@ export class PoolService {
         if (result.tx.tx_status !== 'success') continue;
         if (result.tx.tx_type === 'smart_contract') continue;
         if (result.tx.tx_type === 'token_transfer') continue;
-        if (excludedContracts.includes(result.tx.contract_call.contract_id))
-          continue;
         if (!allowedFunctions.includes(result.tx.contract_call.function_name))
           continue;
-
+        console.log(result.tx.contract_call.function_args[0].repr);
         const key = result.tx.contract_call.function_args[0].repr;
 
         const array = userMap.get(key.toString()) || [];
@@ -102,6 +100,8 @@ export class PoolService {
           ...array,
           result.tx.post_conditions[0].principal.address.toString(),
         ]);
+
+        console.log(array);
       }
       return {
         data: mapToObject(userMap),
@@ -275,12 +275,5 @@ export type token = {
   id: string;
   users: any;
 };
-
-const excludedContracts = [
-  'SP2F4QC563WN0A0949WPH5W1YXVC4M1R46QKE0G14.memegoat-staking-v1',
-  'SP2F4QC563WN0A0949WPH5W1YXVC4M1R46QKE0G14.memegoat-launchpad-v1',
-  'SP2F4QC563WN0A0949WPH5W1YXVC4M1R46QKE0G14.memegoat-launchpad-ext-v1',
-  'SP2F4QC563WN0A0949WPH5W1YXVC4M1R46QKE0G14.memegoat-distributor-v2',
-];
 
 const allowedFunctions = ['stake'];
