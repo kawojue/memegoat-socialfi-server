@@ -73,20 +73,9 @@ export class PoolService {
     try {
       const userMap = new Map<string, Array<string>>();
       const txRecord = await this.getTxns({ ...dto });
-      const expected = txRecord.total - dto.offset;
       let count = 0;
       for (const result of txRecord.results) {
-        if (count >= expected) {
-          continue;
-        }
         count++;
-        if (dto.offset === txRecord.total) {
-          return {
-            data: [],
-            nextOffset: dto.offset,
-            totalTxns: txRecord.total,
-          };
-        }
         if (result.tx.tx_status !== 'success') continue;
         if (result.tx.tx_type === 'smart_contract') continue;
         if (result.tx.tx_type === 'token_transfer') continue;
@@ -100,7 +89,6 @@ export class PoolService {
           ...array,
           result.tx.post_conditions[0].principal.address.toString(),
         ]);
-
         console.log(array);
       }
       return {
