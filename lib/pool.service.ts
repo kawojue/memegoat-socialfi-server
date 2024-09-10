@@ -14,7 +14,8 @@ export class PoolService {
     private readonly contractService: ContractService,
   ) {}
   async getTxns(dto: recordDTO) {
-    const limit = dto.offset == 0 ? 50 : dto.offset >= 50 ? 50 : dto.offset;
+    // const limit = dto.offset == 0 ? 50 : dto.offset >= 50 ? 50 : dto.offset;
+    const limit = 50;
     const offset = dto.offset >= 50 ? dto.offset : 0;
     let url = `https://api.hiro.so/extended/v2/addresses/SP2F4QC563WN0A0949WPH5W1YXVC4M1R46QKE0G14.${dto.contractName}/transactions?limit=${limit}`;
     if (offset > 0) {
@@ -71,16 +72,7 @@ export class PoolService {
   async recordTxnData(dto: recordDTOV3) {
     try {
       const userMap = new Map<string, Array<string>>();
-      const diff = dto.totalTx - dto.offset;
-      if (diff < 0) {
-        return {
-          data: [],
-          nextOffset: dto.offset,
-          totalTxns: dto.offset,
-        };
-      }
-      const offset = diff > 50 ? diff - 50 : diff;
-      const txRecord = await this.getTxns({ ...dto, offset });
+      const txRecord = await this.getTxns({ ...dto });
       const expected = txRecord.total - dto.offset;
       let count = 0;
       for (const result of txRecord.results) {
