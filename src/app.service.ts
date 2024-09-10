@@ -1161,7 +1161,7 @@ export class AppService {
 
   async getPoolsData(res: Response, data: recordDTOV3) {
     try {
-      const response = this.poolService.recordTxnData(data);
+      const response = await this.poolService.recordTxnData(data);
       return this.response.sendSuccess(res, StatusCodes.OK, {
         data: response,
       });
