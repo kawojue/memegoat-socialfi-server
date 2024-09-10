@@ -16,12 +16,12 @@ import { CampaignRequestDTO } from './dto/compaign-req.dto';
 import { CloudflareService } from './cloudflare/cloudflare.service';
 import { token, TxnVolumeService, txVolumeOutput } from 'lib/txVolume.service';
 import { contractDTO, ContractService } from 'lib/contract.service';
-import BigNumber from 'bignumber.js';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { LockerDTO } from './dto/locker.dto';
 import { FeeVolumeService } from 'lib/feeVol.service';
 import { GoogleSheetsService } from 'lib/gsheet.service';
 import { PoolService, recordDTOV3 } from 'lib/pool.service';
+import BigNumber from 'bignumber.js'
 
 @Injectable()
 export class AppService {
@@ -31,12 +31,16 @@ export class AppService {
     private readonly apiService: ApiService,
     private readonly response: ResponseService,
     private readonly cloudflare: CloudflareService,
-    private readonly txnVolumeService: TxnVolumeService,
     private readonly contractService: ContractService,
     private readonly feeService: FeeVolumeService,
     private readonly gSheetService: GoogleSheetsService,
+<<<<<<< HEAD
     private readonly poolService: PoolService,
   ) {}
+=======
+    private readonly txnVolumeService: TxnVolumeService,
+  ) { }
+>>>>>>> 847df9c69054236575d46d3843b4e09694703542
 
   getHello(): string {
     return 'Memegoat!';
@@ -745,17 +749,15 @@ export class AppService {
     const volData = await this.prisma.memegoatVolume.findMany();
     const data = volData.map((data) => {
       if (data.token === 'STX') {
-        const presale = 50000000000;
+        const presale: number = 50000000000
         return {
           ...data,
-          amount: new BigNumber(
-            new BigNumber(data.amount.toString()).plus(new BigNumber(presale)),
-          ).toFixed(),
+          amount: Number(data.amount) + Number(presale),
         };
       } else {
         return {
           ...data,
-          amount: new BigNumber(data.amount as any).toFixed(),
+          amount: data.amount,
         };
       }
     });
@@ -768,9 +770,7 @@ export class AppService {
     });
 
     this.response.sendSuccess(res, StatusCodes.OK, {
-      data: new BigNumber(memegoatVolUsdValue.amount.toString())
-        .dividedBy(new BigNumber(10).pow(6))
-        .toFixed(),
+      data: memegoatVolUsdValue.amount.toNumber() / Math.pow(10, 6),
     });
   }
 
@@ -804,12 +804,12 @@ export class AppService {
         where: { record: 'VOLUME' },
         update: {
           amount: {
-            increment: BigInt(memegoatVolUsdValue) as any,
+            increment: memegoatVolUsdValue,
           },
         },
         create: {
           record: 'VOLUME',
-          amount: BigInt(memegoatVolUsdValue) as any,
+          amount: memegoatVolUsdValue,
         },
       });
     } catch (err) {
