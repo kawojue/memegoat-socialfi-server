@@ -26,6 +26,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CookieAuthGuard } from './jwt/cookie-auth.guard';
 import { CampaignRequestDTO } from './dto/compaign-req.dto';
 import { LockerDTO } from './dto/locker.dto';
+import { recordDTOV3 } from 'lib/pool.service';
 
 @Controller()
 @ApiTags('App')
@@ -126,6 +127,11 @@ export class AppController {
   @Post('waitlist')
   async waitlist(@Res() res: Response, @Body() body: WaitListDTO) {
     await this.appService.waitlist(res, body);
+  }
+
+  @Post('poolsData')
+  async getPools(@Res() res: Response, @Body() body: recordDTOV3) {
+    await this.appService.getPoolsData(res, body);
   }
 
   @Get('/memegoatVolume')

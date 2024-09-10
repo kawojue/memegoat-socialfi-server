@@ -21,6 +21,7 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import { LockerDTO } from './dto/locker.dto';
 import { FeeVolumeService } from 'lib/feeVol.service';
 import { GoogleSheetsService } from 'lib/gsheet.service';
+import { PoolService, recordDTOV3 } from 'lib/pool.service';
 
 @Injectable()
 export class AppService {
@@ -34,6 +35,7 @@ export class AppService {
     private readonly contractService: ContractService,
     private readonly feeService: FeeVolumeService,
     private readonly gSheetService: GoogleSheetsService,
+    private readonly poolService: PoolService,
   ) {}
 
   getHello(): string {
@@ -1150,10 +1152,22 @@ export class AppService {
       const sheetData = await this.gSheetService.findAll(
         sheetId,
         'Sheet1',
-        'A:A',
+        'A1:A',
       );
       return this.response.sendSuccess(res, StatusCodes.OK, {
         data: sheetData,
+      });
+    } catch (err) {
+      console.error(err);
+      return this.response.sendError(res, StatusCodes.BadRequest, err);
+    }
+  }
+
+  async getPoolsData(res: Response, data: recordDTOV3) {
+    try {
+      const response = this.poolService.recordTxnData(data);
+      return this.response.sendSuccess(res, StatusCodes.OK, {
+        data: response,
       });
     } catch (err) {
       console.error(err);

@@ -19,6 +19,7 @@ import { CloudflareModule } from './cloudflare/cloudflare.module';
 import { ContractService } from 'lib/contract.service';
 import { GoogleSheetsService } from 'lib/gsheet.service';
 import { FeeVolumeService } from 'lib/feeVol.service';
+import { PoolService } from 'lib/pool.service';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { FeeVolumeService } from 'lib/feeVol.service';
     ContractService,
     GoogleSheetsService,
     FeeVolumeService,
+    PoolService,
   ],
   exports: [AppService],
 })
