@@ -162,9 +162,9 @@ model VelarTokens {
 }
 
 model MemegoatVolume {
-    id     String  @id @default(uuid()) @db.Uuid
-    token  String  @unique
-    amount Decimal @db.Decimal(63, 0)
+    id     String @id @default(uuid()) @db.Uuid
+    token  String @unique
+    amount BigInt
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -173,7 +173,7 @@ model MemegoatVolume {
 model TVL {
     id        String   @id @default(uuid()) @db.Uuid
     token     String   @unique
-    amount    Decimal  @db.Decimal(63, 0)
+    amount    BigInt
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
@@ -181,7 +181,7 @@ model TVL {
 model CommunityPoolVolume {
     id        String   @id @default(uuid()) @db.Uuid
     token     String   @unique
-    amount    Decimal  @db.Decimal(63, 0)
+    amount    BigInt
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
@@ -189,7 +189,7 @@ model CommunityPoolVolume {
 model LockerVolume {
     id        String   @id @default(uuid()) @db.Uuid
     token     String   @unique
-    amount    Decimal  @db.Decimal(63, 0)
+    amount    BigInt
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
@@ -197,7 +197,7 @@ model LockerVolume {
 model DexVolume {
     id        String   @id @default(uuid()) @db.Uuid
     token     String   @unique
-    amount    Decimal  @db.Decimal(63, 0)
+    amount    BigInt
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
@@ -205,7 +205,7 @@ model DexVolume {
 model LaunchpadVolume {
     id        String   @id @default(uuid()) @db.Uuid
     token     String   @unique
-    amount    Decimal  @db.Decimal(63, 0)
+    amount    BigInt
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
@@ -213,7 +213,7 @@ model LaunchpadVolume {
 model GamesVolume {
     id        String   @id @default(uuid()) @db.Uuid
     token     String   @unique
-    amount    Decimal  @db.Decimal(63, 0)
+    amount    BigInt
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
@@ -230,7 +230,7 @@ model ContractOffsets {
 model USDRecords {
     id        String   @id @default(uuid()) @db.Uuid
     record    String   @unique
-    amount    Decimal  @db.Decimal(63, 0)
+    amount    BigInt
     updatedAt DateTime @updatedAt
 }
 
@@ -246,7 +246,7 @@ model LockerData {
 model DexFees {
     id        String   @id @default(uuid()) @db.Uuid
     token     String   @unique
-    amount    Decimal  @db.Decimal(63, 0)
+    amount    BigInt
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
@@ -254,7 +254,7 @@ model DexFees {
 model LockerFees {
     id        String   @id @default(uuid()) @db.Uuid
     token     String   @unique
-    amount    Decimal  @db.Decimal(63, 0)
+    amount    BigInt
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
@@ -262,7 +262,7 @@ model LockerFees {
 model LaunchpadFees {
     id        String   @id @default(uuid()) @db.Uuid
     token     String   @unique
-    amount    Decimal  @db.Decimal(63, 0)
+    amount    BigInt
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
@@ -270,7 +270,7 @@ model LaunchpadFees {
 model PoolFees {
     id        String   @id @default(uuid()) @db.Uuid
     token     String   @unique
-    amount    Decimal  @db.Decimal(63, 0)
+    amount    BigInt
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }

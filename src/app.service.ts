@@ -36,7 +36,7 @@ export class AppService {
     private readonly gSheetService: GoogleSheetsService,
     private readonly poolService: PoolService,
     private readonly txnVolumeService: TxnVolumeService,
-  ) {}
+  ) { }
 
   getHello(): string {
     return 'Memegoat!';
@@ -766,7 +766,9 @@ export class AppService {
     });
 
     this.response.sendSuccess(res, StatusCodes.OK, {
-      data: memegoatVolUsdValue.amount.toNumber() / Math.pow(10, 6),
+      data: new BigNumber(
+        memegoatVolUsdValue.amount.toString()
+      ).dividedBy(new BigNumber(10).pow(6)).toFixed(0)
     });
   }
 
@@ -800,12 +802,12 @@ export class AppService {
         where: { record: 'VOLUME' },
         update: {
           amount: {
-            increment: memegoatVolUsdValue,
+            increment: BigInt(memegoatVolUsdValue),
           },
         },
         create: {
           record: 'VOLUME',
-          amount: memegoatVolUsdValue,
+          amount: BigInt(memegoatVolUsdValue),
         },
       });
     } catch (err) {
