@@ -36,7 +36,7 @@ export class AppService {
     private readonly gSheetService: GoogleSheetsService,
     private readonly poolService: PoolService,
     private readonly txnVolumeService: TxnVolumeService,
-  ) { }
+  ) {}
 
   getHello(): string {
     return 'Memegoat!';
@@ -766,9 +766,9 @@ export class AppService {
     });
 
     this.response.sendSuccess(res, StatusCodes.OK, {
-      data: new BigNumber(
-        memegoatVolUsdValue.amount.toString()
-      ).dividedBy(new BigNumber(10).pow(6)).toFixed(0)
+      data: new BigNumber(memegoatVolUsdValue.amount.toString())
+        .dividedBy(new BigNumber(10).pow(6))
+        .toFixed(0),
     });
   }
 
@@ -993,11 +993,12 @@ export class AppService {
         where: { contract: contractName },
       });
       const offset = contractOffsets ? contractOffsets.nextOffset : 0;
+      const totalTx = contractOffsets ? contractOffsets.totalTransactions : 0;
       const record = await this.feeService.recordTxnData(
         {
           contractName,
           offset,
-          totalTx: contractOffsets.totalTransactions,
+          totalTx,
         },
         dexName,
       );
@@ -1033,11 +1034,12 @@ export class AppService {
         where: { contract: contractName },
       });
       const offset = contractOffsets ? contractOffsets.nextOffset : 0;
+      const totalTx = contractOffsets ? contractOffsets.totalTransactions : 0;
       const record = await this.feeService.recordTxnData(
         {
           contractName,
           offset,
-          totalTx: contractOffsets.totalTransactions,
+          totalTx,
         },
         dexName,
       );
@@ -1073,11 +1075,12 @@ export class AppService {
         where: { contract: contractName },
       });
       const offset = contractOffsets ? contractOffsets.nextOffset : 0;
+      const totalTx = contractOffsets ? contractOffsets.totalTransactions : 0;
       const record = await this.feeService.recordTxnData(
         {
           contractName,
           offset,
-          totalTx: contractOffsets.totalTransactions,
+          totalTx,
         },
         dexName,
       );
@@ -1113,11 +1116,12 @@ export class AppService {
         where: { contract: contractName },
       });
       const offset = contractOffsets ? contractOffsets.nextOffset : 0;
+      const totalTx = contractOffsets ? contractOffsets.totalTransactions : 0;
       const record = await this.feeService.recordTxnData(
         {
           contractName,
           offset,
-          totalTx: contractOffsets.totalTransactions,
+          totalTx,
         },
         dexName,
       );

@@ -72,7 +72,7 @@ export class FeeVolumeService {
     try {
       const tokenMap = new Map<string, number>();
       const diff = dto.totalTx - dto.offset;
-      if (diff < 0) {
+      if (diff < 0 && dto.totalTx > 0) {
         return {
           data: [],
           nextOffset: dto.offset,
