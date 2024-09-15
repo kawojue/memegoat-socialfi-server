@@ -354,8 +354,39 @@ export class AppService {
 
   async addCampaignRequest(res: Response, dto: CampaignRequestDTO) {
     try {
-      const campaign = await this.prisma.campaignRequest.create({
-        data: {
+      const campaign = await this.prisma.campaignRequest.upsert({
+        where: { token_address: dto.token_address },
+        update: {
+          step: dto.step,
+          tx_id: dto.tx_id,
+          action: dto.action,
+          discord: dto.discord,
+          twitter: dto?.twitter,
+          soft_cap: dto.soft_cap,
+          hard_cap: dto.hard_cap,
+          tx_status: dto.tx_status,
+          user_addr: dto.user_addr,
+          token_desc: dto.token_desc,
+          token_name: dto.token_name,
+          token_image: dto.token_image,
+          is_campaign: dto.is_campaign,
+          minimum_buy: dto.minimum_buy,
+          maximum_buy: dto.maximum_buy,
+          token_ticker: dto.token_ticker,
+          token_supply: dto.token_supply,
+          token_address: dto.token_address,
+          token_website: dto.token_website,
+          end_date: new Date(dto.end_date),
+          start_date: new Date(dto.start_date),
+          sale_allocation: dto.sale_allocation,
+          sale_description: dto.sale_description,
+          campaign_twitter: dto.campaign_twitter,
+          campaign_hashtags: dto.campaign_hashtags,
+          listing_allocation: dto.listing_allocation,
+          campaign_allocation: dto.campaign_allocation,
+          campaign_description: dto.campaign_description,
+        },
+        create: {
           step: dto.step,
           tx_id: dto.tx_id,
           action: dto.action,
