@@ -602,10 +602,11 @@ export class AppService {
         where: { contract: contractName },
       });
       const offset = contractOffsets ? contractOffsets.nextOffset : 0;
+      const totalTx = contractOffsets ? contractOffsets.totalTransactions : 0;
       const record = await this.txnVolumeService.recordTxnData({
         contractName,
         offset,
-        totalTx: contractOffsets.totalTransactions,
+        totalTx,
       });
       await this.updateDBVol(contractName, record, true);
       await this.updateTVLUsdValue(record.data);
