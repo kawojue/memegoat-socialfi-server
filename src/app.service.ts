@@ -800,7 +800,7 @@ export class AppService {
     this.response.sendSuccess(res, StatusCodes.OK, {
       data: new BigNumber(memegoatVolUsdValue.amount.toString())
         .dividedBy(new BigNumber(10).pow(6))
-        .toFixed(0),
+        .toFixed(),
     });
   }
 
