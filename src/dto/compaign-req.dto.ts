@@ -65,6 +65,10 @@ export class CampaignRequestDTO {
   @IsString()
   token_address: string;
 
+  @ApiProperty({ example: '0xabc123...', description: 'Launchpad address' })
+  @IsString()
+  launchpad_contract: string;
+
   @ApiProperty({
     example: 'https://tokenwebsite.com',
     description: 'Token website URL',

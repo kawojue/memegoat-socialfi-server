@@ -95,6 +95,7 @@ model CampaignRequest {
     token_supply         String?
     token_ticker         String?
     token_address        String   @unique
+    launchpad_contract   String?
     token_website        String?
     twitter              String?
     discord              String?
