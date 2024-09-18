@@ -652,15 +652,16 @@ export class AppService {
   @Cron(CronExpression.EVERY_4_HOURS)
   async updateCommunityPoolsVolume() {
     try {
-      const contractName = 'memegoat-stakepool-vault-v1';
+      const contractName = 'memegoat-vault';
       const contractOffsets = await this.prisma.contractOffsets.findUnique({
         where: { contract: contractName },
       });
       const offset = contractOffsets ? contractOffsets.nextOffset : 0;
+      const totalTx = contractOffsets ? contractOffsets.totalTransactions : 82;
       const record = await this.txnVolumeService.recordTxnData({
         contractName,
         offset,
-        totalTx: contractOffsets.totalTransactions,
+        totalTx,
       });
       await this.updateDBVol(contractName, record, true);
       await this.updateTVLUsdValue(record.data);
