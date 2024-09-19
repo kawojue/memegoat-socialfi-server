@@ -986,7 +986,7 @@ export class AppService {
     creator: string,
     token: string,
   ) {
-    const data = await this.prisma.lockerContracts.findMany({
+    const data = await this.prisma.lockerContracts.findFirst({
       where: { creator: creator, tokenAddress: token },
       orderBy: { createdAt: 'desc' },
     });
