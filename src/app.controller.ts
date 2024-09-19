@@ -238,12 +238,13 @@ export class AppController {
     await this.appService.getLockerContracts(res);
   }
 
-  @Get('/lockerContracts:creator')
+  @Get('/lockerContracts/:creator/:token')
   async getLockerContractsByCreator(
     @Res() res: Response,
     @Param('creator') creator: string,
+    @Param('token') token: string,
   ) {
-    await this.appService.getLockerContractsByCreator(res, creator);
+    await this.appService.getLockerContractsByCreator(res, creator, token);
   }
 
   @Get('/chart')
