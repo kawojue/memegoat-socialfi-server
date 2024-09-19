@@ -19,3 +19,29 @@ export class LockerDTO {
   @IsString()
   tokenImg?: string;
 }
+
+export class LockerDTOV2 {
+  @IsString()
+  contractAddress: string;
+
+  @IsString()
+  creator: string;
+
+  @IsString()
+  tokenAddress: string;
+
+  @IsString()
+  txId: string;
+
+  @IsOptional()
+  @IsString()
+  tokenName?: string;
+
+  @IsOptional()
+  @IsString()
+  tokenSymbol?: string;
+
+  @IsOptional()
+  @IsString()
+  tokenImg?: string;
+}

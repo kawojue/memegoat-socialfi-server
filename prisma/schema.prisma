@@ -244,6 +244,18 @@ model LockerData {
     count        Int
 }
 
+model LockerContracts {
+    id              String   @id @default(uuid()) @db.Uuid
+    contractAddress String   @unique
+    tokenAddress    String
+    creator         String
+    txId            String
+    tokenName       String?
+    tokenImg        String?
+    tokenSymbol     String?
+    createdAt       DateTime @default(now())
+}
+
 model DexFees {
     id        String   @id @default(uuid()) @db.Uuid
     token     String   @unique

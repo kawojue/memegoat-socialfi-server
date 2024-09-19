@@ -17,7 +17,7 @@ import { CloudflareService } from './cloudflare/cloudflare.service';
 import { token, TxnVolumeService, txVolumeOutput } from 'lib/txVolume.service';
 import { contractDTO, ContractService } from 'lib/contract.service';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { LockerDTO } from './dto/locker.dto';
+import { LockerDTO, LockerDTOV2 } from './dto/locker.dto';
 import { FeeVolumeService } from 'lib/feeVol.service';
 import { GoogleSheetsService } from 'lib/gsheet.service';
 import { PoolService, recordDTOV3 } from 'lib/pool.service';
@@ -954,6 +954,38 @@ export class AppService {
 
   async getLockerToken(res: Response) {
     const data = await this.prisma.lockerData.findMany();
+    this.response.sendSuccess(res, StatusCodes.OK, {
+      data: data,
+    });
+  }
+
+  async recordLockerContracts(res: Response, dto: LockerDTOV2) {
+    const lock = await this.prisma.lockerContracts.findUnique({
+      where: { contractAddress: dto.contractAddress },
+    });
+
+    if (lock) {
+      return this.response.sendError(res, StatusCodes.OK, 'Already exists');
+    }
+
+    await this.prisma.lockerContracts.create({ data: dto });
+    this.response.sendSuccess(res, StatusCodes.OK, {
+      data: `${dto.tokenAddress} added`,
+    });
+  }
+
+  async getLockerContracts(res: Response) {
+    const data = await this.prisma.lockerContracts.findMany();
+    this.response.sendSuccess(res, StatusCodes.OK, {
+      data: data,
+    });
+  }
+
+  async getLockerContractsByCreator(res: Response, creator: string) {
+    const data = await this.prisma.lockerContracts.findMany({
+      where: { creator: creator },
+      orderBy: { createdAt: 'desc' },
+    });
     this.response.sendSuccess(res, StatusCodes.OK, {
       data: data,
     });
