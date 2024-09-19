@@ -235,7 +235,7 @@ export class AppController {
 
   @Get('/lockerContracts')
   async getLockerContracts(@Res() res: Response) {
-    await this.appService.getLockerToken(res);
+    await this.appService.getLockerContracts(res);
   }
 
   @Get('/lockerContracts:creator')
