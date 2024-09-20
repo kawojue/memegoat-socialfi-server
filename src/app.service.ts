@@ -981,13 +981,23 @@ export class AppService {
     });
   }
 
-  async getLockerContractsByCreator(
+  async getLockerContractByCreator(
     res: Response,
     creator: string,
     token: string,
   ) {
     const data = await this.prisma.lockerContracts.findFirst({
       where: { creator: creator, tokenAddress: token },
+      orderBy: { createdAt: 'desc' },
+    });
+    this.response.sendSuccess(res, StatusCodes.OK, {
+      data: data,
+    });
+  }
+
+  async getAllLockerContractsByCreator(res: Response, creator: string) {
+    const data = await this.prisma.lockerContracts.findMany({
+      where: { creator: creator },
       orderBy: { createdAt: 'desc' },
     });
     this.response.sendSuccess(res, StatusCodes.OK, {
