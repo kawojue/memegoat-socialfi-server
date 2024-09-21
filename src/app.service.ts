@@ -1010,7 +1010,7 @@ export class AppService {
   async getAllParentContracts(res: Response) {
     const data = await this.prisma.lockerContractsV2.findMany({
       where: { type: CAType.Parent },
-      orderBy: { createdAt: 'desc', tokenAddress: 'asc' },
+      orderBy: { createdAt: 'desc' },
     });
     this.response.sendSuccess(res, StatusCodes.OK, {
       data: data,
