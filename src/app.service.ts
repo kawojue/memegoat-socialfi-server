@@ -1299,7 +1299,7 @@ export class AppService {
   }
 
   async getProposal(res: Response, contract: string) {
-    const data = await this.prisma.proposals.findFirst({
+    const data = await this.prisma.proposals.findUnique({
       where: { address: contract },
     });
     this.response.sendSuccess(res, StatusCodes.OK, {
