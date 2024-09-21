@@ -11,7 +11,7 @@ export class ProposalDTO {
   @ApiProperty({
     example: 'Increase Staking Rewards for Token Holders',
   })
-  @IsArray()
+  @IsString()
   title: string;
 
   @ApiProperty({
@@ -24,6 +24,6 @@ export class ProposalDTO {
   @ApiProperty({
     example: ['a', 'b', 'c', 'd'],
   })
-  @IsString()
+  @IsArray()
   options: string[];
 }
