@@ -256,6 +256,24 @@ model LockerContracts {
     createdAt       DateTime @default(now())
 }
 
+enum CAType {
+  Parent
+  Child
+}
+
+model LockerContractsV2 {
+    id              String   @id @default(uuid()) @db.Uuid
+    contractAddress String   
+    tokenAddress    String
+    user            String
+    txId            String
+    type            CAType
+    tokenName       String?
+    tokenImg        String?
+    tokenSymbol     String?
+    createdAt       DateTime @default(now())
+}
+
 model DexFees {
     id        String   @id @default(uuid()) @db.Uuid
     token     String   @unique

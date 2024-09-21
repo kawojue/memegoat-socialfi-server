@@ -17,11 +17,13 @@ import { CloudflareService } from './cloudflare/cloudflare.service';
 import { token, TxnVolumeService, txVolumeOutput } from 'lib/txVolume.service';
 import { contractDTO, ContractService } from 'lib/contract.service';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { LockerDTO, LockerDTOV2 } from './dto/locker.dto';
+import { LockerDTO, LockerDTOV2, LockerDTOV3 } from './dto/locker.dto';
 import { FeeVolumeService } from 'lib/feeVol.service';
 import { GoogleSheetsService } from 'lib/gsheet.service';
 import { PoolService, recordDTOV3 } from 'lib/pool.service';
 import BigNumber from 'bignumber.js';
+import { CAType, LockerContractsV2 } from '@prisma/client';
+import { STATUS_CODES } from 'http';
 
 @Injectable()
 export class AppService {
@@ -959,35 +961,42 @@ export class AppService {
     });
   }
 
-  async recordLockerContracts(res: Response, dto: LockerDTOV2) {
-    const lock = await this.prisma.lockerContracts.findUnique({
-      where: { contractAddress: dto.contractAddress },
-    });
+  async addLockerContractV3(res: Response, dto: LockerDTOV3) {
+    const prisma = this.prisma;
+    try {
+      await prisma.$transaction(async (tx) => {
+        await tx.lockerContractsV2.create({
+          data: { ...dto, type: CAType.Parent },
+        });
 
-    if (lock) {
-      return this.response.sendError(res, StatusCodes.OK, 'Already exists');
+        const lockerPromises = dto.addresses.map(async (address) => {
+          await tx.lockerContractsV2.create({
+            data: {
+              ...dto,
+              type: CAType.Child,
+              user: address,
+            },
+          });
+        });
+
+        await Promise.all(lockerPromises);
+      });
+
+      this.response.sendSuccess(res, StatusCodes.OK, {
+        data: `${dto.tokenAddress} and ${dto.addresses.length} addresses added successfully`,
+      });
+    } catch (error) {
+      this.response.sendError(
+        res,
+        StatusCodes.BadRequest,
+        'Unable to add addresses',
+      );
     }
-
-    await this.prisma.lockerContracts.create({ data: dto });
-    this.response.sendSuccess(res, StatusCodes.OK, {
-      data: `${dto.tokenAddress} added`,
-    });
   }
 
-  async getLockerContracts(res: Response) {
-    const data = await this.prisma.lockerContracts.findMany();
-    this.response.sendSuccess(res, StatusCodes.OK, {
-      data: data,
-    });
-  }
-
-  async getLockerContractByCreator(
-    res: Response,
-    creator: string,
-    token: string,
-  ) {
-    const data = await this.prisma.lockerContracts.findFirst({
-      where: { creator: creator, tokenAddress: token },
+  async getAllLockerContractsByUser(res: Response, user: string) {
+    const data = await this.prisma.lockerContractsV2.findMany({
+      where: { user },
       orderBy: { createdAt: 'desc' },
     });
     this.response.sendSuccess(res, StatusCodes.OK, {
@@ -995,9 +1004,9 @@ export class AppService {
     });
   }
 
-  async getAllLockerContractsByCreator(res: Response, creator: string) {
-    const data = await this.prisma.lockerContracts.findMany({
-      where: { creator: creator },
+  async getAllParentContracts(res: Response) {
+    const data = await this.prisma.lockerContractsV2.findMany({
+      where: { type: CAType.Parent },
       orderBy: { createdAt: 'desc' },
     });
     this.response.sendSuccess(res, StatusCodes.OK, {

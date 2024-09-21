@@ -25,7 +25,7 @@ import { ResponseService } from 'lib/response.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CookieAuthGuard } from './jwt/cookie-auth.guard';
 import { CampaignRequestDTO } from './dto/compaign-req.dto';
-import { LockerDTO, LockerDTOV2 } from './dto/locker.dto';
+import { LockerDTO, LockerDTOV2, LockerDTOV3 } from './dto/locker.dto';
 import { recordDTOV3 } from 'lib/pool.service';
 
 @Controller()
@@ -229,30 +229,21 @@ export class AppController {
   }
 
   @Post('/lockerContracts')
-  async recordLockerContracts(@Res() res: Response, @Body() body: LockerDTOV2) {
-    await this.appService.recordLockerContracts(res, body);
+  async recordLockerContracts(@Res() res: Response, @Body() body: LockerDTOV3) {
+    await this.appService.addLockerContractV3(res, body);
   }
 
   @Get('/lockerContracts')
   async getLockerContracts(@Res() res: Response) {
-    await this.appService.getLockerContracts(res);
+    await this.appService.getAllParentContracts(res);
   }
 
   @Get('/lockerContracts')
-  async getAllLockerContractsByCreator(
+  async getAllLockerContractsByUser(
     @Res() res: Response,
-    @Query('creator') creator: string,
+    @Query('user') user: string,
   ) {
-    await this.appService.getAllLockerContractsByCreator(res, creator);
-  }
-
-  @Get('/lockerContract')
-  async getLockerContractsByCreator(
-    @Res() res: Response,
-    @Query('creator') creator: string,
-    @Query('token') token: string,
-  ) {
-    await this.appService.getLockerContractByCreator(res, creator, token);
+    await this.appService.getAllLockerContractsByUser(res, user);
   }
 
   @Get('/chart')
