@@ -25,7 +25,7 @@ import { ResponseService } from 'lib/response.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CookieAuthGuard } from './jwt/cookie-auth.guard';
 import { CampaignRequestDTO } from './dto/compaign-req.dto';
-import { LockerDTO, LockerDTOV2, LockerDTOV3 } from './dto/locker.dto';
+import { LockerDTO, LockerDTOV3 } from './dto/locker.dto';
 import { recordDTOV3 } from 'lib/pool.service';
 
 @Controller()
@@ -259,6 +259,16 @@ export class AppController {
   @Get('/balance')
   async fetchBalance(@Res() res: Response, @Query() body: BalanceDTO) {
     await this.appService.getBalances(res, body);
+  }
+
+  @Get('/proposals')
+  async getProposals(@Res() res: Response, @Query('ended') ended: boolean) {
+    await this.appService.getProposals(res, ended);
+  }
+
+  @Get('/proposals')
+  async getProposal(@Res() res: Response, @Query('address') address: string) {
+    await this.appService.getProposal(res, address);
   }
 
   @Get('/testSheetsAPI')

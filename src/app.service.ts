@@ -17,13 +17,12 @@ import { CloudflareService } from './cloudflare/cloudflare.service';
 import { token, TxnVolumeService, txVolumeOutput } from 'lib/txVolume.service';
 import { contractDTO, ContractService } from 'lib/contract.service';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { LockerDTO, LockerDTOV2, LockerDTOV3 } from './dto/locker.dto';
+import { LockerDTO, LockerDTOV3 } from './dto/locker.dto';
 import { FeeVolumeService } from 'lib/feeVol.service';
 import { GoogleSheetsService } from 'lib/gsheet.service';
 import { PoolService, recordDTOV3 } from 'lib/pool.service';
 import BigNumber from 'bignumber.js';
-import { CAType, LockerContractsV2 } from '@prisma/client';
-import { STATUS_CODES } from 'http';
+import { CAType } from '@prisma/client';
 
 @Injectable()
 export class AppService {
@@ -1287,5 +1286,24 @@ export class AppService {
       console.error(err);
       return this.response.sendError(res, StatusCodes.BadRequest, err);
     }
+  }
+
+  async getProposals(res: Response, status: boolean) {
+    const data = await this.prisma.proposals.findMany({
+      where: { ended: status },
+      orderBy: { createdAt: 'desc' },
+    });
+    this.response.sendSuccess(res, StatusCodes.OK, {
+      data: data,
+    });
+  }
+
+  async getProposal(res: Response, contract: string) {
+    const data = await this.prisma.proposals.findFirst({
+      where: { address: contract },
+    });
+    this.response.sendSuccess(res, StatusCodes.OK, {
+      data: data,
+    });
   }
 }
