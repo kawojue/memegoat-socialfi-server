@@ -970,17 +970,19 @@ export class AppService {
           data: { ...parentData, type: CAType.Parent },
         });
 
-        const lockerPromises = addresses.map(async (address) => {
-          await tx.lockerContractsV2.create({
-            data: {
-              ...parentData,
-              type: CAType.Child,
-              user: address,
-            },
+        if (addresses.length > 0) {
+          const lockerPromises = addresses.map(async (address) => {
+            await tx.lockerContractsV2.create({
+              data: {
+                ...parentData,
+                type: CAType.Child,
+                user: address,
+              },
+            });
           });
-        });
 
-        await Promise.all(lockerPromises);
+          await Promise.all(lockerPromises);
+        }
       });
 
       this.response.sendSuccess(res, StatusCodes.OK, {
