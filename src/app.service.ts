@@ -965,14 +965,15 @@ export class AppService {
     const prisma = this.prisma;
     try {
       await prisma.$transaction(async (tx) => {
+        const { addresses, ...parentData } = dto;
         await tx.lockerContractsV2.create({
-          data: { ...dto, type: CAType.Parent },
+          data: { ...parentData, type: CAType.Parent },
         });
 
-        const lockerPromises = dto.addresses.map(async (address) => {
+        const lockerPromises = addresses.map(async (address) => {
           await tx.lockerContractsV2.create({
             data: {
-              ...dto,
+              ...parentData,
               type: CAType.Child,
               user: address,
             },
