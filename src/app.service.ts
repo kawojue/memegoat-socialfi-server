@@ -986,6 +986,7 @@ export class AppService {
         data: `${dto.tokenAddress} and ${dto.addresses.length} addresses added successfully`,
       });
     } catch (error) {
+      console.log(error);
       this.response.sendError(
         res,
         StatusCodes.BadRequest,
