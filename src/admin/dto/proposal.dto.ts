@@ -1,4 +1,4 @@
-import { IsArray, IsNumber, IsString } from 'class-validator';
+import { IsArray, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class ProposalDTO {
@@ -18,7 +18,7 @@ export class ProposalDTO {
     example:
       'Should we lower the transaction fees on our platform by 2%? This would make transactions more affordable for all users',
   })
-  @IsNumber()
+  @IsString()
   description: string;
 
   @ApiProperty({
