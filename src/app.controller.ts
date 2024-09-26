@@ -266,7 +266,7 @@ export class AppController {
     await this.appService.getProposals(res, ended);
   }
 
-  @Get('/proposals')
+  @Get('/proposal')
   async getProposal(@Res() res: Response, @Query('address') address: string) {
     await this.appService.getProposal(res, address);
   }
