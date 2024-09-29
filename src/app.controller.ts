@@ -271,6 +271,14 @@ export class AppController {
     await this.appService.getProposal(res, address);
   }
 
+  @Get('/stxCity')
+  async getSTXCityTokens(
+    @Res() res: Response,
+    @Query('address') address: string,
+  ) {
+    await this.appService.getSTxCityTokens(res, address);
+  }
+
   @Get('/testSheetsAPI')
   async getSheet(@Res() res: Response) {
     await this.appService.getSheet(res);

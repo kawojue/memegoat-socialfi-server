@@ -1306,4 +1306,11 @@ export class AppService {
       data: data,
     });
   }
+
+  async getSTxCityTokens(res: Response, address: string) {
+    const data = await this.apiService.getSTXCityTokens(address);
+    this.response.sendSuccess(res, StatusCodes.OK, {
+      data: data,
+    });
+  }
 }
