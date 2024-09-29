@@ -174,13 +174,12 @@ export class ApiService {
     }
   }
 
-  //SP2470N2A31DGDHX541MK2FKJSRHSCW907S5KKYTR
   async getSTXCityTokens(address: string) {
     const url = `https://stx.city/api/profile/token_creation?deployed_by=${address}`;
     try {
       const response = this.httpService.get(url);
       const result = await lastValueFrom(response);
-      return result.data;
+      return result.data.deployed_tokens;
     } catch (err) {
       if (err?.response?.data?.message) {
         throw new HttpException(err.response.data.message, err.response.status);
